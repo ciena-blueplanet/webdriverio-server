@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h1= title
+  p Upload a file
+
+  form(action="/", method="post", enctype="multipart/form-data")
+      input(type="file", name="tarball")
+      button(type="submit") Submit
