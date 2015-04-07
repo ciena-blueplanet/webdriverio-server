@@ -45,10 +45,11 @@ app.get('/', function (req, res) {
 app.post('/', function (req, res) {
     if (done) {
         var filename = req.files.tarball.name;
-        // res.send('File uploaded. ' + req.files.tarball.name);
         processUpload.newFile(filename, res);
     }
 });
+
+app.use('/screenshots', express.static('screenshots'));
 
 /*********************************************************************
  *                          Error handling                           *

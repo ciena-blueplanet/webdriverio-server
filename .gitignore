@@ -1,27 +1,6 @@
-# External Dependencies
-node_modules
-
-# Generated Directories
-/build
-/bundle
-/coverage
-/docs
-
-# Generated Files
-demo/**/*.html
-spec/e2e/test-config.json
-/cy-toolkit.json
-
-# WebdriverCSS comparisons
-spec/e2e/screenshots/**/*.png
-!spec/e2e/screenshots/*.baseline.png
-
-# OSX Temporary Files
-.DS_Store
-
-# IDE/Editor Files
+npm-debug.log
+build/node_modules
+screenshots
+uploads
 .*.swp
-*~
-.idea
-
-# Project-specific Ignores
+node_modules/
