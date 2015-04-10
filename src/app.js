@@ -45,7 +45,8 @@ app.get('/', function (req, res) {
 app.post('/', function (req, res) {
     if (done) {
         var filename = req.files.tarball.name;
-        processUpload.newFile(filename, res);
+        var entryPoint = req.body['entry-point'] || 'demo';
+        processUpload.newFile(filename, entryPoint, res);
     }
 });
 
