@@ -1,39 +1,47 @@
 /**
  * Gruntfile for webdriverio-server
- * @copyright 2015 . All rights reserved.
+ * @copyright 2015 Cyan Inc. All rights reserved.
  */
 
 'use strict';
 
-var _ = require('lodash');
-var helper = require('cy-toolkit').gruntHelper;
-
-var allJsFiles = [
-    './Gruntfile.js',
-    'src/**/*.js',
-    'spec/**/*.js',
-];
-
 module.exports = function (grunt) {
 
-    // initialize the helper with the grunt instance
-    helper.init(grunt);
+    grunt.loadNpmTasks('grunt-eslint');
+    grunt.loadNpmTasks('grunt-filenames');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
-        eslint: helper.opts.eslint({
-            files: allJsFiles,
-        }),
+        eslint: {
+            files: [
+                './Gruntfile.js',
+                'bin/**/*.js',
+                'src/**/*.js',
+                'spec/**/*.js',
+            ],
 
-        filenames: helper.opts.filenames({
-            files: _.without(allJsFiles, './Gruntfile.js'),
-        }),
+            options: {
+                config: '.eslintrc',
+                rulesdir: ['node_modules/beaker/src/eslint-rules'],
+            },
+        },
 
-        jsdoc: helper.opts.jsdoc(),
+        filenames: {
+            src: [
+                'bin/**/*.*',
+                'src/**/*.*',
+                'spec/**/*.*',
+                '!**/Gruntfile.js',
+                '!node_modules/**',
+            ],
+
+            options: {
+                valid: /^[a-z0-9\-\.]+\.([^\.]+)$/,
+            },
+        },
     });
 
-    // register aliases (dependencies will be loaded when they are run)
-    helper.registerTaskAlias('default', []);
-    helper.registerTaskAlias('lint', ['eslint', 'filenames']);
+    grunt.registerTask('lint', ['eslint', 'filenames']);
+    grunt.registerTask('default', []);
 };

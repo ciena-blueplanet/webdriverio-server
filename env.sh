@@ -4,7 +4,7 @@
 #
 
 # Source the base environment from the toolkit
-source node_modules/cy-toolkit/files/base_env.sh
+source node_modules/beaker/files/base_env.sh
 
 # Environment variables needed to build cairo, a dependency of webdrivercss
 if [ `uname` = 'Darwin' ]; then  # OS X

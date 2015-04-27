@@ -3,28 +3,28 @@
 # Copyright (c) 2015 . All rights reserved.
 #
 
-GITHUB_HOST := "github.com"
-REPO := "/webdriverio-server"
+GITHUB_HOST := github.com
+REPO := cyaninc/webdriverio-server
 NODE_COVERAGE_DIR := coverage
 
--include node_modules/cy-toolkit/files/make/common.mk
--include node_modules/cy-toolkit/files/make/gh-pages.mk
--include node_modules/cy-toolkit/files/make/node-targets.mk
+-include node_modules/beaker/make/common.mk
+-include node_modules/beaker/make/gh-pages.mk
+-include node_modules/beaker/make/node-targets.mk
 
-.PHONY: install test coverage report-coverage release version-bumped bump-version docs ghp-update
+.PHONY: install clean test coverage release ghp-update
 
 install:
 	$(HIDE)npm install
+
+clean:
+	$(HIDE)rm -rf $(NODE_COVERAGE_DIR)
 
 test: node-test
 
 coverage: node-coverage
 
-report-coverage:
-	$(HIDE)echo "Reporting Coverage not implemented yet"
-
 release:
 	$(HIDE)echo "Publishing version $(VERSION)"
 	$(HIDE)npm publish .
 
-ghp-update: jsdoc ghp-clean ghp-checkout ghp-copy-node ghp-publish
+ghp-update: ghp-clean ghp-checkout ghp-copy-node ghp-publish
