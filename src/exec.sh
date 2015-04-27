@@ -44,13 +44,13 @@ function testIt {
 echo Processing $TARBALL...
 mkdir -p uploads/run
 mkdir -p screenshots
+mkdir -p build-${TIMESTAMP}
 
-cd build # IN BUILD DIRECTORY =============================
+cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 testIt
-rm -rf demo
-tar -cf ../screenshots/$TIME_STAMP.tar spec/e2e/screenshots
-rm -rf spec
+tar -cf ../screenshots/${TIMESTAMP}.tar spec/e2e/screenshots
 cd - # IN ROOT DIRECTORY ==================================
+rm -rf build-${TIMESTAMP}
 
 if [[ $TEST_STATUS != 0 ]]; then exit $TEST_STATUS; fi

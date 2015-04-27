@@ -5,8 +5,9 @@
 
 'use strict';
 
-var ns = {};
 var childProcess = require('child_process');
+
+var ns = {};
 
 var strip = function (data) {
     return data.toString().replace(/(\r\n|\n|\r)/gm, '');
@@ -24,7 +25,7 @@ var strip = function (data) {
 ns.newFile = function (filename, entryPoint, res) {
     console.log('------------------- newFile');
     var info = [];
-    var seconds = seconds = Math.floor(new Date().getTime() / 1000);
+    var seconds = Math.floor(new Date().getTime() / 1000);
     var child = childProcess.spawn('bash', ['./src/exec.sh', filename, entryPoint, seconds]);
 
     child.stdout.on('data', function (data) {
