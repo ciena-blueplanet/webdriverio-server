@@ -1,3 +1,8 @@
+/**
+ * @author Peter Banka [@psbanka](https://github.com/psbanka)
+ * @copyright 2015 Cyan Inc. All rights reserved.
+ */
+
 'use strict';
 
 var express = require('express');
@@ -34,7 +39,7 @@ app.use(multer({
     onFileUploadComplete: function (file) {
         console.log(file.fieldname + ' uploaded to  ' + file.path);
         done = true;
-    }
+    },
 }));
 
 /* GET home page. */
@@ -73,7 +78,7 @@ if (app.get('env') === 'development') {
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
-            error: err
+            error: err,
         });
     });
 }
@@ -84,7 +89,7 @@ app.use(function (err, req, res) {
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
-        error: {}
+        error: {},
     });
 });
 

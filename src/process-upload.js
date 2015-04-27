@@ -1,10 +1,15 @@
+/**
+ * @author Peter Banka [@psbanka](https://github.com/psbanka)
+ * @copyright 2015 Cyan Inc. All rights reserved.
+ */
+
 'use strict';
 
 var ns = {};
 var childProcess = require('child_process');
 
 var strip = function (data) {
-    return data.toString().replace(/(\r\n|\n|\r)/gm,"");
+    return data.toString().replace(/(\r\n|\n|\r)/gm, '');
 };
 
 /**
@@ -14,6 +19,7 @@ var strip = function (data) {
  * response for the requester.
  * @param {String} filename - the name of the tar file that was uploaded
  * @param {String} entryPoint - the URL to start testing
+ * @param {Response} res - the express response object
  */
 ns.newFile = function (filename, entryPoint, res) {
     console.log('------------------- newFile');
@@ -21,15 +27,15 @@ ns.newFile = function (filename, entryPoint, res) {
     var seconds = seconds = Math.floor(new Date().getTime() / 1000);
     var child = childProcess.spawn('bash', ['./src/exec.sh', filename, entryPoint, seconds]);
 
-    child.stdout.on('data', function(data) {
+    child.stdout.on('data', function (data) {
         console.log('stdout: ' + strip(data));
-        info.push(data)
+        info.push(data);
     });
-    child.stderr.on('data', function(data) {
+    child.stderr.on('data', function (data) {
         console.log('sterr: ' + strip(data));
-        info.push(data)
+        info.push(data);
     });
-    child.on('exit', function(code) {
+    child.on('exit', function (code) {
         console.log('closing code: ' + code);
         var output = {
             exitCode: code,
