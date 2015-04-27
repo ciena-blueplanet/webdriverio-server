@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "./bin/www.js",
-    "test": "make lint && make node-test"
+    "test": "make lint && make test"
   },
   "bin": {
     "webdriverio-server": "./bin/www.js"

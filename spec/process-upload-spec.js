@@ -3,6 +3,8 @@
  * @copyright 2015 Cyan Inc. All rights reserved.
  */
 
+/* eslint-disable max-nested-callbacks */
+
 'use strict';
 
 var childProcess = require('child_process');
