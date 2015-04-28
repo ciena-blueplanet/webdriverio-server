@@ -13,9 +13,9 @@
     "selenium"
   ],
   "author": "Peter Banka",
-  "contributors": [{
+  "contributors": [
     "Adam Meadows <adam.meadows@gmail.com> (https://github.com/job13er)"
-  }],
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cyaninc/webdriverio-server/issues"
