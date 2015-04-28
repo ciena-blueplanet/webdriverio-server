@@ -1,8 +1,31 @@
 {
   "name": "webdriverio-server",
   "version": "0.2.0",
+  "description": "Toolkit for building web interfaces",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:cyaninc/webdriverio-server.git"
+  },
+  "keywords": [
+    "e2e",
+    "testing",
+    "webdriverio",
+    "selenium"
+  ],
+  "author": "Peter Banka",
+  "contributors": [{
+    "Adam Meadows <adam.meadows@gmail.com> (https://github.com/job13er)"
+  }],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cyaninc/webdriverio-server/issues"
+  },
+  "homepage": "https://github.com/cyaninc/webdriverio-server",
   "devDependencies": {
     "beaker": "^2.0.0"
+  },
+  "peerDependencies": {
+    "webdriver-manager": "0.0.7"
   },
   "dependencies": {
     "body-parser": "~1.12.0",
@@ -16,8 +39,10 @@
   },
   "scripts": {
     "start": "./bin/www.js",
-    "test": "make lint && make test"
+    "test": "make lint && make test",
+    "postinstall": "webdriver-manager update --standalone && cd build && make install"
   },
+  "preferGlobal": true,
   "bin": {
     "webdriverio-server": "./bin/www.js"
   }

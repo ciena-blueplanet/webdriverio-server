@@ -44,7 +44,7 @@ function testIt {
 echo Processing $TARBALL...
 mkdir -p uploads/run
 mkdir -p screenshots
-mkdir -p build-${TIMESTAMP}
+cp -a build build-${TIMESTAMP}
 
 cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
