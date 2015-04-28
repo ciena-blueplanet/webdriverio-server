@@ -56,7 +56,7 @@ app.post('/', function (req, res) {
     }
 });
 
-app.use('/screenshots', express.static(path.join(__dirnam, '..', 'screenshots')));
+app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')));
 
 /*********************************************************************
  *                          Error handling                           *

@@ -8,7 +8,6 @@
 'use strict';
 
 var childProcess = require('child_process');
-var path = require('path');
 var t = require('beaker').transplant(__dirname);
 var processUpload = t.require('./process-upload');
 
