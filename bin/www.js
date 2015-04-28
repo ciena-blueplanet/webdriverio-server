@@ -12,7 +12,7 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('webdriverio-server:server');
+var debug = require('debug')('server');
 var http = require('http');
 
 var app = require('../src/app');
@@ -38,19 +38,20 @@ function normalizePort(val) {
     return false;
 }
 
-app.set('port', normalizePort(process.env.PORT || '3000'));
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
 
 var server = http.createServer(app);
 
 // Listen on provided port, on all network interfaces.
-server.listen(app.port);
+server.listen(port);
 
 server.on('error', function (error) {
     if (error.syscall !== 'listen') {
         throw error;
     }
 
-    var bind = typeof app.port === 'string' ? 'Pipe ' + app.port : 'Port ' + app.port;
+    var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
     // handle specific listen errors with friendly messages
     switch (error.code) {

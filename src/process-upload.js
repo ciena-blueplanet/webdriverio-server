@@ -6,8 +6,12 @@
 'use strict';
 
 var childProcess = require('child_process');
+var debug = require('debug')('server');
+var path = require('path');
 
-var ns = {};
+var ns = {
+    scriptPath: path.join(__dirname, './exec.sh'),
+};
 
 var strip = function (data) {
     return data.toString().replace(/(\r\n|\n|\r)/gm, '');
@@ -23,21 +27,21 @@ var strip = function (data) {
  * @param {Response} res - the express response object
  */
 ns.newFile = function (filename, entryPoint, res) {
-    console.log('------------------- newFile');
+    debug('------------------- newFile');
     var info = [];
     var seconds = Math.floor(new Date().getTime() / 1000);
-    var child = childProcess.spawn('bash', ['./src/exec.sh', filename, entryPoint, seconds]);
+    var child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds]);
 
     child.stdout.on('data', function (data) {
-        console.log('stdout: ' + strip(data));
+        debug('stdout: ' + strip(data));
         info.push(data);
     });
     child.stderr.on('data', function (data) {
-        console.log('sterr: ' + strip(data));
+        debug('sterr: ' + strip(data));
         info.push(data);
     });
     child.on('exit', function (code) {
-        console.log('closing code: ' + code);
+        debug('closing code: ' + code);
         var output = {
             exitCode: code,
             info: info.join(''),

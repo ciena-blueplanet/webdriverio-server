@@ -39,11 +39,11 @@
   },
   "scripts": {
     "start": "./bin/www.js",
-    "test": "make lint && make test",
-    "postinstall": "webdriver-manager update --standalone && cd build && make install"
+    "test": "make lint && make test"
   },
   "preferGlobal": true,
   "bin": {
-    "webdriverio-server": "./bin/www.js"
+    "webdriverio-server": "./bin/www.js",
+    "webdriverio-server-init": "./bin/init.sh"
   }
 }

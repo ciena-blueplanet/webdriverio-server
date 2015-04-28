@@ -5,6 +5,7 @@
 
 'use strict';
 
+var debug = require('debug')('server');
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
@@ -29,15 +30,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 var done = false;
 
 app.use(multer({
-    dest: './uploads/',
+    dest: path.join(__dirname, '..', 'uploads'),
     rename: function (fieldname, filename) {
-        return filename + Date.now();
+        return filename + '.' + Date.now();
     },
     onFileUploadStart: function (file) {
-        console.log(file.originalname + ' is starting ...');
+        debug(file.originalname + ' is starting ...');
     },
     onFileUploadComplete: function (file) {
-        console.log(file.fieldname + ' uploaded to  ' + file.path);
+        debug(file.fieldname + ' uploaded to  ' + file.path);
         done = true;
     },
 }));
@@ -55,7 +56,7 @@ app.post('/', function (req, res) {
     }
 });
 
-app.use('/screenshots', express.static('screenshots'));
+app.use('/screenshots', express.static(path.join(__dirnam, '..', 'screenshots')));
 
 /*********************************************************************
  *                          Error handling                           *
@@ -63,7 +64,7 @@ app.use('/screenshots', express.static('screenshots'));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    console.log(req);
+    debug(req);
     var err = new Error('Not Found');
     err.status = 404;
     next(err);

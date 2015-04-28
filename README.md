@@ -24,8 +24,12 @@ These instructions assume that you have set up a server (either Mac or Ubuntu) w
 ### Installation
 
     npm install -g webdriverio-server
+    webdriverio-server-init
+    webdriver-manager update --standalone
 
-This will install both the `webdriverio-server` and `webdriver-manager` alongside it to be able to run selenium.
+The first line will install both the `webdriverio-server` and `webdriver-manager` alongside it. The second line will
+initialize the build environment for the `webriverio-server` And the third line will update the standalone selenium
+server.
 
 ### Running the selenium server
 
@@ -43,6 +47,11 @@ port 4444 on your server.
 Now you're ready to run the web service which will respond to test-upload requests:
 
     webdriverio-server
+
+If you'd like to override the port being listened to, or perhapse get some verbose debugging output, you can turn
+those on using environment variables
+
+    PORT=3001 DEBUG=server webdriverio-server
 
 ## Using the server
 
