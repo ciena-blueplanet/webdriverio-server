@@ -1,6 +1,18 @@
+# External Dependencies
 npm-debug.log
-build/node_modules
+node_modules
+
+# Generated Directories
+build-*
+
+# OSX Temporary Files
+.DS_Store
+
+# IDE/Editor Files
+.*.swp
+*~
+.idea
+
+# Project-specific Ignores
 screenshots
 uploads
-.*.swp
-node_modules/
