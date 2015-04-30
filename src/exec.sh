@@ -22,19 +22,11 @@ set -e
 set -u
 
 echo '-INPUT VARIABLES---------------'
-echo '.'
-echo $0 'WHAT IS THIS?'
-echo '.'
 echo build-index: $1
-echo '.'
 echo tarball: $2
-echo '.'
 echo entry-point: $3
-echo '.'
 echo timestamp: $4
-echo '.'
 echo '-------------------------------'
-echo '.'
 
 BUILD_INDEX=$1
 TARBALL=$2
@@ -72,7 +64,6 @@ cd $DIR/..
 echo Processing $TARBALL...
 mkdir -p uploads/run
 mkdir -p screenshots
-#cp -a build build-${TIMESTAMP}
 mv build-$BUILD_INDEX build-${TIMESTAMP}
 
 cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
