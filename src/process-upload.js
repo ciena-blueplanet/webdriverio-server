@@ -44,7 +44,7 @@ var watchChild = function (child, seconds) {
     // TODO: setTimeout to delete the screenshots file in 30s
     child.on('exit', function (code) {
         debug('closing code: ' + code);
-        console.log('Returning ' + info.length + ' lines of output');
+        debug('Returning ' + info.length + ' lines of output');
         var output = {
             exitCode: code,
             info: info.join(''),
@@ -53,7 +53,7 @@ var watchChild = function (child, seconds) {
         try {
             output = JSON.stringify(output);
         } catch (e) {
-            console.log('ERROR: ', e);
+            debug('ERROR: ', e);
             output = {
                 exitCode: code,
                 info: e.toString(),

@@ -10,6 +10,7 @@
 var childProcess = require('child_process');
 var t = require('beaker').transplant(__dirname);
 var processUpload = t.require('./process-upload');
+var fs = require('fs');
 
 describe('process-upload', function () {
     var child;
@@ -21,12 +22,12 @@ describe('process-upload', function () {
         };
         spyOn(childProcess, 'spawn').and.returnValue(child);
         spyOn(console, 'log');
+        spyOn(fs, 'existsSync').and.returnValue(true);
     });
 
     describe('.newFile()', function () {
         var res, seconds;
         beforeEach(function () {
-            childProcess.spawn('bash', ['echo', 'hi']);
             res = jasmine.createSpyObj('res', ['send', 'end']);
             seconds = Math.floor(new Date().getTime() / 1000);
             processUpload.newFile('filename', 'entry-point', res);
@@ -35,7 +36,7 @@ describe('process-upload', function () {
         it('spawns a new process', function () {
             expect(childProcess.spawn).toHaveBeenCalledWith('bash', [
                 processUpload.scriptPath,
-                1,
+                0,
                 'filename',
                 'entry-point',
                 seconds,

@@ -18,6 +18,11 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 cd $DIR/../build
 npm install
 cd ..
-cp -a build build-1
-cp -a build build-2
-cp -a build build-3
+mkdir build-1
+mkdir build-2
+mkdir build-3
+mkdir build-4
+ln -s ../build/node_modules build-1/node_modules
+ln -s ../build/node_modules build-2/node_modules
+ln -s ../build/node_modules build-3/node_modules
+ln -s ../build/node_modules build-4/node_modules
