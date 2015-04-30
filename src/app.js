@@ -35,7 +35,7 @@ app.use(multer({
     rename: function (fieldname, filename) {
         return filename + '.' + Date.now();
     },
-    onFileUploadStart: function (file) {
+    onFileUploadStart: function () {
         debug('cient request is starting ...');
     },
     onFileUploadComplete: function (file) {
@@ -47,14 +47,13 @@ app.use(multer({
 app.get(/^\/status\/(\d+)$/, function (req, res) {
     var id = req.params[0];
     var filename = 'screenshots/output-' + id + '.json';
-    console.log("filename: ", filename);
     fs.exists(filename, function (exists) {
         if (exists) {
             res.status(200).send('finished');
         } else {
             res.status(404).send('Not found');
         }
-        res.end()
+        res.end();
     });
 });
 
@@ -78,7 +77,7 @@ app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')
  *********************************************************************/
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use(function (req, res) {
     console.log(req.path);
     res.status(404).send('Not Found');
     res.end();
