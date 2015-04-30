@@ -35,6 +35,7 @@ describe('process-upload', function () {
         it('spawns a new process', function () {
             expect(childProcess.spawn).toHaveBeenCalledWith('bash', [
                 processUpload.scriptPath,
+                1,
                 'filename',
                 'entry-point',
                 seconds,
@@ -61,11 +62,7 @@ describe('process-upload', function () {
             });
 
             it('sends response', function () {
-                expect(res.send).toHaveBeenCalledWith(JSON.stringify({
-                    exitCode: 13,
-                    info: 'some-stdout-datasome-stderr-data',
-                    output: 'screenshots/' + seconds + '.tar',
-                }));
+                expect(res.send).toHaveBeenCalledWith(seconds.toString());
             });
         });
     });

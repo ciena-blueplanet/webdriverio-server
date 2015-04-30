@@ -22,14 +22,24 @@ set -e
 set -u
 
 echo '-INPUT VARIABLES---------------'
-echo $1
-echo $2
-echo $3
+echo '.'
+echo $0 'WHAT IS THIS?'
+echo '.'
+echo build-index: $1
+echo '.'
+echo tarball: $2
+echo '.'
+echo entry-point: $3
+echo '.'
+echo timestamp: $4
+echo '.'
 echo '-------------------------------'
+echo '.'
 
-TARBALL=$1
-ENTRY_POINT=$2
-TIMESTAMP=$3
+BUILD_INDEX=$1
+TARBALL=$2
+ENTRY_POINT=$3
+TIMESTAMP=$4
 TEST_CONFIG='spec/e2e/test-config.json'
 NODE_SPECS=spec/e2e
 JASMINE_NODE_OPTS='--captureExceptions --verbose'
@@ -62,13 +72,16 @@ cd $DIR/..
 echo Processing $TARBALL...
 mkdir -p uploads/run
 mkdir -p screenshots
-cp -a build build-${TIMESTAMP}
+#cp -a build build-${TIMESTAMP}
+mv build-$BUILD_INDEX build-${TIMESTAMP}
 
 cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 testIt
 tar -cf ../screenshots/${TIMESTAMP}.tar spec/e2e/screenshots
 cd - # IN ROOT DIRECTORY ==================================
-rm -rf build-${TIMESTAMP}
+rm -rf build-${TIMESTAMP}/demo
+rm -rf build-${TIMESTAMP}/spec
+mv build-$TIMESTAMP build-$BUILD_INDEX
 
 if [[ $TEST_STATUS != 0 ]]; then exit $TEST_STATUS; fi
