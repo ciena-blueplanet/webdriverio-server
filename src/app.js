@@ -7,6 +7,7 @@
 
 var debug = require('debug')('server');
 var express = require('express');
+var fs = require('fs');
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
@@ -43,6 +44,20 @@ app.use(multer({
     },
 }));
 
+app.get(/^\/status\/(\d+)$/, function (req, res) {
+    var id = req.params[0];
+    var filename = 'screenshots/output-' + id + '.json';
+    console.log("filename: ", filename);
+    fs.exists(filename, function (exists) {
+        if (exists) {
+            res.status(200).send('finished');
+        } else {
+            res.status(404).send('Not found');
+        }
+        res.end()
+    });
+});
+
 /* GET home page. */
 app.get('/', function (req, res) {
     res.render('index', {title: 'Webdriver server'});
@@ -64,28 +79,12 @@ app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    debug(req);
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+    console.log(req.path);
+    res.status(404).send('Not Found');
+    res.end();
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function (err, req, res) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err,
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
+// error handler
 app.use(function (err, req, res) {
     res.status(err.status || 500);
     res.render('error', {
