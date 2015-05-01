@@ -21,20 +21,21 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 set -e
 set -u
 
-echo '-INPUT VARIABLES---------------'
-echo build-index: $1
-echo tarball: $2
-echo entry-point: $3
-echo timestamp: $4
-echo '-------------------------------'
+TEST_CONFIG='spec/e2e/test-config.json'
+NODE_SPECS=spec/e2e
+JASMINE_NODE_OPTS='--captureExceptions --verbose'
 
 BUILD_INDEX=$1
 TARBALL=$2
 ENTRY_POINT=$3
 TIMESTAMP=$4
-TEST_CONFIG='spec/e2e/test-config.json'
-NODE_SPECS=spec/e2e
-JASMINE_NODE_OPTS='--captureExceptions --verbose'
+
+echo '-INPUT VARIABLES---------------'
+echo build-index: $BUILD_INDEX
+echo tarball: $TARBALL
+echo entry-point: $ENTRY_POINT
+echo timestamp: $TIMESTAMP
+echo '-------------------------------'
 
 # -----------------------------------------------------------------------
 # -                          Testing function                           -

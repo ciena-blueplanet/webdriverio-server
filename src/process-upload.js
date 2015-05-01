@@ -65,7 +65,7 @@ var watchChild = function (child, seconds) {
                 output = 'ERROR';
             }
         }
-        var filename = 'screenshots/output-' + seconds + '.json';
+        var filename = path.join(__dirname, '../screenshots/output-' + seconds + '.json');
         fs.writeFile(filename, output, function (err) {
             if (err) {
                 debug(seconds + ' : UNABLE TO WRITE FILE ' + filename + ' -- ' + err.toString());
@@ -90,18 +90,21 @@ ns.newFile = function (filename, entryPoint, res) {
     debug('START: ------------ ' + seconds);
     var child;
     for (var index = 0; index < 3; index++) {
-        var buildFile = 'build-' + index;
+        var buildDir = path.join(__dirname, '../build-' + index);
         var self = this;
-        if (fs.existsSync(buildFile)) {
+        if (fs.existsSync(buildDir)) {
             // We found a waiting build directory
             child = childProcess.spawn('bash', [self.scriptPath, index, filename, entryPoint, seconds]);
             watchChild(child, seconds);
             res.send(seconds.toString());
             res.end();
-        }
-        if (child) {
             break;
         }
+    }
+    if (!child) {
+        var msg = 'Server is busy. Try again later';
+        debug(msg);
+        res.status(500).send(msg);
     }
 };
 
