@@ -1,6 +1,6 @@
 {
   "name": "webdriverio-server",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Toolkit for building web interfaces",
   "repository": {
     "type": "git",

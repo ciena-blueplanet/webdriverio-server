@@ -46,7 +46,7 @@ app.use(multer({
 
 app.get(/^\/status\/(\d+)$/, function (req, res) {
     var id = req.params[0];
-    var filename = 'screenshots/output-' + id + '.json';
+    var filename = path.join(__dirname, '..', 'screenshots/output-' + id + '.json');
     fs.exists(filename, function (exists) {
         if (exists) {
             res.status(200).send('finished');
