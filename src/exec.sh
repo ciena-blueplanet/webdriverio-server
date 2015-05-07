@@ -67,7 +67,7 @@ function testIt {
         http.port:$HTTP_PORT \
         http.entryPoint:$ENTRY_POINT
 
-	echo "Running jasmine-node tests on port $HTTP_PORT"
+	echo "Running jasmine-node tests with http port $HTTP_PORT and selenium port $SELENIUM_PORT"
     TEST_STATUS=0
     ./node_modules/.bin/jasmine-node $JASMINE_NODE_OPTS $NODE_SPECS || TEST_STATUS=1
 
