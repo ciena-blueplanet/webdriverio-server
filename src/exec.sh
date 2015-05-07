@@ -25,17 +25,24 @@ TEST_CONFIG='spec/e2e/test-config.json'
 NODE_SPECS=spec/e2e
 JASMINE_NODE_OPTS='--captureExceptions --verbose'
 
-BUILD_INDEX=$1
-TARBALL=$2
-ENTRY_POINT=$3
-TIMESTAMP=$4
+TARBALL=$1
+ENTRY_POINT=$2
+TIMESTAMP=$3
 
 echo '-INPUT VARIABLES---------------'
-echo build-index: $BUILD_INDEX
 echo tarball: $TARBALL
 echo entry-point: $ENTRY_POINT
 echo timestamp: $TIMESTAMP
 echo '-------------------------------'
+
+
+# -----------------------------------------------------------------------
+# -                         port lookup function                        -
+# -----------------------------------------------------------------------
+
+function getOpenPort {
+    perl -MSocket -le 'socket S, PF_INET, SOCK_STREAM,getprotobyname("tcp"); $$port = int(rand(1080))+1080; ++$$port until bind S, sockaddr_in($$port,inet_aton("127.1")); print $$port'
+}
 
 # -----------------------------------------------------------------------
 # -                          Testing function                           -
@@ -45,14 +52,27 @@ echo '-------------------------------'
 function testIt {
     echo Testing...
 
-    TEST_PORT=$(perl -MSocket -le 'socket S, PF_INET, SOCK_STREAM,getprotobyname("tcp"); $$port = int(rand(1080))+1080; ++$$port until bind S, sockaddr_in($$port,inet_aton("127.1")); print $$port')
-	kill $(lsof -t -i:$TEST_PORT) 2>/dev/null || echo ''
-	./node_modules/.bin/http-server -s -c-1 -p $TEST_PORT &
-	echo '{ "seleniumServer": "localhost", "url": "http://'$HOSTNAME:$TEST_PORT/$ENTRY_POINT'" }' > $TEST_CONFIG
-	echo "Running jasmine-node tests on port $TEST_PORT"
+    HTTP_PORT=$(getOpenPort)
+	kill $(lsof -t -i:$HTTP_PORT) 2>/dev/null || echo ''
+	./node_modules/.bin/http-server -s -c-1 -p $HTTP_PORT &
+
+    SELENIUM_PORT=$(getOpenPort)
+	kill $(lsof -t -i:$SELENIUM_PORT) 2>/dev/null || echo ''
+	./node_modules/.bin/webdriver-manager start --seleniumPort $SELENIUM_PORT > /dev/null 2>&1 &
+
+    ../bin/replace.js $TEST_CONFIG \
+        selenium.host:localhost \
+        selenium.port:$SELENIUM_PORT \
+        http.host:localhost \
+        http.port:$HTTP_PORT \
+        http.entryPoint:$ENTRY_POINT
+
+	echo "Running jasmine-node tests on port $HTTP_PORT"
     TEST_STATUS=0
     ./node_modules/.bin/jasmine-node $JASMINE_NODE_OPTS $NODE_SPECS || TEST_STATUS=1
-	kill $(lsof -t -i:$TEST_PORT) || echo 'ERROR killing http-server'
+
+	kill $(lsof -t -i:$HTTP_PORT) || echo 'ERROR killing http-server'
+	kill $(lsof -t -i:$SELENIUM_PORT) || echo 'ERROR killing selenium server'
 }
 
 # -----------------------------------------------------------------------
@@ -62,18 +82,15 @@ function testIt {
 # start at the root of the project
 cd $DIR/..
 
-echo Processing $TARBALL...
-mkdir -p uploads/run
-mkdir -p screenshots
-mv build-$BUILD_INDEX build-${TIMESTAMP}
+echo Processing ${TARBALL}...
+mkdir build-${TIMESTAMP}
+ln -s build/node_modules build-${TIMESTAMP}/node_modules
 
 cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 testIt
 tar -cf ../screenshots/${TIMESTAMP}.tar spec/e2e/screenshots
 cd - # IN ROOT DIRECTORY ==================================
-rm -rf build-${TIMESTAMP}/demo
-rm -rf build-${TIMESTAMP}/spec
-mv build-$TIMESTAMP build-$BUILD_INDEX
+rm -rf build-${TIMESTAMP}
 
 if [[ $TEST_STATUS != 0 ]]; then exit $TEST_STATUS; fi
