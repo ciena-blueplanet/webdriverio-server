@@ -45,6 +45,17 @@ function getOpenPort {
 }
 
 # -----------------------------------------------------------------------
+# -                           port wait function                        -
+# -----------------------------------------------------------------------
+
+function waitForPort {
+    while [ $(lsof -iTCP -sTCP:LISTEN -P | grep -v $1) ];
+    do
+        sleep 1;
+    done
+}
+
+# -----------------------------------------------------------------------
 # -                          Testing function                           -
 # -----------------------------------------------------------------------
 
@@ -55,10 +66,12 @@ function testIt {
     HTTP_PORT=$(getOpenPort)
 	kill $(lsof -t -i:$HTTP_PORT) 2>/dev/null || echo ''
 	./node_modules/.bin/http-server -s -c-1 -p $HTTP_PORT &
+    waitForPort $HTTP_PORT
 
     SELENIUM_PORT=$(getOpenPort)
 	kill $(lsof -t -i:$SELENIUM_PORT) 2>/dev/null || echo ''
 	./node_modules/.bin/webdriver-manager start --seleniumPort $SELENIUM_PORT > /dev/null 2>&1 &
+    waitForPort $SELENIUM_PORT
 
     ../bin/replace.js $TEST_CONFIG \
         selenium.host:localhost \
