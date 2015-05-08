@@ -93,4 +93,4 @@ tar -cf ../screenshots/${TIMESTAMP}.tar spec/e2e/screenshots
 cd - # IN ROOT DIRECTORY ==================================
 rm -rf build-${TIMESTAMP}
 
-if [[ $TEST_STATUS != 0 ]]; then exit $TEST_STATUS; fi
+exit $TEST_STATUS
