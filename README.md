@@ -11,7 +11,6 @@ Setting up a new server for selenium testing requires
 
 1. Prerequisites
 1. Installation
-1. Running the selenium server
 1. Starting the webdriverio-server node process
 
 ### Prerequisites
@@ -25,22 +24,10 @@ These instructions assume that you have set up a server (either Mac or Ubuntu) w
 
     npm install -g webdriverio-server
     webdriverio-server-init
-    webdriver-manager update --standalone
 
 The first line will install both the `webdriverio-server` and `webdriver-manager` alongside it. The second line will
 initialize the build environment for the `webriverio-server` And the third line will update the standalone selenium
 server.
-
-### Running the selenium server
-
-In a separate terminal, launch the selenium server:
-
-    webdriver-manager start
-
-This process must always be running. Be careful, if you hit `ENTER` while this
-process is running, it will cause it to terminate. This process will listen on
-port 4444 on your server.
-
 
 ### Starting the webdriver-io server node process
 
@@ -73,7 +60,7 @@ SERVER=my-webdriverio-server
 echo "Creating bundle..."
 tar --exclude='*map' -czf test.tar.gz spec demo/index.html demo/bundle
 echo "Submitting bundle to server for test..."
-curl -s -F "tarball=@test.tar.gz" -F "entry-point=/demo/#/main/" http://$SERVER:$PORT/ > test-output.json
+curl -s -F "tarball=@test.tar.gz" -F "entry-point=/demo/" http://$SERVER:$PORT/ > test-output.json
 echo "Parsing results..."
 rm -f test.tar.gz
 cat test-output.json | python -c 'import sys,json;data=json.loads(sys.stdin.read()); sys.exit(data["exitCode"])'

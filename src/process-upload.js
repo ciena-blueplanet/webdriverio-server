@@ -88,24 +88,11 @@ var watchChild = function (child, seconds) {
 ns.newFile = function (filename, entryPoint, res) {
     var seconds = Math.floor(new Date().getTime() / 1000);
     debug('START: ------------ ' + seconds);
-    var child;
-    for (var index = 0; index < 3; index++) {
-        var buildDir = path.join(__dirname, '../build-' + index);
-        var self = this;
-        if (fs.existsSync(buildDir)) {
-            // We found a waiting build directory
-            child = childProcess.spawn('bash', [self.scriptPath, index, filename, entryPoint, seconds]);
-            watchChild(child, seconds);
-            res.send(seconds.toString());
-            res.end();
-            break;
-        }
-    }
-    if (!child) {
-        var msg = 'Server is busy. Try again later';
-        debug(msg);
-        res.status(500).send(msg);
-    }
+
+    var child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds]);
+    watchChild(child, seconds);
+    res.send(seconds.toString());
+    res.end();
 };
 
 module.exports = ns;

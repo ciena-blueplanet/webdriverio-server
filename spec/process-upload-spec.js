@@ -8,9 +8,11 @@
 'use strict';
 
 var childProcess = require('child_process');
+var fs = require('fs');
+var path = require('path');
+
 var t = require('beaker').transplant(__dirname);
 var processUpload = t.require('./process-upload');
-var fs = require('fs');
 
 describe('process-upload', function () {
     var child;
@@ -36,7 +38,6 @@ describe('process-upload', function () {
         it('spawns a new process', function () {
             expect(childProcess.spawn).toHaveBeenCalledWith('bash', [
                 processUpload.scriptPath,
-                0,
                 'filename',
                 'entry-point',
                 seconds,
@@ -55,15 +56,32 @@ describe('process-upload', function () {
             expect(child.on).toHaveBeenCalledWith('exit', jasmine.any(Function));
         });
 
+        it('sends response back', function () {
+            expect(res.send).toHaveBeenCalledWith(seconds.toString());
+        });
+
+        it('ends the response', function () {
+            expect(res.end).toHaveBeenCalled();
+        });
+
         describe('when child exits', function () {
             beforeEach(function () {
+                spyOn(fs, 'writeFile');
                 child.stdout.on.calls.argsFor(0)[1]('some-stdout-data');
                 child.stderr.on.calls.argsFor(0)[1]('some-stderr-data');
                 child.on.calls.argsFor(0)[1](13);
             });
 
-            it('sends response', function () {
-                expect(res.send).toHaveBeenCalledWith(seconds.toString());
+            it('writes a file', function () {
+                expect(fs.writeFile).toHaveBeenCalledWith(
+                    path.join(__dirname, '../screenshots/output-' + seconds + '.json'),
+                    JSON.stringify({
+                        exitCode: 13,
+                        info: 'some-stdout-datasome-stderr-data',
+                        output: 'screenshots/' + seconds + '.tar',
+                    }),
+                    jasmine.any(Function)
+                );
             });
         });
     });
