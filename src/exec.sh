@@ -84,7 +84,7 @@ cd $DIR/..
 
 echo Processing ${TARBALL}...
 mkdir build-${TIMESTAMP}
-ln -s build/node_modules build-${TIMESTAMP}/node_modules
+ln -s ../build/node_modules build-${TIMESTAMP}/node_modules
 
 cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL

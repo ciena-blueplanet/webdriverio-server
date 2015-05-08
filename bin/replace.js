@@ -22,7 +22,6 @@ var fs = require('fs');
 function replace(object, keyStr, value) {
     var keys = keyStr.split('.');
     for (var i = 0, len = keys.length - 1; i < len; i++) {
-        console.log('traversing ' + keys[i]);
         object = object[keys[i]];
     }
 
@@ -32,7 +31,6 @@ function replace(object, keyStr, value) {
         value = parseInt(value, 10);
     }
 
-    console.log('setting ' + keys[len] + ' to ' + value);
     object[keys[len]] = value;
 }
 
@@ -51,7 +49,6 @@ function getPairs() {
     var pair = [];
     for (var i = 3, len = process.argv.length; i < len; i++) {
         pair = process.argv[i].split(':');
-        console.log(JSON.stringify(pair));
         pairs.push({
             keyStr: pair[0],
             value: pair[1],
