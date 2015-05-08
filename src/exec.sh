@@ -49,10 +49,7 @@ function getOpenPort {
 # -----------------------------------------------------------------------
 
 function waitForPort {
-    while [ $(lsof -iTCP -sTCP:LISTEN -P | grep -v $1) ];
-    do
-        sleep 1;
-    done
+    while grep -v $1 <<< $(lsof -iTCP -sTCP:LISTEN -P); do sleep 1; done
 }
 
 # -----------------------------------------------------------------------
