@@ -36,7 +36,7 @@ app.use(multer({
         return filename + '.' + Date.now();
     },
     onFileUploadStart: function () {
-        debug('cient request is starting ...');
+        debug('client request is starting ...');
     },
     onFileUploadComplete: function (file) {
         debug(file.fieldname + ' uploaded to  ' + file.path);
