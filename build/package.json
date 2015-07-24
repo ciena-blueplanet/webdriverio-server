@@ -16,13 +16,13 @@
   "author": "Peter Banka",
   "license": "MIT",
   "devDependencies": {
-    "beaker": "^3.10.0",
+    "beaker": "sandersky/beaker",
     "gm": "1.18.1",
     "protractor": "^2.1.0",
     "raw-loader": "^0.5.1",
     "webdriver": "0.0.1",
     "webdriver-manager": "7.0.1",
-    "webdrivercss": "^1.1.4",
+    "webdrivercss": "sandersky/webdrivercss",
     "webdriverio": "^3.1.0"
   }
 }
