@@ -16,7 +16,7 @@
   "author": "Peter Banka",
   "license": "MIT",
   "devDependencies": {
-    "beaker": "^3.10.0",
+    "beaker": "^3.10.1",
     "gm": "1.18.1",
     "protractor": "^2.1.0",
     "raw-loader": "^0.5.1",

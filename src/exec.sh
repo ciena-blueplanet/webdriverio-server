@@ -23,7 +23,6 @@ set -u
 
 TEST_CONFIG='spec/e2e/test-config.json'
 NODE_SPECS=spec/e2e
-JASMINE_NODE_OPTS='--captureExceptions --verbose'
 
 TARBALL=$1
 ENTRY_POINT=$2
@@ -77,9 +76,9 @@ function testIt {
         http.port:$HTTP_PORT \
         http.entryPoint:$ENTRY_POINT
 
-	echo "Running jasmine-node tests with http port $HTTP_PORT and selenium port $SELENIUM_PORT"
+	echo "Running jasmine tests with http port $HTTP_PORT and selenium port $SELENIUM_PORT"
     TEST_STATUS=0
-    ./node_modules/.bin/jasmine-node $JASMINE_NODE_OPTS $NODE_SPECS || TEST_STATUS=1
+    ./node_modules/.bin/jasmine JASMINE_CONFIG_PATH=${NODE_SPECS}/jasmine.json
 
 	kill $(lsof -t -i:$HTTP_PORT) || echo 'ERROR killing http-server'
 	kill $(lsof -t -i:$SELENIUM_PORT) || echo 'ERROR killing selenium server'
