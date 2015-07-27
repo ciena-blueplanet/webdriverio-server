@@ -23,6 +23,6 @@
     "webdriver": "0.0.1",
     "webdriver-manager": "7.0.1",
     "webdrivercss": "sandersky/webdrivercss",
-    "webdriverio": "^3.1.0"
+    "webdriverio": "^2.4.5"
   }
 }
