@@ -78,7 +78,7 @@ function testIt {
 
 	echo "Running jasmine tests with http port $HTTP_PORT and selenium port $SELENIUM_PORT"
     TEST_STATUS=0
-    ./node_modules/.bin/jasmine JASMINE_CONFIG_PATH=${NODE_SPECS}/jasmine.json
+    ./node_modules/.bin/jasmine JASMINE_CONFIG_PATH=${NODE_SPECS}/jasmine.json || TEST_STATUS=1
 
 	kill $(lsof -t -i:$HTTP_PORT) || echo 'ERROR killing http-server'
 	kill $(lsof -t -i:$SELENIUM_PORT) || echo 'ERROR killing selenium server'
