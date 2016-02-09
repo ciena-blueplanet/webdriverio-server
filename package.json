@@ -4,7 +4,7 @@
   "description": "Server for running webdriverio tests",
   "repository": {
     "type": "git",
-    "url": "git@github.com:cyaninc/webdriverio-server.git"
+    "url": "git@github.com:ciena-blueplanet/webdriverio-server.git"
   },
   "keywords": [
     "e2e",
@@ -18,9 +18,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cyaninc/webdriverio-server/issues"
+    "url": "https://github.com/ciena-blueplanet/webdriverio-server/issues"
   },
-  "homepage": "https://github.com/cyaninc/webdriverio-server",
+  "homepage": "https://github.com/ciena-blueplanet/webdriverio-server",
   "devDependencies": {
     "beaker": "^2.0.0"
   },

@@ -23,7 +23,7 @@
     "raw-loader": "^0.5.1",
     "webdriver": "0.0.1",
     "webdriver-manager": "7.0.1",
-    "webdrivercss": "cyaninc/webdrivercss#v1.1.4.fork",
+    "webdrivercss": "ciena-blueplanet/webdrivercss#v1.1.4.fork",
     "webdriverio": "^2.4.5"
   }
 }
