@@ -1,3 +1,39 @@
 language: node_js
 node_js:
-    - "0.10"
+- '5.3'
+sudo: false
+branches:
+  except:
+  - /^v[0-9\.]+/
+before_install:
+- npm install -g coveralls pr-bumper
+- pr-bumper check
+install:
+- npm install
+after_success:
+- cat coverage/lcov.info | coveralls
+env:
+  matrix:
+  - CXX=g++-4.8
+  global:
+    secure: WfaFlDrkjeqZ2AkECWpl5uu2MYHk3bhViTV04svnd2QbZJsBlhVMQ7vRPSx2bI8VrpWM5uooikeYJlLVGT0ExjYosqwEVbKOEDdWYPJIy5hP1nh4i9jh0A4XvBrISnc5E8h4egG2QX7pRz8YxILM42Pre13kPjNqh5B3Bsjwrxo=
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
+before_deploy:
+- pr-bumper bump
+deploy:
+  provider: npm
+  email: npm.ciena@gmail.com
+  skip_cleanup: true
+  api_key:
+    secure: U9kyJoFYJOQWdiYyET9crawBM3y0/zEjcvzXUjnNvrlD6Zf6E2b1/DA0N7mFV79tU/rvjfdIrLMX1woYZao05DeCgkXvrsC5rAADxdiemQSmUAlpW9ShxTcyeEu34eTP8K2GTBK5qUqCFOWCn1a7CjdPqSi+cUg//LNpZeMcpts=
+  on:
+    branch: master
+    tags: false
+notifications:
+  slack:
+    secure: pkKtSBBudAsARDMdPR2+Isqwu1tnJlpiZb3EyTTGSukb4a9DVyhOwZNppouH5zBiQfm6PAp9EhC/VTa0b1a+7YupRsC9R9UTPyM7xyhduatCfGlyYGESjD6RgXUAVZLbjgRmQO75rhlJeAIt3GmkhYPDEWiAK661ZlxkwUkQ05s=

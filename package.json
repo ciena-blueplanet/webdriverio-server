@@ -2,6 +2,12 @@
   "name": "webdriverio-server",
   "version": "0.6.2",
   "description": "Server for running webdriverio tests",
+  "scripts": {
+    "start": "./bin/www.js",
+    "lint": "eslint .",
+    "jasmine": "JASMINE_CONFIG_PATH=spec/jasmine.json jasmine",
+    "test": "npm run lint && npm run jasmine"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:cyaninc/webdriverio-server.git"
@@ -16,13 +22,18 @@
   "contributors": [
     "Adam Meadows <adam.meadows@gmail.com> (https://github.com/job13er)"
   ],
+  "engines": {
+    "node": ">=5.0.0"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cyaninc/webdriverio-server/issues"
   },
   "homepage": "https://github.com/cyaninc/webdriverio-server",
   "devDependencies": {
-    "beaker": "^2.0.0"
+    "eslint": "^1.10.3",
+    "eslint-config-frost-standard": "^0.2.5",
+    "jasmine": "^2.4.1"
   },
   "dependencies": {
     "body-parser": "~1.12.0",
@@ -33,10 +44,6 @@
     "morgan": "~1.5.1",
     "multer": "^0.1.8",
     "serve-favicon": "~2.2.0"
-  },
-  "scripts": {
-    "start": "./bin/www.js",
-    "test": "make lint && make test"
   },
   "preferGlobal": true,
   "bin": {
