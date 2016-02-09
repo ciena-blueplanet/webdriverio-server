@@ -4,7 +4,7 @@
  * Simple script to replace dotted keys in a json file with new values.
  * It takes a filename as the first parameter, then a number of key:value pairs
  * @author Adam Meadows [job13er](https://github.com/job13er)
- * @copyright 2015 Cyan, Inc. All rights reserved.
+ * @copyright 2015 Ciena Corporation. All rights reserved.
  */
 
 'use strict'
