@@ -16,14 +16,14 @@
   "author": "Peter Banka",
   "license": "MIT",
   "devDependencies": {
-    "beaker": "^3.11.3",
+    "beaker": "^7.1.0",
     "gm": "1.18.1",
-    "nan": "<2.0.0",
+    "nan": "^2.0.0",
     "protractor": "^2.1.0",
     "raw-loader": "^0.5.1",
     "webdriver": "0.0.1",
     "webdriver-manager": "7.0.1",
-    "webdrivercss": "cyaninc/webdrivercss#v1.1.4.fork",
+    "webdrivercss": "ciena-blueplanet/webdrivercss#v1.1.4.fork",
     "webdriverio": "^2.4.5"
   }
 }

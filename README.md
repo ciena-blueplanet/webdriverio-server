@@ -1,7 +1,7 @@
 # webdriverio-server
 
 [![npm version](https://badge.fury.io/js/webdriverio-server.svg)](http://badge.fury.io/js/webdriverio-server)
-[![build status](https://travis-ci.org/cyaninc/webdriverio-server.svg?branch=master)](https://travis-ci.org/cyaninc/webdriverio-server)
+[![build status](https://travis-ci.org/ciena-blueplanet/webdriverio-server.svg?branch=master)](https://travis-ci.org/ciena-blueplanet/webdriverio-server)
 
 If you want a remote server to do selenium testing, this is a better way
 
@@ -18,7 +18,7 @@ Setting up a new server for selenium testing requires
 These instructions assume that you have set up a server (either Mac or Ubuntu) with the following:
 
 - [NodeJS (including NPM)](https://github.com/creationix/nvm)
-- [Dependencies](https://github.com/cyaninc/beaker#end-to-end-test-dependencies) of webdrivercss
+- [Dependencies](https://github.com/ciena-blueplanet/beaker#end-to-end-test-dependencies) of webdrivercss
 
 ### Installation
 
@@ -35,7 +35,7 @@ Now you're ready to run the web service which will respond to test-upload reques
 
     webdriverio-server
 
-If you'd like to override the port being listened to, or perhapse get some verbose debugging output, you can turn
+If you'd like to override the port being listened to, or perhaps get some verbose debugging output, you can turn
 those on using environment variables
 
     PORT=3001 DEBUG=server webdriverio-server

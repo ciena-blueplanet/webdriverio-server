@@ -4,7 +4,7 @@
 #
 
 GITHUB_HOST := github.com
-REPO := cyaninc/webdriverio-server
+REPO := ciena-blueplanet/webdriverio-server
 NODE_COVERAGE_DIR := coverage
 
 -include node_modules/beaker/make/common.mk
