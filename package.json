@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/ciena-blueplanet/webdriverio-server",
   "devDependencies": {
-    "beaker": "^2.0.0"
+    "beaker": "^7.1.0"
   },
   "dependencies": {
     "body-parser": "~1.12.0",
