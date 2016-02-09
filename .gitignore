@@ -4,6 +4,7 @@ node_modules
 
 # Generated Directories
 build-*
+coverage
 
 # OSX Temporary Files
 .DS_Store

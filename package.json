@@ -2,10 +2,13 @@
   "name": "webdriverio-server",
   "version": "0.6.2",
   "description": "Server for running webdriverio tests",
+  "config": {
+    "coverage_opts": "-x **/spec/** --report cobertura --report lcov --dir spec"
+  },
   "scripts": {
     "start": "./bin/www.js",
     "lint": "eslint .",
-    "jasmine": "JASMINE_CONFIG_PATH=spec/jasmine.json jasmine",
+    "jasmine": "JASMINE_CONFIG_PATH=spec/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
     "test": "npm run lint && npm run jasmine"
   },
   "repository": {
@@ -33,6 +36,7 @@
   "devDependencies": {
     "eslint": "^1.10.3",
     "eslint-config-frost-standard": "^0.2.5",
+    "istanbul": "^0.4.2",
     "jasmine": "^2.4.1"
   },
   "dependencies": {
