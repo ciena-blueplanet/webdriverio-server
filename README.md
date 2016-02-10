@@ -35,7 +35,7 @@ Now you're ready to run the web service which will respond to test-upload reques
 
     webdriverio-server
 
-If you'd like to override the port being listened to, or perhapse get some verbose debugging output, you can turn
+If you'd like to override the port being listened to, or perhaps get some verbose debugging output, you can turn
 those on using environment variables
 
     PORT=3001 DEBUG=server webdriverio-server
