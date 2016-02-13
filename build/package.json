@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-  },
+  "repository": {},
   "keywords": [
     "javascript",
     "testing",
@@ -17,6 +16,7 @@
   "license": "MIT",
   "devDependencies": {
     "gm": "1.18.1",
+    "http-server": "^0.8.5",
     "jasmine": "^2.4.1",
     "protractor": "^2.1.0",
     "webdriver": "0.0.1",

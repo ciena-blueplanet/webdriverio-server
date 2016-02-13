@@ -20,8 +20,8 @@ const fs = require('fs')
  */
 function replace (object, keyStr, value) {
   const keys = keyStr.split('.')
-  let len
-  for (let i = 0, len = keys.length - 1; i < len; i++) {
+  let i, len
+  for (i = 0, len = keys.length - 1; i < len; i++) {
     object = object[keys[i]]
   }
 
