@@ -172,18 +172,11 @@ ns.e2e = {
 
             const screenshotsCopy = _.clone(screenshots);
             client.webdrivercss(name, screenshotsCopy, (err, res) => {
-                console.log("************Getting screenshots****")
-                console.log("Error: ", err)
-                console.log("Result: ", res)
                 expect(err).toBeFalsy();
-                console.log('debug1')
                 _.forEach(screenshots, (screenshot) => {
-                    console.log('debug2', screenshot)
                     const result = res[screenshot.name][0];
                     const msg = 'Visual difference found for "' + screenshot.name + '" \n';
                     expect(result.isWithinMisMatchTolerance).toBeTruthy(msg + JSON.stringify(result, null, 4));
-
-                    console.log('end of verify screenshots')
                 });
                 cb();
             });

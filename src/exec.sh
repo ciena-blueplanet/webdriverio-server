@@ -21,12 +21,15 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 set -e
 set -u
 
-TEST_CONFIG='tests/e2e/test-config.json'
-NODE_SPECS='tests/e2e'
 
 TARBALL=$1
 ENTRY_POINT=$2
 TIMESTAMP=$3
+TESTS_FOLDER=$4
+
+TEST_CONFIG="$TESTS_FOLDER/test-config.json"
+NODE_SPECS=$TESTS_FOLDER
+
 
 echo '-INPUT VARIABLES---------------'
 echo tarball: $TARBALL
@@ -103,7 +106,7 @@ ln -s ../testUtils build-${TIMESTAMP}/testUtils
 cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 testIt
-tar -cf ../screenshots/${TIMESTAMP}.tar tests/e2e/screenshots
+tar -cf ../screenshots/${TIMESTAMP}.tar "$TESTS_FOLDER/screenshots"
 cd - # IN ROOT DIRECTORY ==================================
 rm -rf build-${TIMESTAMP}
 
