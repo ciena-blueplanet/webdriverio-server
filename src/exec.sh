@@ -21,12 +21,15 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 set -e
 set -u
 
-TEST_CONFIG='spec/e2e/test-config.json'
-NODE_SPECS=spec/e2e
 
 TARBALL=$1
 ENTRY_POINT=$2
 TIMESTAMP=$3
+TESTS_FOLDER=$4
+
+TEST_CONFIG="$TESTS_FOLDER/test-config.json"
+NODE_SPECS=$TESTS_FOLDER
+
 
 echo '-INPUT VARIABLES---------------'
 echo tarball: $TARBALL
@@ -57,31 +60,35 @@ function waitForPort {
 
 
 function testIt {
-    echo Testing...
+  echo Testing...
 
-    HTTP_PORT=$(getOpenPort)
-	kill $(lsof -t -i:$HTTP_PORT) 2>/dev/null || echo ''
-	./node_modules/.bin/http-server -s -c-1 -p $HTTP_PORT &
-    waitForPort $HTTP_PORT
+  HTTP_PORT=$(getOpenPort)
+  kill $(lsof -t -i:$HTTP_PORT) 2>/dev/null || echo ''
+  CURRENT_DIR=`pwd`
+  cd $ENTRY_POINT
+  $CURRENT_DIR/node_modules/.bin/http-server -s -c-1 -p $HTTP_PORT &
+  waitForPort $HTTP_PORT
+  cd $CURRENT_DIR
 
-    SELENIUM_PORT=$(getOpenPort)
-	kill $(lsof -t -i:$SELENIUM_PORT) 2>/dev/null || echo ''
-	./node_modules/.bin/webdriver-manager start --seleniumPort $SELENIUM_PORT > /dev/null 2>&1 &
-    waitForPort $SELENIUM_PORT
+  SELENIUM_PORT=$(getOpenPort)
+  kill $(lsof -t -i:$SELENIUM_PORT) 2>/dev/null || echo ''
+  ./node_modules/.bin/webdriver-manager start --seleniumPort $SELENIUM_PORT > /dev/null 2>&1 &
+  waitForPort $SELENIUM_PORT
 
-    ../bin/replace.js $TEST_CONFIG \
-        selenium.host:localhost \
-        selenium.port:$SELENIUM_PORT \
-        http.host:localhost \
-        http.port:$HTTP_PORT \
-        http.entryPoint:$ENTRY_POINT
+  ../bin/replace.js $TEST_CONFIG \
+      selenium.host:localhost \
+      selenium.port:$SELENIUM_PORT \
+      http.host:localhost \
+      http.port:$HTTP_PORT \
+      http.entryPoint:"/"
 
-	echo "Running jasmine tests with http port $HTTP_PORT and selenium port $SELENIUM_PORT"
-    TEST_STATUS=0
-    ./node_modules/.bin/jasmine JASMINE_CONFIG_PATH=${NODE_SPECS}/jasmine.json || TEST_STATUS=1
+  echo "Running jasmine tests with http port $HTTP_PORT and selenium port $SELENIUM_PORT"
+  echo
+  TEST_STATUS=0
+  ./node_modules/.bin/jasmine JASMINE_CONFIG_PATH=${NODE_SPECS}/jasmine.json || TEST_STATUS=1
 
-	kill $(lsof -t -i:$HTTP_PORT) || echo 'ERROR killing http-server'
-	kill $(lsof -t -i:$SELENIUM_PORT) || echo 'ERROR killing selenium server'
+  kill $(lsof -t -i:$HTTP_PORT) || echo 'ERROR killing http-server'
+  kill $(lsof -t -i:$SELENIUM_PORT) || echo 'ERROR killing selenium server'
 }
 
 # -----------------------------------------------------------------------
@@ -94,11 +101,12 @@ cd $DIR/..
 echo Processing ${TARBALL}...
 mkdir build-${TIMESTAMP}
 ln -s ../build/node_modules build-${TIMESTAMP}/node_modules
+ln -s ../testUtils build-${TIMESTAMP}/testUtils
 
 cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 testIt
-tar -cf ../screenshots/${TIMESTAMP}.tar spec/e2e/screenshots
+tar -cf ../screenshots/${TIMESTAMP}.tar "$TESTS_FOLDER/screenshots"
 cd - # IN ROOT DIRECTORY ==================================
 rm -rf build-${TIMESTAMP}
 

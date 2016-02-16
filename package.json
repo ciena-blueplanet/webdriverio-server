@@ -3,12 +3,12 @@
   "version": "1.0.1",
   "description": "Server for running webdriverio tests",
   "config": {
-    "coverage_opts": "-x **/spec/** --report cobertura --report lcov --dir spec"
+    "coverage_opts": "-x **/tests/** --report cobertura --report lcov --dir tests"
   },
   "scripts": {
     "start": "./bin/www.js",
     "lint": "eslint .",
-    "jasmine": "JASMINE_CONFIG_PATH=spec/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
+    "jasmine": "JASMINE_CONFIG_PATH=tests/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
     "test": "npm run lint && npm run jasmine"
   },
   "repository": {
@@ -45,8 +45,10 @@
     "debug": "~2.1.1",
     "express": "~4.12.2",
     "jade": "~1.9.2",
+    "lodash": "^4.3.0",
     "morgan": "~1.5.1",
     "multer": "^0.1.8",
+    "q": "^1.4.1",
     "serve-favicon": "~2.2.0"
   },
   "preferGlobal": true,

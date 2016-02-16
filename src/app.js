@@ -62,7 +62,8 @@ app.post('/', function (req, res) {
   if (done) {
     const filename = req.files.tarball.name
     const entryPoint = req.body['entry-point'] || 'demo'
-    processUpload.newFile(filename, entryPoint, res)
+    const testsFolder = req.body['tests-folder'] || 'tests/e2e'
+    processUpload.newFile(filename, entryPoint, testsFolder, res)
   }
 })
 

@@ -80,13 +80,14 @@ const watchChild = function (child, seconds) {
  * response for the requester.
  * @param {String} filename - the name of the tar file that was uploaded
  * @param {String} entryPoint - the URL to start testing
+ * @param {String} testsFolder - the path to the tests folder (tests/e2e)
  * @param {Response} res - the express response object
  */
-ns.newFile = function (filename, entryPoint, res) {
+ns.newFile = function (filename, entryPoint, testsFolder, res) {
   const seconds = Math.floor(new Date().getTime() / 1000)
   debug('START: ------------ ' + seconds)
 
-  const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds])
+  const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
   watchChild(child, seconds)
   res.send(seconds.toString())
   res.end()
