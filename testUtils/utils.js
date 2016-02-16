@@ -145,8 +145,8 @@ ns.e2e = {
         });
 
         _.defaults(wdCssOpts, {
-            screenshotRoot: 'spec/e2e/screenshots',
-            failedComparisonsRoot: 'spec/e2e/screenshots/diff',
+            screenshotRoot: 'tests/e2e/screenshots',
+            failedComparisonsRoot: 'tests/e2e/screenshots/diff',
             misMatchTolerance: 0.1,
         });
 
