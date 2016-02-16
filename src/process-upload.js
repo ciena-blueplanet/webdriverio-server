@@ -80,6 +80,7 @@ const watchChild = function (child, seconds) {
  * response for the requester.
  * @param {String} filename - the name of the tar file that was uploaded
  * @param {String} entryPoint - the URL to start testing
+ * @param {String} testsFolder - the path to the tests folder (tests/e2e)
  * @param {Response} res - the express response object
  */
 ns.newFile = function (filename, entryPoint, testsFolder, res) {
