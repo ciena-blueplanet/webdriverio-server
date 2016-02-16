@@ -1,6 +1,6 @@
 {
   "name": "webdriverio-server",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Server for running webdriverio tests",
   "config": {
     "coverage_opts": "-x **/tests/** --report cobertura --report lcov --dir tests"
