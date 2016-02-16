@@ -23,5 +23,9 @@
     "webdriver-manager": "7.0.1",
     "webdrivercss": "ciena-blueplanet/webdrivercss#v1.1.4.fork",
     "webdriverio": "^2.4.5"
+  },
+  "dependencies": {
+    "lodash": "^4.3.0",
+    "q": "^1.4.1"
   }
 }
