@@ -17,7 +17,6 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 # End snippet from stackoverflow
 # =================================================================================================================
 
-
 set -e
 set -u
 
@@ -97,7 +96,6 @@ function testIt {
 
 # start at the root of the project
 cd $DIR/..
-
 echo Processing ${TARBALL}...
 mkdir build-${TIMESTAMP}
 ln -s ../build/node_modules build-${TIMESTAMP}/node_modules
@@ -107,7 +105,10 @@ cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 testIt
 tar -cf ../screenshots/${TIMESTAMP}.tar "$TESTS_FOLDER/screenshots"
-cd - # IN ROOT DIRECTORY ==================================
+
+# CD TO ROOT DIRECTORY ==================================
+cd $DIR/..
+
 rm -rf build-${TIMESTAMP}
 
 exit $TEST_STATUS
