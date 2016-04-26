@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# This whole script should be run with 'sudo'
+
+# Install the base dependencies
+apt-get update
+apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    python-pip \
+    libcurl4-openssl-dev \
+    graphicsmagick \
+    libcairo2 \
+    unzip
+
+# Install nodeenv and node version (defined by NODE_VERSION environment variable)
+if [ -z "$NODE_VERSION" ]
+then
+    NODE_VERSION=5.11.0
+fi
+
+pip install nodeenv
+mkdir -p /opt/node-envs
+cd /opt/node-envs
+nodeenv --node=$NODE_VERSION --prebuilt $NODE_VERSION
+cd -
+
+# Install xvfb, chrome and firefox
+curl -sL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google.list
+apt-get update
+apt-get install -y xvfb firefox google-chrome-stable
+apt-get clean
+
+# Download and extract Java
+JAVA_URL=http://download.oracle.com/otn-pub/java/jdk/8u65-b17/jdk-8u65-linux-x64.tar.gz
+mkdir -p /usr/lib/jvm
+wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $JAVA_URL
+tar -zxvf jdk-8u65-linux-x64.tar.gz -C /usr/lib/jvm
+rm jdk-8u65-linux-x64.tar.gz
+
+# Configure Java
+update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.8.0_65/bin/java" 1
+update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk1.8.0_65/bin/javac" 1
+update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1.8.0_65/bin/javaws" 1
+chmod a+x /usr/bin/java
+chmod a+x /usr/bin/javac
+chmod a+x /usr/bin/javaws
