@@ -15,6 +15,7 @@
   "author": "Peter Banka",
   "license": "MIT",
   "devDependencies": {
+    "glob-all": "^3.0.1",
     "gm": "1.18.1",
     "http-server": "^0.8.5",
     "jasmine": "^2.4.1",
