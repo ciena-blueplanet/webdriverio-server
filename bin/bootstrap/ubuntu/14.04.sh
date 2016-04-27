@@ -109,6 +109,9 @@ http {
 EOF
 sudo mv nginx.conf /etc/nginx/nginx.conf
 
+# Reload with the new config
+sudo service nginx reload
+
 # Setup .bashrc
 echo "source ~/.bashrc" >> ~/.bash_profile
 echo "# Activate a node version from nodeenv" >> ~/.bashrc
