@@ -53,7 +53,7 @@ sudo chmod a+x /usr/bin/javaws
 
 # Configure nginx
 sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.default
-cat << EOF > /etc/nginx/nginx.conf
+sudo sh -c 'cat << EOF > /etc/nginx/nginx.conf
 worker_processes 1;
 pid /run/nginx.pid;
 
@@ -107,6 +107,7 @@ http {
     }
 }
 EOF
+'
 
 # Setup .bashrc
 echo "source ~/.bashrc" >> ~/.bash_profile
