@@ -148,11 +148,12 @@ echo "source ~/.bashrc" >> ~/.bash_profile
 echo "# Activate a node version from nodeenv" >> ~/.bashrc
 echo "source /opt/node-envs/${NODE_VERSION}/bin/activate" >> ~/.bashrc
 echo "Please source ~/.bashrc to complete setup"
-echo "You can then do the following to run webdriverio-server:"
+echo "You can now do the following to run webdriverio-server:"
 echo ""
-echo "\$ npm install -g webdriverio-server"
-echo "\$ webdriverio-server-init"
-echo "\$ DISPLAY=:0 DEBUG=server webdriverio-server"
+echo "\$ source ~/.bashrc && npm install -g webdriverio-server && webdriverio-server-init && DISPLAY=:0 DEBUG=server webdriverio-server"
+echo ""
+echo "After the initial run, to run it again, you should only need:"
+echo "\$ source ~/.bashrc && DISPLAY=:0 DEBUG=server webdriverio-server"
 echo ""
 
 } # this ensures the entire script is downloaded
