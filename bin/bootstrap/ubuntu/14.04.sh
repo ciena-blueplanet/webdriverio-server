@@ -8,10 +8,11 @@ sudo apt-get install -y \
     build-essential \
     curl \
     git \
-    python-pip \
-    libcurl4-openssl-dev \
     graphicsmagick \
+    libcurl4-openssl-dev \
     libcairo2 \
+    nginx \
+    python-pip \
     unzip
 
 # Install nodeenv and node version (defined by NODE_VERSION environment variable)
@@ -50,9 +51,73 @@ sudo chmod a+x /usr/bin/java
 sudo chmod a+x /usr/bin/javac
 sudo chmod a+x /usr/bin/javaws
 
+# Configure nginx
+sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.default
+cat << EOF > /etc/nginx/nginx.conf
+worker_processes 1;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include mime.types;
+    default_type application/octet-stream;
+
+    sendfile on;
+
+    keepalive_timeout 65;
+
+    ##
+    # Gzip Settings
+    ##
+
+    gzip on;
+    gzip_disable "msie6";
+
+    server {
+        listen 80;
+        server_name localhost;
+
+        charset utf-8;
+
+        ssl off;
+
+        location / {
+            # increase max upload size to 200MB
+            client_max_body_size 200M;
+            proxy_pass http://localhost:3000/;
+        }
+    }
+
+    server {
+        listen 81;
+        server_name localhost;
+
+        charset utf-8;
+
+        ssl off;
+
+        location / {
+            # increase max upload size to 200MB
+            client_max_body_size 200M;
+            proxy_pass http://localhost:3001/;
+        }
+    }
+}
+EOF
+
 # Setup .bashrc
 echo "source ~/.bashrc" >> ~/.bash_profile
 echo "# Activate a node version from nodeenv" >> ~/.bashrc
 echo "source /opt/node-envs/${NODE_VERSION}/bin/activate" >> ~/.bashrc
+echo "Please source ~/.bashrc to complete setup"
+echo "You can then do the following to run webdriverio-server:"
+echo ""
+echo "\$ npm install -g webdriverio-server"
+echo "\$ webdriverio-server-init"
+echo "\$ DEBUG=server webdriverio-server"
+echo ""
 
 } # this ensures the entire script is downloaded
