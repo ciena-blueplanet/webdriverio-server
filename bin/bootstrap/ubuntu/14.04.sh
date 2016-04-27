@@ -64,6 +64,7 @@ case "\$1" in
 exit 0
 EOF
 
+chmod +x xvfb.service
 sudo mv xvfb.service /etc/init.d/xvfb
 sudo service xvfb start
 
