@@ -50,4 +50,9 @@ sudo chmod a+x /usr/bin/java
 sudo chmod a+x /usr/bin/javac
 sudo chmod a+x /usr/bin/javaws
 
+# Setup .bashrc
+echo "source ~/.bashrc" >> ~/.bash_profile
+echo "# Activate a node version from nodeenv" >> ~/.bashrc
+echo "source /opt/node-envs/${NODE_VERSION}/bin/activate" >> ~/.bashrc
+
 } # this ensures the entire script is downloaded
