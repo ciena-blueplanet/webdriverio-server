@@ -36,6 +36,37 @@ sudo apt-get update
 sudo apt-get install -y xvfb firefox google-chrome-stable
 sudo apt-get clean
 
+# Configure xvfb
+cat << EOF > xvfb.service
+XVFB=/usr/bin/Xvfb
+XVFBARGS=":0 -screen 0 1024x768x24 -ac +extension GLX +render -noreset"
+PIDFILE=/var/run/xvfb.pid
+case "\$1" in
+    start)
+        echo -n "Starting virtual X frame buffer: Xvfb"
+        start-stop-daemon --start --quiet --pidfile \$PIDFILE --make-pidfile --background --exec \$XVFB -- \$XVFBARGS
+        echo "."
+        ;;
+    stop)
+        echo -n "Stopping virtual X frame buffer: Xvfb"
+        start-stop-daemon --stop --quiet --pidfile \$PIDFILE
+        echo "."
+    ;;
+    restart)
+        \$0 stop
+        \$0 start
+    ;;
+    *)
+        echo "Usage: /etc/init.d/xvfb {start|stop|restart}"
+        exit 1
+    esac
+
+exit 0
+EOF
+
+sudo mv xvfb.service /etc/init.d/xvfb
+sudo service xvfb start
+
 # Download and extract Java
 JAVA_URL=http://download.oracle.com/otn-pub/java/jdk/8u65-b17/jdk-8u65-linux-x64.tar.gz
 sudo mkdir -p /usr/lib/jvm
