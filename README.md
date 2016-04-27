@@ -25,7 +25,7 @@ These instructions assume that you have set up a server (either Mac or Ubuntu) w
 In order to facilitate this for an Ubuntu 14.04 server, the following command can be used:
 
 ```
-wget -q0- https://raw.githubusercontent.com/ciena-blueplanet/webdriverio-server/master/bin/bootstrap/ubuntu/14.04.sh | bash
+wget -qO- https://raw.githubusercontent.com/ciena-blueplanet/webdriverio-server/master/bin/bootstrap/ubuntu/14.04.sh | bash
 ```
 
 This will configure a new system capable of running `webdriverio-server` using `xvfb` to allow headless execution of

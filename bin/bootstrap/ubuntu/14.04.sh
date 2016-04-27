@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+{ # this ensures the entire script is downloaded
 
 # Install the base dependencies
 sudo apt-get update
@@ -45,3 +47,5 @@ sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1
 sudo chmod a+x /usr/bin/java
 sudo chmod a+x /usr/bin/javac
 sudo chmod a+x /usr/bin/javaws
+
+} # this ensures the entire script is downloaded
