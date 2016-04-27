@@ -121,7 +121,7 @@ echo "You can then do the following to run webdriverio-server:"
 echo ""
 echo "\$ npm install -g webdriverio-server"
 echo "\$ webdriverio-server-init"
-echo "\$ DEBUG=server webdriverio-server"
+echo "\$ DISPLAY=:0 DEBUG=server webdriverio-server"
 echo ""
 
 } # this ensures the entire script is downloaded
