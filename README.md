@@ -22,6 +22,15 @@ These instructions assume that you have set up a server (either Mac or Ubuntu) w
 - Java runtime environment (ubuntu: `sudo apt-get install -y openjdk-7-jre`)
 - Chrome web browser installed
 
+In order to facilitate this for an Ubuntu 14.04 server, the following command can be used:
+
+```
+wget -qO- https://raw.githubusercontent.com/ciena-blueplanet/webdriverio-server/master/bin/bootstrap/ubuntu/14.04.sh | bash
+```
+
+This will configure a new system capable of running `webdriverio-server` using `xvfb` to allow headless execution of
+the Chrome browser to capture screenshots.
+
 ### Installation
 
     npm install -g webdriverio-server
