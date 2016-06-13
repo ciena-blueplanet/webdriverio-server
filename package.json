@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "nodemon ./bin/www.js",
-    "lint": "eslint .",
+    "lint": "eslint *.js bin routes src tests testUtils ",
     "jasmine": "JASMINE_CONFIG_PATH=tests/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
     "test": "npm run lint && npm run jasmine"
   },
