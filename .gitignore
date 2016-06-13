@@ -1,6 +1,7 @@
 # External Dependencies
 npm-debug.log
 node_modules
+bower_components
 
 # Generated Directories
 build-*

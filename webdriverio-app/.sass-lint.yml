@@ -1,0 +1,59 @@
+# Frost SASS linting config
+# v1.0.0
+options:
+  formatter: stylish
+
+  # This file already includes the default rules to be more explicit
+  merge-default-rules: false
+
+files:
+  include: '+(addon|app|tests)/styles/**/*.s+(a|c)ss'
+
+# Documentation on all rules available here: https://github.com/sasstools/sass-lint/blob/master/docs/rules
+# 0 - disabled
+# 1 - warning
+# 2 - error
+rules:
+
+
+  # =======================================================
+  # Extends
+  # =======================================================
+
+  # enforce that extends should be written before mixins in a ruleset.
+  # https://github.com/sasstools/sass-lint/blob/master/docs/rules/extends-before-mixins.md
+  extends-before-mixins: 2
+
+  # enforce that extends should be written before declarations in a ruleset
+  # https://github.com/sasstools/sass-lint/blob/master/docs/rules/extends-before-declarations.md
+  extends-before-declarations: 2
+
+  # enforce whether extends should only include placeholder selectors
+  # https://github.com/sasstools/sass-lint/blob/master/docs/rules/placeholder-in-extend.md
+  placeholder-in-extend: 2
+
+
+  # =======================================================
+  # Mixins
+  # =======================================================
+
+  # enforce that mixins should be written before declarations in a ruleset
+  # https://github.com/sasstools/sass-lint/blob/master/docs/rules/mixins-before-declarations.md
+  mixins-before-declarations: 2
+
+
+  # =======================================================
+  # Line Spacing
+  # =======================================================
+
+  # enforce that new declarations must begin on new lines
+  # https://github.com/sasstools/sass-lint/blob/master/docs/rules/one-declaration-per-line.md
+  one-declaration-per-line: 2
+
+  # will enforce whether or not nested blocks should include a space between the last non-comment declaration or not
+  # https://github.com/sasstools/sass-lint/blob/master/docs/rules/empty-line-between-blocks.md
+  empty-line-between-blocks: 2
+
+  # enforce whether selectors should be placed on a new line
+  # https://github.com/sasstools/sass-lint/blob/master/docs/rules/single-line-per-selector.md
+  single-line-per-selector: 2
