@@ -55,3 +55,35 @@ those on using environment variables
 The best way to use the server is to utilize the [webdriverio-client](https://github.com/ciena-blueplanet/webdriverio-client) to make test requests.
 
 For an example usage of the client, take a look at [ember-frost-checkbox](https://github.com/ciena-frost/ember-frost-checkbox.git)
+
+# Running the Front End Application
+
+    cd webdriverio-app
+    npm install
+    npm start
+
+Navigate to localhost:4200 to view the current version of the website
+
+# Frequently Asked Questions
+
+#### Where is the important information stored?
+
+The wdio server contains a secure reds db accessed through a small express application 
+where the authorized usernames and corresponding testing tokens are stored.
+
+#### What sensitive computing resources are trying to be protected? 
+We are trying to prevent people from breaking the wdio server since anyone can submit node scripts to the server. 
+We don't necessarily require authorized ciena developers to submit pull requests before testing through the wdio server.
+
+#### How do we develop trust for random people on the internet to submit pr's?
+
+We develop trust with developers through authorization their accounts with github, which is secure and trustworthy. 
+
+The developer must also have an account that meets certain criteria including
+
+1. The account must be no less than six months old
+2. The account must have had at least two contributions to other repositories in the last six months
+3. The account must have at least two repositories associated with it
+
+We also use randomly generated 30 character testing tokens securely stored in a database.
+
