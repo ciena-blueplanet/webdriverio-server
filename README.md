@@ -2,6 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/webdriverio-server.svg)](http://badge.fury.io/js/webdriverio-server)
 [![build status](https://travis-ci.org/ciena-blueplanet/webdriverio-server.svg?branch=master)](https://travis-ci.org/ciena-blueplanet/webdriverio-server)
+[![Stories in Ready](https://badge.waffle.io/pastorsj/webdriverio-server.svg?label=ready&title=Ready)](http://waffle.io/pastorsj/webdriverio-server)
 
 If you want a remote server to do selenium testing, this is a better way
 

@@ -3,7 +3,7 @@ require('should')
 
 const server = supertest.agent('http://localhost:3000')
 
-describe('Baseline tests', function () {
+describe('Baseline tests', () => {
   it('should return the homepage', (done) => {
     server
         .get('/')
@@ -19,7 +19,7 @@ describe('Baseline tests', function () {
   })
 })
 
-describe('Post Requests', function () {
+describe('Post Requests', () => {
   it('should post a new user correctly', (done) => {
     server
         .post('/developers/testuser')
@@ -37,7 +37,7 @@ describe('Post Requests', function () {
   })
 })
 
-describe('Put Requests', function () {
+describe('Put Requests', () => {
   it('should update a user correctly', (done) => {
     server
         .post('/developers/testuser')
@@ -55,7 +55,7 @@ describe('Put Requests', function () {
   })
 })
 
-describe('Get Requests', function () {
+describe('Get Requests', () => {
   it('should get a user with the correct token after an update happens', (done) => {
     var testToken = {token: 'sometokenofjustice'}
     server
@@ -114,7 +114,7 @@ describe('Get Requests', function () {
   })
 })
 
-describe('Delete Requests', function () {
+describe('Delete Requests', () => {
   it('should delete a user correctly', (done) => {
     server
         .post('/developers/testuser')
