@@ -8,7 +8,7 @@
   "scripts": {
     "start": "nodemon ./bin/www.js",
     "lint": "eslint *.js bin routes src tests testUtils ",
-    "jasmine": "JASMINE_CONFIG_PATH=tests/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
+    "jasmine": "JASMINE_CONFIG_PATH=spec/support/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
     "test": "npm run lint && npm run jasmine"
   },
   "repository": {
@@ -39,7 +39,6 @@
     "eslint-config-frost-standard": "^0.2.5",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
-    "mocha": "^2.5.3",
     "should": "^9.0.2",
     "supertest": "^1.2.0"
   },

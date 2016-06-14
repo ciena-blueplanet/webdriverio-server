@@ -11,8 +11,6 @@ const multer = require('multer')
 
 const app = express()
 
-const routes = require('../routes/index')
-const users = require('../routes/users')
 const developers = require('../routes/developers')
 
 const processUpload = require('./process-upload')
@@ -26,8 +24,6 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/', routes)
-app.use('/users', users)
 app.use('/developers', developers)
 
 // ==================================================================
