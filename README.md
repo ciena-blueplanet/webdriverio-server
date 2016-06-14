@@ -87,3 +87,8 @@ The developer must also have an account that meets certain criteria including
 
 We also use randomly generated 30 character testing tokens securely stored in a database.
 
+#### Communication Diagrams
+![Use Case 1](https://github.com/pastorsj/webdriverio-server/blob/webdriverio-app/resources/UseCase1.png)
+
+![Use Case 2](https://github.com/pastorsj/webdriverio-server/blob/webdriverio-app/resources/UseCase2.png)
+
