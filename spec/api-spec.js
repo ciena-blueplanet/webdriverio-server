@@ -1,146 +1,113 @@
-const supertest = require('supertest')
+const server = require('request')
+const base_url = 'http://localhost:3000'
 
-const server = supertest.agent('http://localhost:3000')
-
-xdescribe('Baseline tests', () => {
-  it('should return the homepage', (done) => {
-    server
-        .get('/')
-        .expect('Content-type', /html/)
-        .expect(200)
-        .end((err, res) => {
-          if (err) {
-            throw err
-          }
-          expect(res.status).toEqual(200)
-          done()
-        })
-  })
-})
-
-xdescribe('Post Requests', () => {
+describe('Post Requests', () => {
   it('should post a new user correctly', (done) => {
-    server
-        .post('/developers/testuser')
-        .send({token: '1234567890987654321'})
-        .expect('Content-type', /json/)
-        .expect(200)
-        .end((err, res) => {
-          if (err) throw err
-          expect(res.status).toEqual(200)
-          expect(res.body).toEqual('OK')
-          done()
-        })
+    server.post({url: base_url + '/developers/testuser', form: {token: '1234567890987654321'}}, (err, res, body) => {
+      if (err) {
+        done.fail(err)
+      } else {
+        expect(res.statusCode).toEqual(200)
+        // TODO Fix this test
+        expect(body).toEqual('"OK"')
+        done()
+      }
+    })
   })
 })
 
-xdescribe('Put Requests', () => {
+describe('Put Requests', () => {
   it('should update a user correctly', (done) => {
-    server
-        .post('/developers/testuser')
-        .send({token: '357284909lsdkjf83745'})
-        .expect('Content-type', /json/)
-        .expect(200)
-        .end((err, res) => {
-          if (err) throw err
-          expect(res.status).toEqual(200)
-          expect(res.body).toEqual('OK')
-          done()
-        })
+    server.put({url: base_url + '/developers/testuser', form: {token: '357284909lsdkjf83745'}}, (err, res, body) => {
+      if (err) {
+        done.fail(err)
+      } else {
+        expect(res.statusCode).toEqual(200)
+        expect(body).toEqual('"OK"')
+        done()
+      }
+    })
   })
 })
 
-xdescribe('Get Requests', () => {
+describe('Get Requests', () => {
   it('should get a user with the correct token after an update happens', (done) => {
     var testToken = {token: 'sometokenofjustice'}
-    server
-        .put('/developers/testuser')
-        .send(testToken)
-        .end(() => {
-          server
-            .get('/developers/testuser')
-            .expect('Content-type', /json/)
-            .expect(200)
-            .end((err, res) => {
-              if (err) throw err
-              expect(res.status).toEqual(200)
-              expect(res.body).toEquals('sometokenofjustice')
-              done()
-            })
+    server.put({url: base_url + '/developers/testuser', form: testToken}, (err, res, body) => {
+      if (err) {
+        done.fail(err)
+      } else {
+        expect(res.statusCode).toEqual(200)
+        server.get(base_url + '/developers/testuser', (err, res, body) => {
+          if (err) {
+            done.fail(err)
+          } else {
+            expect(res.statusCode).toEqual(200)
+            expect(body).toEqual('"sometokenofjustice"')
+            done()
+          }
         })
+      }
+    })
   })
 
   it('should get a user with the correct token after an post happens', (done) => {
     var testToken = {token: 'acompletelynewandoriginaltoken'}
-    server
-        .post('/developers/testuser')
-        .send(testToken)
-        .end(() => {
-          server
-            .get('/developers/testuser')
-            .expect('Content-type', /json/)
-            .expect(200)
-            .end((err, res) => {
-              if (err) {
-                throw err
-              }
-              expect(res.status).toEqual(200)
-              expect(res.body).toEquals('acompletelynewandoriginaltoken')
-              done()
-            })
+    server.post({url: base_url + '/developers/testuser', form: testToken}, (err, res, body) => {
+      if (err) {
+        done.fail(err)
+      } else {
+        expect(res.statusCode).toEqual(200)
+        server.get(base_url + '/developers/testuser', (err, res, body) => {
+          if (err) {
+            done.fail(err)
+          } else {
+            expect(res.statusCode).toEqual(200)
+            expect(body).toEqual('"acompletelynewandoriginaltoken"')
+            done()
+          }
         })
+      }
+    })
   })
 
   it('should indicate that a username does not exist', (done) => {
-    server
-        .get('/developers/ksdflaj')
-        .expect('Content-type', /json/)
-        .expect(500)
-        .end((err, res) => {
-          if (err) {
-            throw err
-          }
-          expect(res.status).toEqual(500)
-          expect(res.body).toEquals('The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com')
-          done()
-        })
+    server.get(base_url + '/developers/ksdflaj', (err, res, body) => {
+      if (err) {
+        done.fail(err)
+      } else {
+        expect(res.statusCode).toEqual(500)
+        expect(body).toEqual('{"error":"The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com"}')
+        done()
+      }
+    })
   })
 })
 
-xdescribe('Delete Requests', () => {
+describe('Delete Requests', () => {
   it('should delete a user correctly', (done) => {
-    server
-        .post('/developers/testuser')
-        .expect('Content-type', /json/)
-        .expect(200)
-        .end((err, res) => {
+    server.post(base_url + '/developers/testuser', (err, res, body) => {
+      if (err) {
+        done.fail(err)
+      } else {
+        expect(res.statusCode).toEqual(200)
+        server.delete(base_url + '/developers/testuser', (err, res, body) => {
           if (err) {
-            throw err
-          }
-          expect(res.status).toEqual(200)
-          server
-            .delete('/developers/testuser')
-            .expect('Content-type', /json/)
-            .expect(200)
-            .end((err, res) => {
+            done.fail(err)
+          } else {
+            expect(res.statusCode).toEqual(200)
+            server.get(base_url + '/developers/testuser', (err, res, body) => {
               if (err) {
-                throw err
+                done.fail(err)
+              } else {
+                expect(res.statusCode).toEqual(500)
+                expect(body).toEqual('{"error":"The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com"}')
+                done()
               }
-              expect(res.status).toEqual(200)
-              server
-                .get('/developers/testuser')
-                .expect('Content-type', /json/)
-                .expect(500)
-                .end((err, res) => {
-                  if (err) {
-                    throw err
-                  }
-                  console.log(res.status)
-                  expect(res.status).toEqual(500)
-                  expect(res.body).toEquals('The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com')
-                  done()
-                })
             })
+          }
         })
+      }
+    })
   })
 })

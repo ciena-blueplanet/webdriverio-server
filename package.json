@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "nodemon ./bin/www.js",
-    "lint": "eslint *.js bin routes src tests testUtils ",
+    "lint": "eslint *.js bin routes src spec testUtils ",
     "jasmine": "JASMINE_CONFIG_PATH=spec/support/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
     "test": "npm run lint && npm run jasmine"
   },
@@ -39,8 +39,8 @@
     "eslint-config-frost-standard": "^0.2.5",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
-    "should": "^9.0.2",
-    "supertest": "^1.2.0"
+    "jasmine-node": "^1.14.5",
+    "request": "^2.72.0"
   },
   "dependencies": {
     "body-parser": "~1.12.0",
