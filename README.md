@@ -53,11 +53,11 @@ those on using environment variables
 
 ### Running the webdriverio-server on your localhost
 
-1) First install [Graphics Magick](http://www.graphicsmagick.org/README.html). It is a critical dependency for screenshot processing.
-2) Next, fork and clone the webdriverio-server code from the ciena-blueplanet repository and make any changes.
-3) If you are not already in the top level of the webdriverio-server directory, go there (cd webdriverio-server)
-4) Once you have made satisfactory changes or you just want to run the server on your localhost, download a project that utilizes e2e tests (see below for examples on using the server)
-5) Finally, run ```npm start``` on the webdriverio-server code and run ```npm run b2e-test``` on the project
+1. First install [Graphics Magick](http://www.graphicsmagick.org/README.html). It is a critical dependency for screenshot processing.
+2. Next, fork and clone the webdriverio-server code from the ciena-blueplanet repository and make any changes.
+3. If you are not already in the top level of the webdriverio-server directory, go there (cd webdriverio-server)
+4. Once you have made satisfactory changes or you just want to run the server on your localhost, download a project that utilizes e2e tests (see below for examples on using the server)
+5. Finally, run ```npm start``` on the webdriverio-server code and run ```npm run b2e-test``` on the project
 
 
 ## Using the server
