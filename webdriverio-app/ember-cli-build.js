@@ -11,7 +11,7 @@ module.exports = function (defaults) {
       ],
       optional: ['es7.decorators']
     },
-    'ember-cli-qunit': {
+    'ember-cli-mocha': {
       useLintTree: false
     }
   })

@@ -4,6 +4,7 @@
     "ember": "~2.5.0",
     "ember-cli-shims": "0.1.1",
     "ember-cli-test-loader": "0.2.2",
+    "ember-mocha": "0.8.11",
     "ember-qunit-notifications": "0.1.0",
     "z-schema": "3.16.1",
     "lodash": "^4.10.0",
