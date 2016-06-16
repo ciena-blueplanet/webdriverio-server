@@ -1,7 +1,7 @@
 const server = require('request')
 const base_url = 'http://localhost:3000'
 
-describe('Post Requests', () => {
+xdescribe('Post Requests', () => {
   it('should post a new user correctly', (done) => {
     server.post({url: base_url + '/developers/testuser', form: {token: '1234567890987654321'}}, (err, res, body) => {
       if (err) {
@@ -16,7 +16,7 @@ describe('Post Requests', () => {
   })
 })
 
-describe('Put Requests', () => {
+xxdescribe('Put Requests', () => {
   it('should update a user correctly', (done) => {
     server.put({url: base_url + '/developers/testuser', form: {token: '357284909lsdkjf83745'}}, (err, res, body) => {
       if (err) {
@@ -30,7 +30,7 @@ describe('Put Requests', () => {
   })
 })
 
-describe('Get Requests', () => {
+xdescribe('Get Requests', () => {
   it('should get a user with the correct token after an update happens', (done) => {
     var testToken = {token: 'sometokenofjustice'}
     server.put({url: base_url + '/developers/testuser', form: testToken}, (err, res, body) => {
@@ -84,7 +84,7 @@ describe('Get Requests', () => {
   })
 })
 
-describe('Delete Requests', () => {
+xdescribe('Delete Requests', () => {
   it('should delete a user correctly', (done) => {
     server.post(base_url + '/developers/testuser', (err, res, body) => {
       if (err) {
