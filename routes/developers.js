@@ -16,6 +16,7 @@ router.use(methodOverride(function (req, res) {
 
 // Build the REST operations at the base of courses
 // This will be accessible from localhost:3000/developers
+DeveloperHandler.init
 router.route('/:username')
     .get(DeveloperHandler.get)
     .post(DeveloperHandler.post)
