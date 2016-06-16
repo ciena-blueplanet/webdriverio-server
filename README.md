@@ -22,6 +22,7 @@ These instructions assume that you have set up a server (either Mac or Ubuntu) w
 - [Dependencies](https://github.com/webdriverio/webdrivercss) of webdrivercss
 - Java runtime environment (ubuntu: `sudo apt-get install -y openjdk-7-jre`)
 - Chrome web browser installed
+- RedisDB instance
 
 In order to facilitate this for an Ubuntu 14.04 server, the following command can be used:
 
