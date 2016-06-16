@@ -1,23 +1,56 @@
-const base_url = 'http://localhost:3000'
 const server = require('../handlers/developers_handler.js')
 const redis = require('redis')
+
+var redisResponse = ''
 
 const res = {
   status: jasmine.createSpy('status'),
   format: jasmine.createSpy('format'),
-  json: function () {}
+  json: function (redisResp) {
+    if (redisResp !== undefined) {
+      redisResponse = redisResp
+    }
+  }
+}
+
+var db = new Map()
+
+function set (username, token) {
+  db.set(username, token)
+  res.json('OK')
+}
+
+function get (username) {
+  const token = db.get(username)
+  if (token !== undefined) {
+    res.json(token)
+  } else {
+    res.json({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
+  }
+}
+
+function remove (username) {
+  db.delete(username)
+  res.json('OK')
 }
 
 beforeEach(() => {
   spyOn(redis, 'createClient').and.returnValue({
-    delete: function () {},
-    get: function () {},
-    post: function () {},
-    put: function () {},
-    set: function (username, token, cb) {
+    get: function (username, cb) {
+      get(username)
+      if (redisResponse.error !== undefined) {
+        cb(undefined, null)
+      }
       cb(undefined, res)
     },
-    del: function () {}
+    set: function (username, token, cb) {
+      set(username, token)
+      cb(undefined, res)
+    },
+    del: function (username, cb) {
+      remove(username)
+      cb(undefined, res)
+    }
   })
   server.init()
 })
@@ -33,6 +66,7 @@ describe('Post Requests', () => {
         expect(res.format).toHaveBeenCalledWith({
           json: jasmine.any(Function)
         })
+        expect(redisResponse).toEqual('OK')
         done()
       }
     })
@@ -50,26 +84,30 @@ describe('Put Requests', () => {
         expect(res.format).toHaveBeenCalledWith({
           json: jasmine.any(Function)
         })
+        expect(redisResponse).toEqual('OK')
         done()
       }
     })
   })
 })
 
-xdescribe('Get Requests', () => {
+describe('Get Requests', () => {
   it('should get a user with the correct token after an update happens', (done) => {
-    var testToken = {token: 'sometokenofjustice'}
-    server.put({url: base_url + '/developers/testuser', form: testToken}, (err, res, body) => {
+    const req = {params: {username: 'testuser'}, body: {token: 'sometokenofjustice'}}
+    server.put(req, res, (err) => {
       if (err) {
         done.fail(err)
       } else {
-        expect(res.statusCode).toEqual(200)
-        server.get(base_url + '/developers/testuser', (err, res, body) => {
+        expect(res.status).toHaveBeenCalledWith(200)
+        server.get(req, res, (err) => {
           if (err) {
             done.fail(err)
           } else {
-            expect(res.statusCode).toEqual(200)
-            expect(body).toEqual('"sometokenofjustice"')
+            expect(res.status).toHaveBeenCalledWith(200)
+            expect(res.format).toHaveBeenCalledWith({
+              json: jasmine.any(Function)
+            })
+            expect(redisResponse).toEqual('sometokenofjustice')
             done()
           }
         })
@@ -78,18 +116,21 @@ xdescribe('Get Requests', () => {
   })
 
   it('should get a user with the correct token after an post happens', (done) => {
-    var testToken = {token: 'acompletelynewandoriginaltoken'}
-    server.post({url: base_url + '/developers/testuser', form: testToken}, (err, res, body) => {
+    const req = {params: {username: 'testuser'}, body: {token: 'acompletelynewandoriginaltoken'}}
+    server.post(req, res, (err) => {
       if (err) {
         done.fail(err)
       } else {
-        expect(res.statusCode).toEqual(200)
-        server.get(base_url + '/developers/testuser', (err, res, body) => {
+        expect(res.status).toHaveBeenCalledWith(200)
+        server.get(req, res, (err) => {
           if (err) {
             done.fail(err)
           } else {
-            expect(res.statusCode).toEqual(200)
-            expect(body).toEqual('"acompletelynewandoriginaltoken"')
+            expect(res.status).toHaveBeenCalledWith(200)
+            expect(res.format).toHaveBeenCalledWith({
+              json: jasmine.any(Function)
+            })
+            expect(redisResponse).toEqual('acompletelynewandoriginaltoken')
             done()
           }
         })
@@ -98,36 +139,44 @@ xdescribe('Get Requests', () => {
   })
 
   it('should indicate that a username does not exist', (done) => {
-    server.get(base_url + '/developers/ksdflaj', (err, res, body) => {
+    const req = {params: {username: 'lhg'}}
+    server.get(req, res, (err) => {
       if (err) {
         done.fail(err)
       } else {
-        expect(res.statusCode).toEqual(500)
-        expect(body).toEqual('{"error":"The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com"}')
+        expect(res.status).toHaveBeenCalledWith(500)
+        expect(res.format).toHaveBeenCalledWith({
+          json: jasmine.any(Function)
+        })
+        expect(redisResponse).toEqual({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
         done()
       }
     })
   })
 })
 
-xdescribe('Delete Requests', () => {
+describe('Delete Requests', () => {
   it('should delete a user correctly', (done) => {
-    server.post(base_url + '/developers/testuser', (err, res, body) => {
+    const req = {params: {username: 'testuser'}, body: {token: 'atokenthattotallyworks'}}
+    server.post(req, res, (err) => {
       if (err) {
         done.fail(err)
       } else {
-        expect(res.statusCode).toEqual(200)
-        server.delete(base_url + '/developers/testuser', (err, res, body) => {
+        expect(res.status).toHaveBeenCalledWith(200)
+        server.delete(req, res, (err) => {
           if (err) {
             done.fail(err)
           } else {
-            expect(res.statusCode).toEqual(200)
-            server.get(base_url + '/developers/testuser', (err, res, body) => {
+            expect(res.status).toHaveBeenCalledWith(200)
+            server.get(req, res, (err) => {
               if (err) {
                 done.fail(err)
               } else {
-                expect(res.statusCode).toEqual(500)
-                expect(body).toEqual('{"error":"The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com"}')
+                expect(res.status).toHaveBeenCalledWith(500)
+                expect(res.format).toHaveBeenCalledWith({
+                  json: jasmine.any(Function)
+                })
+                expect(redisResponse).toEqual({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
                 done()
               }
             })

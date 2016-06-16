@@ -60,12 +60,15 @@ var DeveloperHandler = {
       }
     })
   },
-  delete: function (req, res) {
+  delete: function (req, res, cb) {
     this.client.del(req.params.username, function (err, redisResp) {
       if (err) {
         setErrorResponse(res, err, 404)
       } else {
         setStandardResponse(res, redisResp)
+      }
+      if (cb) {
+        cb(err, redisResp)
       }
     })
   }
