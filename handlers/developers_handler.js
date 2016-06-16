@@ -1,5 +1,5 @@
 const redis = require('redis') // redis connection
-const client = redis.createClient()
+const client = redis.createClient({password: '123456'})
 
 var DeveloperHandler = {
   get: function (req, res) {

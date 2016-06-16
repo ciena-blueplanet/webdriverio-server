@@ -16,7 +16,7 @@ xdescribe('Post Requests', () => {
   })
 })
 
-xxdescribe('Put Requests', () => {
+xdescribe('Put Requests', () => {
   it('should update a user correctly', (done) => {
     server.put({url: base_url + '/developers/testuser', form: {token: '357284909lsdkjf83745'}}, (err, res, body) => {
       if (err) {
