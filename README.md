@@ -2,7 +2,6 @@
 
 [![npm version](https://badge.fury.io/js/webdriverio-server.svg)](http://badge.fury.io/js/webdriverio-server)
 [![build status](https://travis-ci.org/ciena-blueplanet/webdriverio-server.svg?branch=master)](https://travis-ci.org/ciena-blueplanet/webdriverio-server)
-[![Stories in Ready](https://badge.waffle.io/pastorsj/webdriverio-server.svg?label=ready&title=Ready)](http://waffle.io/pastorsj/webdriverio-server)
 
 If you want a remote server to do selenium testing, this is a better way
 
@@ -22,7 +21,7 @@ These instructions assume that you have set up a server (either Mac or Ubuntu) w
 - [Dependencies](https://github.com/webdriverio/webdrivercss) of webdrivercss
 - Java runtime environment (ubuntu: `sudo apt-get install -y openjdk-7-jre`)
 - Chrome web browser installed
-- RedisDB instance
+- Redis instance
 
 In order to facilitate this for an Ubuntu 14.04 server, the following command can be used:
 
@@ -58,7 +57,10 @@ those on using environment variables
 2. Next, fork and clone the webdriverio-server code from the ciena-blueplanet repository and make any changes.
 3. If you are not already in the top level of the webdriverio-server directory, go there (cd webdriverio-server)
 4. Once you have made satisfactory changes or you just want to run the server on your localhost, download a project that utilizes e2e tests (see below for examples on using the server)
-5. Finally, run ```npm start``` on the webdriverio-server code and run ```npm run b2e-test``` on the project
+5. Run ```npm start``` on the webdriverio-server code
+6. If you are running a project that is already configured to run e2e tests, you can run those now. If not, configure your project 
+using the (webdriverio-client)[https://github.com/ciena-blueplanet/webdriverio-client] package. Instructions on configuring your project to run e2e tests can 
+be found in the README.md in the webdriverio-client repo on GitHub
 
 
 ## Using the server
@@ -79,7 +81,7 @@ Navigate to localhost:4200 to view the current version of the website
 
 #### Where is the important information stored?
 
-The wdio server contains a secure reds db accessed through a small express application 
+The wdio server contains a secure redis db accessed through a small express application 
 where the authorized usernames and corresponding testing tokens are stored.
 
 #### What sensitive computing resources are trying to be protected? 
