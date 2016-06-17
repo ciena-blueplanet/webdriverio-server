@@ -1,8 +1,49 @@
 @import 'node_modules/ember-frost-core/addon/styles/addon';
 
-.container {
+.flex {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
+
+.container {
+    @extend .flex;
+    min-height: 100vh;
+}
+
+.main {
+    @extend .flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+}
+
+.footer-image {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.footer-bar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.link {
+    padding: 2px;
+}
+
+.login {
+    @extend .flex;
+    button {
+        width: 150px;
+        margin: 20px auto;
+    }
+}
+
+a {
+    @extend .frost-link;
+    @extend .small;
+    @extend .secondary;
+}
+

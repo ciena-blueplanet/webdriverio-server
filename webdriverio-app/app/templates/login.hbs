@@ -1,1 +1,43 @@
-{{outlet}}
+<div class="container">
+    <div class='main'>
+      <div class='login'>
+          <img src='./images/login_image.png'>
+            {{frost-bunsen-form
+            bunsenModel=loginModel
+            bunsenView=loginView
+            disabled=isFormDisabled
+            onChange=(action "formChange")
+            onValidation=(action "formValidation")
+            }}
+            {{frost-button
+            disabled=(or isFormDisabled isFormInvalid)
+            onClick=(action "submitForm")
+            priority="primary"
+            size="medium"
+            text="Sign Up"
+            }}
+      </div>
+    </div>
+    <div class='footer'>
+        <div class='footer-bar'>
+            <div class='link'>
+                {{#frost-link 'login'
+                priority='secondary'
+                size='small'
+                tab-index='-1'}}
+                Login
+                {{/frost-link}}
+            </div>
+            <div class='link'>
+                <a href='https://www.github.com/ciena-blueplanet/webdriverio-server'>
+                    <div class='content'>
+                        Interested in Contributing?
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class='footer-image'>
+            <img src="./images/ciena_logo.png">
+        </div>
+    </div>
+</div>

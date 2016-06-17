@@ -1,9 +1,33 @@
 <div class="container">
-    <img src="./images/welcome_image.png">
-    {{#frost-link 'register'
-    priority='secondary'
-    size='medium'
-    }}
-    Sign Up Here
-    {{/frost-link}}
+    <div class='main'>
+        <img src="./images/welcome_image.png">
+        {{#frost-link 'register'
+        priority='secondary'
+        size='medium'
+        }}
+        Sign Up Here
+        {{/frost-link}}
+    </div>
+    <div class='footer'>
+        <div class='footer-bar'>
+            <div class='link'>
+                {{#frost-link 'login'
+                priority='secondary'
+                size='small'
+                tab-index='-1'}}
+                Login
+                {{/frost-link}}
+            </div>
+            <div class='link'>
+                <a href='https://www.github.com/ciena-blueplanet/webdriverio-server'>
+                    <div class='content'>
+                        Interested in Contributing?
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class='footer-image'>
+            <img src="./images/ciena_logo.png">
+        </div>
+    </div>
 </div>
