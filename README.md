@@ -85,7 +85,7 @@ The wdio server contains a secure redis db accessed through a small express appl
 where the authorized usernames and corresponding testing tokens are stored.
 
 #### What sensitive computing resources are trying to be protected? 
-We are trying to prevent people from breaking the wdio server since anyone can submit node scripts to the server. 
+We are trying to prevent people from breaking into the wdio server since anyone can submit node scripts to the server. 
 We don't necessarily require authorized ciena developers to submit pull requests before testing through the wdio server.
 
 #### How do we develop trust for random people on the internet to submit pr's?
