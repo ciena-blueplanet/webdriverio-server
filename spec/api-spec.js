@@ -15,11 +15,20 @@ const res = {
 
 var db = new Map()
 
+/**
+ * Mocks the redis set command
+ * @param {string} username - The username of a developer
+ * @param {string} token - The token randomly generated and stored as the value to the username key
+ */
 function set (username, token) {
   db.set(username, token)
   res.json('OK')
 }
 
+/**
+ * Mocks the redis get command
+ * @param {string} username - The username of a developer
+ */
 function get (username) {
   const token = db.get(username)
   if (token !== undefined) {
@@ -29,6 +38,10 @@ function get (username) {
   }
 }
 
+/**
+ * Mocks the redis del command
+ * @param {string} username - The username of the developer
+ */
 function remove (username) {
   db.delete(username)
   res.json('OK')

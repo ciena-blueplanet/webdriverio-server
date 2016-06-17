@@ -1,5 +1,15 @@
+/**
+ * A Redis client for node.js
+ * https://github.com/NodeRedis/node_redis
+ */
 const redis = require('redis') // redis connection
 
+/**
+ * Sets the response object to be in the format of an error
+ * @param {object} res - The response object
+ * @param {string} err - The specific error
+ * @param {Number} statusCode - The http status code
+ */
 function setErrorResponse (res, err, statusCode) {
   res.status(statusCode)
   res.format({
@@ -9,6 +19,11 @@ function setErrorResponse (res, err, statusCode) {
   })
 }
 
+/**
+ * Set the response object to be in the format of a successful reponse
+ * @param {object} res - The response object
+ * @param {object} redisResp - The response from the redis database
+ */
 function setStandardResponse (res, redisResp) {
   res.status(200)
   res.format({
