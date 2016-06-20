@@ -61,11 +61,6 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
 
 app.use('/', express.static(path.join(__dirname, '..', 'webdriverio-app/dist')))
 
-/* GET home page. */
-app.get('/', function (req, res) {
-  res.render('index', {title: 'Webdriver server'})
-})
-
 app.post('/', function (req, res) {
   if (done) {
     const filename = req.files.tarball.name

@@ -35,7 +35,7 @@ function setStandardResponse (res, redisResp) {
 
 var DeveloperHandler = {
   init: function () {
-    this.client = redis.createClient({password: '123456'})
+    this.client = redis.createClient({password: process.env.REDIS})
   },
   get: function (req, res, cb) {
     this.client.get(req.params.username, function (err, redisResp) {

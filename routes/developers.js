@@ -17,11 +17,11 @@ router.use(methodOverride(function (req, res) {
 
 // Build the REST operations at the base of courses
 // This will be accessible from base_url/developers
-DeveloperHandler.init
+DeveloperHandler.init()
 router.route('/:username')
-    .get(DeveloperHandler.get)
-    .post(DeveloperHandler.post)
-    .put(DeveloperHandler.put)
-    .delete(DeveloperHandler.delete)
+    .get(DeveloperHandler.get.bind(DeveloperHandler))
+    .post(DeveloperHandler.post.bind(DeveloperHandler))
+    .put(DeveloperHandler.put.bind(DeveloperHandler))
+    .delete(DeveloperHandler.delete.bind(DeveloperHandler))
 
 module.exports = router
