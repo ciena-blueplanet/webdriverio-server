@@ -1,6 +1,7 @@
 # External Dependencies
 npm-debug.log
 node_modules
+bower_components
 
 # Generated Directories
 build-*
@@ -17,3 +18,6 @@ coverage
 # Project-specific Ignores
 screenshots
 uploads
+
+# Redis Dump Files
+dump.rdb

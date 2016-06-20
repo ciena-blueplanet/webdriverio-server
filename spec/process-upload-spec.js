@@ -26,7 +26,9 @@ describe('process-upload', function () {
     beforeEach(function () {
       res = jasmine.createSpyObj('res', ['send', 'end'])
       seconds = Math.floor(new Date().getTime() / 1000)
-      processUpload.newFile('filename', 'entry-point', res)
+      console.log('attempting newFile call...')
+      processUpload.newFile('filename', 'entry-point', '.', res)
+      console.log('done----------------------')
     })
 
     it('spawns a new process', function () {
@@ -34,7 +36,8 @@ describe('process-upload', function () {
         processUpload.scriptPath,
         'filename',
         'entry-point',
-        seconds
+        seconds,
+        '.'
       ])
     })
 

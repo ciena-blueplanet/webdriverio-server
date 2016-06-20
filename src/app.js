@@ -5,10 +5,13 @@ const express = require('express')
 const fs = require('fs')
 const path = require('path')
 const logger = require('morgan')
+const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 
 const app = express()
+
+const developers = require('../routes/developers')
 
 const processUpload = require('./process-upload')
 // view engine setup
@@ -18,7 +21,10 @@ app.set('view engine', 'jade')
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
+app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
+
+app.use('/developers', developers)
 
 // ==================================================================
 //                          The main method
@@ -53,10 +59,7 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
   })
 })
 
-/* GET home page. */
-app.get('/', function (req, res) {
-  res.render('index', {title: 'Webdriver server'})
-})
+app.use('/', express.static(path.join(__dirname, '..', 'webdriverio-app/dist')))
 
 app.post('/', function (req, res) {
   if (done) {
