@@ -17,16 +17,15 @@
     flex: 1;
 }
 
-.footer-image {
+.footer {
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .footer-bar {
     display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    align-items: center;
 }
 
 .link {
@@ -39,6 +38,10 @@
         width: 150px;
         margin: 20px auto;
     }
+}
+
+.ciena-image-filler {
+    width: 200px;
 }
 
 a {
