@@ -9,25 +9,23 @@
 * **GraphicsMagick**
 * **Webdriverio-server**
 * **Redis**
+* **Nginx**
+* **Java 1.8**
 
 ## Shell Script (See setup.sh)
 To run the shell script and setup the webserver automatically
 ```
 sudo apt-get install wget
-wget -0- https://raw.githubusercontent.com/pastorsj/webdriverio-server/sprint12/bin/bootstrap/ubuntu/14.04.sh | bash
+wget -O- https://raw.githubusercontent.com/pastorsj/webdriverio-server/sprint12/bin/bootstrap/ubuntu/14.04.sh | bash
 ```
 
-## Running the webdriverio-server
-1. First, a .bashrc file must be configured. Instructions are below
-2. X Virtual Frame Buffer must be running as a service. Run the command ```sudo service xvfb```
-3. The webdriverio-server code must be running as a service. Instructions on configuring this are below
-
-
-#### Configuring the Webdriverio-server to run as a service
-1. Run the command ```tmux```
-2. Run the command ```webdriverio-server```
+#### Configuring the Wetmux attachbdriverio-server to run as a service
+1. Run the command ```tmux``` to enter a tmux session
+2. Run the command ```source ~/.bashrc && DISPLAY=:0 DEBUG=server webdriverio-server``` to begin running the webdriverio-server instance
 3. Type Ctrl b
 4. Type d
+
+If there is any need to enter the tmux session again, run the command ```tmux attach-session```
 
 #### Configuring the RedisDB to use a password
 In Ubuntu, the redis.conf file, or the redis configuration file is stored at this location ```/etc/redis```  
@@ -54,7 +52,7 @@ If the redis-server returns 'OK', you have configured Redis correctly.
 If the redis-cli returns 'No password set', retry the following steps above. If that does not work, file an issue [here](https://github.com/ciena-blueplanet/webdriverio-server/issues).
 
 #### Confirming the front end is running correctly
-Navigate to the server's name in the browser. The website should be displayed.
+Navigate to the server's name in the browser. The website should be displayed. If running on localhost, navigate to localhost:3000
 
 ## Sources
 [Git](https://help.ubuntu.com/lts/serverguide/git.html)  
@@ -65,5 +63,7 @@ Navigate to the server's name in the browser. The website should be displayed.
 [WebDriverIO Server](https://github.com/ciena-blueplanet/webdriverio-server)  
 [Redis](http://redis.io)  
 [Installation Instructions for Redis](https://www.digitalocean.com/community/tutorials/how-to-configure-a-redis-cluster-on-ubuntu-14-04)  
+[Java 1.8 Runtime Environment](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)  
+[Nginx](http://nginx.org)
 
 
