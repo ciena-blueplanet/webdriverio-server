@@ -12,8 +12,8 @@
 * **Nginx**
 * **Java 1.8**
 
-## Shell Script (See setup.sh)
-To run the shell script and setup the webserver automatically
+## Shell Script
+To run the shell script and setup the server automatically
 ```
 sudo apt-get install wget
 wget -O- https://raw.githubusercontent.com/pastorsj/webdriverio-server/sprint12/bin/bootstrap/ubuntu/14.04.sh | bash
@@ -31,9 +31,9 @@ If there is any need to enter the tmux session again, run the command ```tmux at
 In Ubuntu, the redis.conf file, or the redis configuration file is stored at this location ```/etc/redis```  
 
 1. Shutdown the redis-server by running the command ```redis-cli shutdown```
-2. To configure the redis.conf, Type ```nano /etc/redis/redis.conf```
+2. To configure the redis.conf, type ```nano /etc/redis/redis.conf```
 3. Scroll down to the section on security (about halfway to 3/4 of the way down the file)
-4. Uncomment the line with requirepass
+4. Uncomment the line with 'requirepass'
 5. Type in your secret password to the redis server
 6. Save and exit nano ('Ctrl x' + 'y' + 'enter')
 7. Start the redis-server by typing ```sudo redis-server /etc/redis/redis.conf```
