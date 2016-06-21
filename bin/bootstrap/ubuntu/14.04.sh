@@ -13,7 +13,9 @@ sudo apt-get install -y \
     libcairo2 \
     nginx \
     python-pip \
-    unzip
+    unzip \
+    redis-server \
+    tmux
 
 # Install nodeenv and node version (defined by NODE_VERSION environment variable)
 if [ -z "$NODE_VERSION" ]
@@ -144,17 +146,30 @@ sudo mv nginx.conf /etc/nginx/nginx.conf
 # Reload with the new config
 sudo service nginx reload
 
+# Start redis server
+sudo service redis-server restart
+
+npm install -g webdriverio-server && webdriverio-server-init
+
+# Setup the front end
+cd /opt/node-envs/5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
+npm install # Install the npm dependencies for the front end
+npm install bower -g
+bower install # Install the bower dependencies for the front end
+npm install ember-cli -g # This is needed if ember-cli is not already installed. It is used only for the next step.
+ember build # This builds the static assets for the front end
+cd ~
+
 # Setup .bashrc
 echo "source ~/.bashrc" >> ~/.bash_profile
 echo "# Activate a node version from nodeenv" >> ~/.bashrc
 echo "source /opt/node-envs/${NODE_VERSION}/bin/activate" >> ~/.bashrc
 echo "Please source ~/.bashrc to complete setup"
-echo "You can now do the following to run webdriverio-server:"
-echo ""
-echo "\$ source ~/.bashrc && npm install -g webdriverio-server && webdriverio-server-init && DISPLAY=:0 DEBUG=server webdriverio-server"
-echo ""
 echo "After the initial run, to run it again, you should only need:"
 echo "\$ source ~/.bashrc && DISPLAY=:0 DEBUG=server webdriverio-server"
 echo ""
+
+echo "To run webdriverio-server as a service using tmux, follow the end of SETUP.md"
+echo "at https://github.com/pastorsj/webdriverio-server/blob/sprint12/SETUP.md"
 
 } # this ensures the entire script is downloaded

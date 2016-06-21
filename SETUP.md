@@ -11,43 +11,17 @@
 * **Redis**
 
 ## Shell Script (See setup.sh)
-sudo apt-get update  
-sudo apt-get upgrade  
-sudo apt-get install git vvfb graphicsmagick redis-server tmux  
-git clone https://github.com/creationix/nvm.git ~/.nvm && cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`
-. ~/.nvm/nvm.sh  
-nvm install 5.3.0  
-nvm use 5.3.0  
-sudo npm install npm -g  
-sudo npm install bower -g
-sudo npm install -g webdriverio-server  
-webdriverio-server-init  
-cd ~/.nvm/versions/node/v5.3.0/lib/node_modules/webdriverio-server/webdriverio-app  
-npm install  
-bower install  
-// npm install ember-cli -g  
-ember build  
-cd ~  
+To run the shell script and setup the webserver automatically
+```
+sudo apt-get install wget
+wget -0- https://raw.githubusercontent.com/pastorsj/webdriverio-server/sprint12/bin/bootstrap/ubuntu/14.04.sh | bash
+```
 
 ## Running the webdriverio-server
 1. First, a .bashrc file must be configured. Instructions are below
 2. X Virtual Frame Buffer must be running as a service. Run the command ```sudo service xvfb```
 3. The webdriverio-server code must be running as a service. Instructions on configuring this are below
 
-#### Configuring the .bashrc and .bash_profile files
-1. Create a .bash_profile file by typing ```sudo nano ~/.bash_profile```
-2. Type 'source ~/.bashrc' into the .bash_profile file
-3. Type 'Ctrl x', then 'y', then enter, to save the file
-4. Create a .bashrc file by typing sudo ```nano ~/.bashrc```
-5. Type the following lines into the .bashrc file
-
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
-    export DISPLAY = :0
-    
-6. Run step 3 again to save the file
-7. Exit out of the server, and then ssh back in
-8. To confirm that files are written correctly, type 'echo $DISPLAY'. This should return :0. Then type 'node -v'. This should return 5.3.0.  
 
 #### Configuring the Webdriverio-server to run as a service
 1. Run the command ```tmux```
