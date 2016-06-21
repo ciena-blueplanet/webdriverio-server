@@ -2,9 +2,8 @@
 
 ## Requirements
 * **Git**
-* **Node 5.3.0** (Using NVM)
+* **Node 5.11.0**
 * **X Virtual Frame Buffer** (For running Google Chrome or your choice of browser headlessly)
-* **NVM**
 * **Latest Version of NPM**
 * **GraphicsMagick**
 * **Webdriverio-server**
@@ -18,6 +17,7 @@ To run the shell script and setup the server automatically
 sudo apt-get install wget
 wget -O- https://raw.githubusercontent.com/pastorsj/webdriverio-server/sprint12/bin/bootstrap/ubuntu/14.04.sh | bash
 ```
+This script should configure everything, including Node, Redis, xvfb, and Java
 
 #### Configuring the Webdriverio-server to run as a service
 1. Run the command ```tmux``` to enter a tmux session
@@ -58,7 +58,6 @@ Navigate to the server's name in the browser. The website should be displayed. I
 [Git](https://help.ubuntu.com/lts/serverguide/git.html)  
 [X Virtual Frame Buffer](https://www.x.org/archive/X11R7.6/doc/man/man1/Xvfb.1.xhtml)  
 [NodeJS](https://nodejs.org/en)  
-[Node Version Manager](https://github.com/creationix/nvm)  
 [GraphicsMagick](http://www.graphicsmagick.org/index.html)  
 [WebDriverIO Server](https://github.com/ciena-blueplanet/webdriverio-server)  
 [Redis](http://redis.io)  
