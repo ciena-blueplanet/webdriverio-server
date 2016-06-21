@@ -19,7 +19,7 @@ sudo apt-get install wget
 wget -O- https://raw.githubusercontent.com/pastorsj/webdriverio-server/sprint12/bin/bootstrap/ubuntu/14.04.sh | bash
 ```
 
-#### Configuring the Wetmux attachbdriverio-server to run as a service
+#### Configuring the Webdriverio-server to run as a service
 1. Run the command ```tmux``` to enter a tmux session
 2. Run the command ```source ~/.bashrc && DISPLAY=:0 DEBUG=server webdriverio-server``` to begin running the webdriverio-server instance
 3. Type Ctrl b
