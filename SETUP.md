@@ -9,6 +9,7 @@
 * **GraphicsMagick**
 * **Webdriverio-server**
 * **Redis**
+
 ## Shell Script (See setup.sh)
 sudo apt-get update  
 sudo apt-get upgrade  
@@ -53,6 +54,7 @@ cd ~
 2. Run the command ```webdriverio-server```
 3. Type Ctrl b
 4. Type d
+
 #### Configuring the RedisDB to use a password
 In Ubuntu, the redis.conf file, or the redis configuration file is stored at this location ```/etc/redis```  
 
