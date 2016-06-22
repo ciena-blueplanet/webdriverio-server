@@ -1,4 +1,5 @@
 import Ember from 'ember'
+import md5 from 'npm:blueimp-md5'
 
 export default Ember.Controller.extend({
   loginModel: {
@@ -54,12 +55,24 @@ export default Ember.Controller.extend({
     },
     submitForm () {
       Ember.run.later(() => {
-        const username = this.get('loginInfo').username
-        const password = this.get('loginInfo').password
-        console.log('username: ' + username)
-        console.log('password: ' + password)
+        const {username, password} = this.get('loginInfo')
+        this.get('store').queryRecord('developer', {
+          username: md5(username),
+          token: md5(password)
+        }).then((res) => {
+          this.get('store').queryRecord('developer', {
+            token: md5(username),
+            username: md5(password)
+          }).then((res) => {
+            this.transitionToRoute('')
+          }).catch((err) => {
+            throw err
+          })
+        }).catch((err) => {
+          throw err
+        })
         this.set('isFormDisabled', false)
-      }, 3000)
+      }, 1000)
     }
   }
 })

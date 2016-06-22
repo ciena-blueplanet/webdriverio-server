@@ -24,11 +24,14 @@ function setErrorResponse (res, err, statusCode) {
  * @param {object} res - The response object
  * @param {object} redisResp - The response from the redis database
  */
-function setStandardResponse (res, redisResp) {
+function setStandardResponse (res, username, token) {
   res.status(200)
   res.format({
     json: function () {
-      res.json(redisResp)
+      res.json({
+        username,
+        token
+      })
     }
   })
 }
@@ -38,13 +41,13 @@ var DeveloperHandler = {
     this.client = redis.createClient({password: process.env.REDIS})
   },
   get: function (req, res, cb) {
-    this.client.get(req.params.username, function (err, redisResp) {
+    this.client.get(req.query.username, function (err, redisResp) {
       if (err) {
         setErrorResponse(res, err, 404)
       } else if (redisResp === null) {
         setErrorResponse(res, 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com', 500)
       } else {
-        setStandardResponse(res, redisResp)
+        setStandardResponse(res, req.query.username, redisResp)
       }
       if (cb) {
         cb(err, redisResp)
@@ -52,11 +55,11 @@ var DeveloperHandler = {
     })
   },
   post: function (req, res, cb) {
-    this.client.set(req.params.username, req.body.token, function (err, redisResp) {
+    this.client.set(req.query.username, req.query.token, function (err, redisResp) {
       if (err) {
         setErrorResponse(res, err, 404)
       } else {
-        setStandardResponse(res, redisResp)
+        setStandardResponse(res, req.query.username, req.query.token)
       }
       if (cb) {
         cb(err, redisResp)
@@ -64,11 +67,11 @@ var DeveloperHandler = {
     })
   },
   put: function (req, res, cb) {
-    this.client.set(req.params.username, req.body.token, function (err, redisResp) {
+    this.client.set(req.query.username, req.query.token, function (err, redisResp) {
       if (err) {
         setErrorResponse(res, err, 404)
       } else {
-        setStandardResponse(res, redisResp)
+        setStandardResponse(res, req.query.username, req.query.token)
       }
       if (cb) {
         cb(err, redisResp)
@@ -76,11 +79,11 @@ var DeveloperHandler = {
     })
   },
   delete: function (req, res, cb) {
-    this.client.del(req.params.username, function (err, redisResp) {
+    this.client.del(req.query.username, function (err, redisResp) {
       if (err) {
         setErrorResponse(res, err, 404)
       } else {
-        setStandardResponse(res, redisResp)
+        setStandardResponse(res, req.query.username, 'TokenWasDeleted')
       }
       if (cb) {
         cb(err, redisResp)
