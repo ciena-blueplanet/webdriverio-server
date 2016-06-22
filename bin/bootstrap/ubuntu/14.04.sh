@@ -25,11 +25,10 @@ fi
 
 # Installing Node using NVM
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh | bash
-source ~/.profile
-. ~/.nvm/nvm.sh
-sudo nvm install 5.11.0
-'export NVM_DIR="$HOME/.nvm' >> ~/.profile
+echo 'export NVM_DIR="$HOME/.nvm' >> ~/.profile
 echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh' >> ~/.profile
+source ~/.profile
+nvm install 5.11.0
 
 # sudo pip install nodeenv
 # sudo mkdir -p /opt/node-envs
