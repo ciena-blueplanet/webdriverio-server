@@ -1,31 +1,62 @@
 <div class="container">
     <div class='main'>
         <div class='title'>
-            Administrator Login
+            Admin Portal
         </div>
-        <div class='login'>
+        <div class='username_form'>
             {{frost-bunsen-form
-            bunsenModel=loginModel
-            bunsenView=loginView
+            bunsenModel=portalModel
+            bunsenView=portalView
             disabled=isFormDisabled
             onChange=(action "formChange")
             onValidation=(action "formValidation")
             }}
+        </div>
+        <div class='bar'>
+          <div class='link'>
             {{frost-button
             disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "submitForm")
+            onClick=(action "createUser")
             priority="primary"
             size="medium"
-            text="Sign In"
+            text="Create User"
             }}
-        </div>
+          </div>
+          <div class='link'>
+            {{frost-button
+            disabled=(or isFormDisabled isFormInvalid)
+            onClick=(action "updateUserInfo")
+            priority="primary"
+            size="medium"
+            text="Update User"
+            }}
+          </div>
+          <div class='link'>
+            {{frost-button
+            disabled=(or isFormDisabled isFormInvalid)
+            onClick=(action "getUserInfo")
+            priority="primary"
+            size="medium"
+            text="Get User"
+            }}
+          </div>
+          <div class='link'>
+            {{frost-button
+            disabled=(or isFormDisabled isFormInvalid)
+            onClick=(action "deleteUser")
+            priority="primary"
+            size="medium"
+            text="Delete User"
+            }}
+          </div>
+      </div>
     </div>
     <div class='footer'>
         <span class='ciena-image-filler'>
         </span>
         <span class='bar'>
             <span class='link'>
-                {{#frost-link 'portal'
+                {{#frost-link 'index'
                 priority='secondary'
                 size='small'
                 tab-index='-1'}}

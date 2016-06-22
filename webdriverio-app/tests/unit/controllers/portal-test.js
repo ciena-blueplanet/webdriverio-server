@@ -1,20 +1,22 @@
 /* jshint expr:true */
 import { expect } from 'chai'
-import { describeModel, it } from 'ember-mocha'
+import {
+  describeModule,
+  it
+} from 'ember-mocha'
 
-describeModel(
-  'developer',
-  'Unit | Model | developer',
+describeModule(
+  'controller:portal',
+  'PortalController',
   {
     // Specify the other units that are required for this test.
-    needs: []
+    // needs: ['controller:foo']
   },
   function () {
     // Replace this with your real tests.
     it('exists', function () {
-      let model = this.subject()
-      // var store = this.store();
-      expect(model).to.be.ok
+      let controller = this.subject()
+      expect(controller).to.be.ok
     })
   }
 )

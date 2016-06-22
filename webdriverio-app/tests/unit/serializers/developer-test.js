@@ -4,17 +4,19 @@ import { describeModel, it } from 'ember-mocha'
 
 describeModel(
   'developer',
-  'Unit | Model | developer',
+  'Unit | Serializer | developer',
   {
     // Specify the other units that are required for this test.
-    needs: []
+    needs: ['serializer:developer']
   },
   function () {
     // Replace this with your real tests.
-    it('exists', function () {
-      let model = this.subject()
-      // var store = this.store();
-      expect(model).to.be.ok
+    it('serializes records', function () {
+      let record = this.subject()
+
+      let serializedRecord = record.serialize()
+
+      expect(serializedRecord).to.be.ok
     })
   }
 )

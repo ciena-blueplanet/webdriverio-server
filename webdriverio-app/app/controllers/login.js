@@ -59,16 +59,20 @@ export default Ember.Controller.extend({
         this.get('store').queryRecord('developer', {
           username: md5(username),
           token: md5(password)
-        }).then((res) => {
-          this.get('store').queryRecord('developer', {
+        })
+        .then((res) => {
+          console.log(res)
+          return this.get('store').queryRecord('developer', {
             token: md5(username),
             username: md5(password)
-          }).then((res) => {
-            this.transitionToRoute('')
-          }).catch((err) => {
-            throw err
           })
-        }).catch((err) => {
+        })
+        .then((res) => {
+          console.log(res)
+          this.transitionToRoute('portal')
+        })
+        .catch((err) => {
+          console.log('The username and/or password do not match')
           throw err
         })
         this.set('isFormDisabled', false)

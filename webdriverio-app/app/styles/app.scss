@@ -17,15 +17,27 @@
     flex: 1;
 }
 
+.title {
+    text-align: center;
+    padding: 40px;
+    color: #7f91be;
+    font-size: 60px;
+}
+
 .footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.footer-bar {
+.bar {
     display: flex;
     align-items: center;
+    a {
+        @extend .frost-link;
+        @extend .small;
+        @extend .secondary;
+    }
 }
 
 .link {
@@ -44,9 +56,22 @@
     width: 200px;
 }
 
-a {
-    @extend .frost-link;
-    @extend .small;
-    @extend .secondary;
+.welcome_title {
+    @extend .title;
+    width: 700px;
+    font-size: 40px;
 }
+
+.logo {
+    padding-bottom: 30px;
+}
+
+.username_form {
+    @extend .logo;
+}
+
+body {
+    overflow: hidden;
+}
+
 

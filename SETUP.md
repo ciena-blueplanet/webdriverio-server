@@ -1,6 +1,7 @@
 # Setup instructions for your server
 
 ## Requirements
+* **Ubuntu 14.04**
 * **Git**
 * **Node 5.11.0**
 * **X Virtual Frame Buffer** (For running Google Chrome or your choice of browser headlessly)
