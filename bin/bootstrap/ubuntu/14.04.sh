@@ -25,6 +25,7 @@ fi
 
 # Installing Node using NVM
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh | bash
+. ~/.nvm/nvm.sh
 echo 'export NVM_DIR="$HOME/.nvm' >> ~/.profile
 echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh' >> ~/.profile
 source ~/.profile
