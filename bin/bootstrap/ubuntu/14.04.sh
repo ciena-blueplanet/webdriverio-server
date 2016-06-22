@@ -24,11 +24,11 @@ then
 fi
 
 # Installing Node using NVM
-git clone https://github.com/creationix/nvm.git ~/.nvm && cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`
+wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh | bash
 source ~/.profile
 . ~/.nvm/nvm.sh
-nvm install 5.11.0
-echo 'export NVM_DIR="$HOME/.nvm' >> ~/.profile
+sudo nvm install 5.11.0
+'export NVM_DIR="$HOME/.nvm' >> ~/.profile
 echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh' >> ~/.profile
 
 # sudo pip install nodeenv
