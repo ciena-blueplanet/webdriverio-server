@@ -26,9 +26,9 @@ fi
 # Installing Node using NVM
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh | bash
 . ~/.nvm/nvm.sh
-echo 'export NVM_DIR="$HOME/.nvm' >> ~/.profile
-echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh' >> ~/.profile
 source ~/.profile
+. ~/.nvm/nvm.sh
+
 nvm install 5.11.0
 
 # sudo pip install nodeenv
@@ -171,8 +171,8 @@ cd ~
 
 # Setup .bashrc
 echo "source ~/.bashrc" >> ~/.bash_profile
-echo "# Activate a node version from nodeenv" >> ~/.bashrc
-echo "source /opt/node-envs/${NODE_VERSION}/bin/activate" >> ~/.bashrc
+echo 'export NVM_DIR="$HOME/.nvm' >> ~/.bashrc
+echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh' >> ~/.bashrc
 echo "Please source ~/.bashrc to complete setup"
 echo "After the initial run, to run it again, you should only need:"
 echo "\$ source ~/.bashrc && DISPLAY=:0 DEBUG=server webdriverio-server"
