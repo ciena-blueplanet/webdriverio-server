@@ -160,7 +160,8 @@ sudo service redis-server restart
 npm install -g webdriverio-server && webdriverio-server-init
 
 # Setup the front end
-cd /opt/node-envs/5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
+cd ~/.nvm/versions/node/v5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
+# cd /opt/node-envs/5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
 npm install # Install the npm dependencies for the front end
 npm install bower -g
 bower install # Install the bower dependencies for the front end
