@@ -2,7 +2,7 @@
 
 module.exports = (environment) => {
   var ENV = {
-    modulePrefix: 'webdriverio-app',
+    modulePrefix: 'webdriverio-server',
     environment: environment,
     baseURL: '/',
     locationType: 'auto',

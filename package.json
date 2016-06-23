@@ -1,16 +1,21 @@
 {
   "name": "webdriverio-server",
   "version": "2.1.1",
-  "description": "Server for running webdriverio tests",
+  "description": "Server for running webdriverio tests and a frontend for public access",
   "config": {
     "coverage_opts": "-x **/tests/** --report cobertura --report lcov --dir tests"
   },
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
   "scripts": {
-    "build-assets": "cd webdriverio-app && ember build && cd ..",
-    "start": "npm run build-assets && node ./bin/www.js",
-    "lint": "eslint *.js bin routes src spec testUtils ",
+    "start": "npm run build && node ./bin/www.js",
+    "lint": "eslint *.js bin public test routes src spec testUtils && npm run lint-sass",
     "jasmine": "JASMINE_CONFIG_PATH=spec/support/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
-    "test": "npm run lint && npm run jasmine"
+    "test": "npm run lint && npm run jasmine && ember test",
+    "build": "ember build",
+    "lint-sass": "sass-lint *.scss"
   },
   "repository": {
     "type": "git",
@@ -42,6 +47,8 @@
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
     "jasmine-node": "^1.14.5",
+    "mocha": "^2.5.3",
+    "sass-lint": "^1.7.0",
     "request": "^2.72.0"
   },
   "dependencies": {
@@ -58,7 +65,43 @@
     "nodemon": "^1.9.2",
     "q": "^1.4.1",
     "redis": "^2.6.1",
-    "serve-favicon": "~2.2.0"
+    "serve-favicon": "~2.2.0",
+    "blueimp-md5": "^2.3.0",
+    "broccoli-asset-rev": "^2.4.2",
+    "ember-ajax": "0.7.1",
+    "ember-browserify": "1.1.9",
+    "ember-cli": "2.5.1",
+    "ember-cli-app-version": "^1.0.0",
+    "ember-cli-babel": "^5.1.6",
+    "ember-cli-dependency-checker": "^1.2.0",
+    "ember-cli-htmlbars": "^1.0.3",
+    "ember-cli-htmlbars-inline-precompile": "^0.3.1",
+    "ember-cli-inject-live-reload": "^1.4.0",
+    "ember-cli-mocha": "^0.10.4",
+    "ember-cli-release": "0.2.8",
+    "ember-cli-sass": "^5.3.1",
+    "ember-cli-sri": "^2.1.0",
+    "ember-cli-uglify": "^1.2.0",
+    "ember-computed-decorators": "0.2.2",
+    "ember-data": "^2.5.0",
+    "ember-export-application-global": "^1.0.5",
+    "ember-frost-bunsen": "6.1.0",
+    "ember-frost-core": "0.11.18",
+    "ember-frost-tabs": "2.0.1",
+    "ember-load-initializers": "^0.5.1",
+    "ember-lodash": "0.0.9",
+    "ember-one-way-controls": "0.8.3",
+    "ember-prop-types": "2.0.0",
+    "ember-redux": "1.4.0",
+    "ember-resolver": "^2.0.3",
+    "ember-safeguard": "0.0.2",
+    "ember-sortable": "1.8.1",
+    "ember-truth-helpers": "1.2.0",
+    "loader.js": "^4.0.1",
+    "node-sass": "^3.7.0",
+    "redux": "3.5.2",
+    "redux-thunk": "2.1.0",
+    "svg4everybody": "2.1.0"
   },
   "preferGlobal": true,
   "bin": {

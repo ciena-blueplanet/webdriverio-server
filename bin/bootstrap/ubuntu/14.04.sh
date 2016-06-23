@@ -156,12 +156,13 @@ sudo service nginx reload
 # Start redis server
 sudo service redis-server restart
 
+npm install bower -g
 
 # A temporary solution
 git clone https://github.com/pastorsj/webdriverio-server.git
+cd webdriverio-server
 git checkout sprint12
 npm install
-cd webdriverio-app
 bower install
 cd ~
 
