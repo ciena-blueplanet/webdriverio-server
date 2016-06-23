@@ -72,7 +72,9 @@ export default Ember.Controller.extend({
           this.transitionToRoute('portal')
         })
         .catch((err) => {
-          console.log('The username and/or password do not match')
+          Ember.$('.result').addClass('failure')
+          Ember.$('.result').removeClass('success')
+          Ember.$('.result').text('The username and/or password do not match')
           throw err
         })
         this.set('isFormDisabled', false)

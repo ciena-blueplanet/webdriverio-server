@@ -21,7 +21,7 @@
   },
   "author": "Sam Pastoriza",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "blueimp-md5": "^2.3.0",
     "broccoli-asset-rev": "^2.4.2",
     "ember-ajax": "0.7.1",
@@ -61,9 +61,7 @@
     "redux": "3.5.2",
     "redux-thunk": "2.1.0",
     "sass-lint": "^1.7.0",
-    "svg4everybody": "2.1.0"
-  },
-  "dependencies": {
+    "svg4everybody": "2.1.0",
     "nodemon": "^1.9.2"
   }
 }

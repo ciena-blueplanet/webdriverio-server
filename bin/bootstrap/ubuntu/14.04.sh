@@ -156,17 +156,23 @@ sudo service nginx reload
 # Start redis server
 sudo service redis-server restart
 
-npm install -g webdriverio-server && webdriverio-server-init
+
+# A temporary solution
+git clone https://github.com/pastorsj/webdriverio-server.git
+git checkout sprint12
+npm install
+cd webdriverio-app
+bower install
+cd ~
+
+# npm install -g webdriverio-server bower && webdriverio-server-init
 
 # Setup the front end
-cd ~/.nvm/versions/node/v5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
+# cd ~/.nvm/versions/node/v5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
 # cd /opt/node-envs/5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
-npm install # Install the npm dependencies for the front end
-npm install bower -g
-bower install # Install the bower dependencies for the front end
-npm install ember-cli -g # This is needed if ember-cli is not already installed. It is used only for the next step.
-ember build # This builds the static assets for the front end
-cd ~
+# bower install # Install the bower dependencies for the front end
+# ember build # This builds the static assets for the front end
+# cd ~
 
 # Setup .bashrc
 echo "source ~/.bashrc" >> ~/.bash_profile

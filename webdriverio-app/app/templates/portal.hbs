@@ -17,7 +17,7 @@
             {{frost-button
             disabled=(or isFormDisabled isFormInvalid)
             onClick=(action "createUser")
-            priority="primary"
+            priority="secondary"
             size="medium"
             text="Create User"
             }}
@@ -26,7 +26,7 @@
             {{frost-button
             disabled=(or isFormDisabled isFormInvalid)
             onClick=(action "updateUserInfo")
-            priority="primary"
+            priority="secondary"
             size="medium"
             text="Update User"
             }}
@@ -35,7 +35,7 @@
             {{frost-button
             disabled=(or isFormDisabled isFormInvalid)
             onClick=(action "getUserInfo")
-            priority="primary"
+            priority="secondary"
             size="medium"
             text="Get User"
             }}
@@ -44,11 +44,13 @@
             {{frost-button
             disabled=(or isFormDisabled isFormInvalid)
             onClick=(action "deleteUser")
-            priority="primary"
+            priority="secondary"
             size="medium"
             text="Delete User"
             }}
           </div>
+      </div>
+      <div class='result'>
       </div>
     </div>
     <div class='footer'>

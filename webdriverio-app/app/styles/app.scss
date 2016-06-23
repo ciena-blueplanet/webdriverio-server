@@ -74,4 +74,20 @@ body {
     overflow: hidden;
 }
 
+.success {
+    color: green;
+}
+
+.result {
+    padding-top: 20px;
+    font-size: 20px;
+    text-align: left;
+    white-space: normal;
+    width: 50%;
+}
+
+.failure {
+    color: red;
+}
+
 

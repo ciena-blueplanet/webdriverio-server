@@ -1,5 +1,5 @@
 import Ember from 'ember'
-import {generateToken} from '../utils/generateToken'
+import generateToken from '../utils/generateToken'
 
 export default Ember.Controller.extend({
   portalModel: {
@@ -46,8 +46,9 @@ export default Ember.Controller.extend({
         })
         .save()
         .then((res) => {
-          console.log('User was successfully created')
-          console.log('The token that was generated was: ' + token)
+          Ember.$('.result').removeClass('failure')
+          Ember.$('.result').addClass('success')
+          Ember.$('.result').text('The user with the username: ' + username + ' was successfully created.\nTheir testing token is: ' + token)
         }).catch((err) => {
           throw err
         })
@@ -61,13 +62,18 @@ export default Ember.Controller.extend({
         this.get('store').queryRecord('developer', {
           username,
           token
-        }).then((res) => {
-          console.log('For the user with this username: ' + res.get('username'))
-          console.log('Their testing token is: ' + res.get('token'))
-        }).catch((err) => {
-          console.log('No such user exists')
-          throw err
         })
+          .then((res) => {
+            Ember.$('.result').removeClass('failure')
+            Ember.$('.result').addClass('success')
+            Ember.$('.result').text('For the user with this username: ' + res.get('username') + ', their testing token is: ' + res.get('token'))
+          })
+          .catch((err) => {
+            Ember.$('.result').addClass('failure')
+            Ember.$('.result').removeClass('success')
+            Ember.$('.result').text('No such user exists for the username: ' + username)
+            throw err
+          })
         this.set('isFormDisabled', false)
       }, 500)
     },
@@ -81,9 +87,13 @@ export default Ember.Controller.extend({
         })
           .save()
           .then((res) => {
-            console.log('User was successfully updated')
-            console.log('The token that was generated was: ' + token)
+            Ember.$('.result').removeClass('failure')
+            Ember.$('.result').addClass('success')
+            Ember.$('.result').text('The user with the username: ' + username + ' was successfully updated. Their testing token is: ' + token)
           }).catch((err) => {
+            Ember.$('.result').addClass('failure')
+            Ember.$('.result').removeClass('success')
+            Ember.$('.result').text('An error has occured: \n' + err)
             throw err
           })
         this.set('isFormDisabled', false)
@@ -101,9 +111,13 @@ export default Ember.Controller.extend({
             developer.destroyRecord()
           })
           .then((res) => {
-            console.log('User was successfully deleted')
+            Ember.$('.result').removeClass('failure')
+            Ember.$('.result').addClass('success')
+            Ember.$('.result').text('The user with the username: ' + username + ' was successfully deleted.')
           }).catch((err) => {
-            console.log('No such user exists')
+            Ember.$('.result').addClass('failure')
+            Ember.$('.result').removeClass('success')
+            Ember.$('.result').text('An error has occured: \n' + err)
             throw err
           })
         this.set('isFormDisabled', false)
