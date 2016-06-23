@@ -22,7 +22,8 @@ function setErrorResponse (res, err, statusCode) {
 /**
  * Set the response object to be in the format of a successful reponse
  * @param {object} res - The response object
- * @param {object} redisResp - The response from the redis database
+ * @param {string} username - The given username
+ * @param {object} token - The given testing-token
  */
 function setStandardResponse (res, username, token) {
   console.log('BACKEND RESPONSE: username: ' + username + ' token: ' + token)
@@ -64,9 +65,6 @@ var DeveloperHandler = {
       } else {
         setErrorResponse(res, 'The token submitted does not match the token returned.', 500)
       }
-      if (cb) {
-        cb(err, redisResp)
-      }
     })
   },
   post: function (req, res, cb) {
@@ -88,10 +86,32 @@ var DeveloperHandler = {
       } else {
         setStandardResponse(res, username, token)
       }
-      if (cb) {
-        cb(err, redisResp)
-      }
     })
+  },
+  delete: function (req, res, cb) {
+    console.log('DELETE')
+    if (req.query) {
+      console.log('Query' + JSON.stringify(req.query, null, 2))
+    }
+    if (req.body) {
+      console.log('Body' + JSON.stringify(req.body, null, 2))
+    }
+    if (req.params) {
+      console.log('Params' + JSON.stringify(req.params, null, 2))
+    }
+    if (req.params.username === undefined) {
+      setErrorResponse(res, 'Request must be in parameters', 500)
+    } else {
+      this.client.del(req.params.username, function (err, redisResp) {
+        console.log('Redis Response is ' + redisResp)
+        console.log('Error Response is ' + err)
+        if (err) {
+          setErrorResponse(res, err, 404)
+        } else {
+          setStandardResponse(res, req.params.username, 'TokenWasDeleted')
+        }
+      })
+    }
   },
   put: function (req, res, cb) {
     console.log('PUT')
@@ -110,38 +130,7 @@ var DeveloperHandler = {
       } else {
         setStandardResponse(res, req.query.username, req.query.token)
       }
-      if (cb) {
-        cb(err, redisResp)
-      }
     })
-  },
-  delete: function (req, res, cb) {
-    console.log('DELETE')
-    if (req.body) {
-      console.log('Body' + JSON.stringify(req.body, null, 2))
-    }
-    if (req.query) {
-      console.log('Query' + JSON.stringify(req.query, null, 2))
-    }
-    if (req.params) {
-      console.log('Params' + JSON.stringify(req.params, null, 2))
-    }
-    if (req.params.username === undefined) {
-      setErrorResponse(res, 'Request must be in parameters', 500)
-    } else {
-      this.client.del(req.params.username, function (err, redisResp) {
-        console.log('Redis Response is ' + redisResp)
-        console.log('Error Response is ' + err)
-        if (err) {
-          setErrorResponse(res, err, 404)
-        } else {
-          setStandardResponse(res, req.params.username, 'TokenWasDeleted')
-        }
-        if (cb) {
-          cb(err, redisResp)
-        }
-      })
-    }
   }
 }
 
