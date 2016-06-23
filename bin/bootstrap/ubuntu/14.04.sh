@@ -28,7 +28,7 @@ wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh | 
 source ~/.profile
 . ~/.nvm/nvm.sh
 
-nvm alias stable 5.11.0
+nvm install 5.11.0
 
 # sudo pip install nodeenv
 # sudo mkdir -p /opt/node-envs
