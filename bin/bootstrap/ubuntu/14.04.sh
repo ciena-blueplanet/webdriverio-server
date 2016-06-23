@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -x
 { # this ensures the entire script is downloaded
 
 # Install the base dependencies
@@ -28,7 +28,7 @@ wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh | 
 source ~/.profile
 . ~/.nvm/nvm.sh
 
-nvm install 5.11.0
+nvm alias stable 5.11.0
 
 # sudo pip install nodeenv
 # sudo mkdir -p /opt/node-envs
