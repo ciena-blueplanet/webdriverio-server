@@ -1,19 +1,21 @@
-/* jshint expr:true */
-import { expect } from 'chai'
-import { describeModule, it } from 'ember-mocha'
+import {expect} from 'chai'
+import {describeModule, it} from 'ember-mocha'
+import {beforeEach} from 'mocha'
 
 describeModule(
   'adapter:application',
-  'Unit | Adapter | application',
+  'ApplicationAdapter',
   {
-    // Specify the other units that are required for this test.
-    // needs: ['serializer:foo']
+    unit: true
   },
   function () {
-    // Replace this with your real tests.
-    it('exists', function () {
-      let adapter = this.subject()
-      expect(adapter).to.be.ok
+    let adapter
+
+    beforeEach(function () {
+      adapter = this.subject()
     })
-  }
-)
+
+    it('has correct namespace', function () {
+      expect(adapter.namespace).to.equal('')
+    })
+  })
