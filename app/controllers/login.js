@@ -61,14 +61,12 @@ export default Ember.Controller.extend({
           token: md5(password)
         })
         .then((res) => {
-          console.log(res)
           return this.get('store').queryRecord('developer', {
             token: md5(username),
             username: md5(password)
           })
         })
         .then((res) => {
-          console.log(res)
           this.transitionToRoute('portal')
         })
         .catch((err) => {

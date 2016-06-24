@@ -1,10 +1,19 @@
-import {expect} from 'chai'
-import {it} from 'ember-mocha'
-import {describe} from 'mocha'
+import { expect } from 'chai'
+import {
+  describeModule,
+  it
+} from 'ember-mocha'
 
-describe('Login Route', () => {
-  it('should exist', () => {
-    // TODO: Fix Tests
-    expect(1).to.be.equal(1)
-  })
-})
+describeModule(
+  'route:portal',
+  'LoginRoute',
+  {
+    unit: true
+  },
+  function () {
+    it('exists', function () {
+      let route = this.subject()
+      expect(route).to.be.ok
+    })
+  }
+)

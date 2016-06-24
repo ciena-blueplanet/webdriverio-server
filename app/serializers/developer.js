@@ -1,6 +1,7 @@
 import RESTSerializer from 'ember-data/serializers/rest'
 
 export default RESTSerializer.extend({
+  modelName: 'developer',
   primaryKey: 'username',
   normalizeQueryRecordResponse: function (store, primaryModelClass, payload, id, requestType) {
     payload = {

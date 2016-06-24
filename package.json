@@ -13,7 +13,8 @@
     "start": "npm run build && node ./bin/www.js",
     "lint": "eslint *.js bin public test routes src spec testUtils && npm run lint-sass",
     "jasmine": "JASMINE_CONFIG_PATH=spec/support/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
-    "test": "npm run lint && npm run jasmine && ember test",
+    "test": "npm run lint && npm run jasmine npm run ember-test",
+    "ember-test": "COVERAGE=true ember test",
     "build": "ember build",
     "lint-sass": "sass-lint *.scss"
   },
@@ -42,7 +43,9 @@
   "homepage": "https://github.com/ciena-blueplanet/webdriverio-server",
   "devDependencies": {
     "blueimp-md5": "^2.3.0",
+    "ember-cli-code-coverage": "0.2.1",
     "ember-cli-mirage": "0.2.1",
+    "ember-sinon": "0.5.1",
     "eslint": "^1.10.3",
     "eslint-config-frost-standard": "^0.2.5",
     "istanbul": "^0.4.2",
