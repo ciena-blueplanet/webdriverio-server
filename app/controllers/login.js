@@ -54,29 +54,27 @@ export default Ember.Controller.extend({
       this.set('isFormInvalid', validation.errors.length !== 0)
     },
     submitForm () {
-      Ember.run.later(() => {
-        const {username, password} = this.get('loginInfo')
-        this.get('store').queryRecord('developer', {
-          username: md5(username),
-          token: md5(password)
+      const {username, password} = this.get('loginInfo')
+      this.get('store').queryRecord('developer', {
+        username: md5(username),
+        token: md5(password)
+      })
+      .then((res) => {
+        return this.get('store').queryRecord('developer', {
+          token: md5(username),
+          username: md5(password)
         })
-        .then((res) => {
-          return this.get('store').queryRecord('developer', {
-            token: md5(username),
-            username: md5(password)
-          })
-        })
-        .then((res) => {
-          this.transitionToRoute('portal')
-        })
-        .catch((err) => {
-          Ember.$('.result').addClass('failure')
-          Ember.$('.result').removeClass('success')
-          Ember.$('.result').text('The username and/or password do not match')
-          throw err
-        })
-        this.set('isFormDisabled', false)
-      }, 1000)
+      })
+      .then((res) => {
+        this.transitionToRoute('portal')
+      })
+      .catch((err) => {
+        Ember.Logger.debug(err)
+        Ember.$('.result').addClass('failure')
+        Ember.$('.result').removeClass('success')
+        Ember.$('.result').text('The username and/or password do not match')
+      })
+      this.set('isFormDisabled', false)
     }
   }
 })

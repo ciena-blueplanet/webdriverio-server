@@ -26,7 +26,6 @@ function setErrorResponse (res, err, statusCode) {
  * @param {object} token - The given testing-token
  */
 function setStandardResponse (res, username, token) {
-  console.log('BACKEND RESPONSE: username: ' + username + ' token: ' + token)
   res.status(200)
   res.format({
     json: function () {
@@ -42,17 +41,7 @@ var DeveloperHandler = {
   init: function () {
     this.client = redis.createClient({password: process.env.REDIS})
   },
-  get: function (req, res, cb) {
-    console.log('GET')
-    if (req.body) {
-      console.log('Body' + JSON.stringify(req.body, null, 2))
-    }
-    if (req.query) {
-      console.log('Query' + JSON.stringify(req.query, null, 2))
-    }
-    if (req.params) {
-      console.log('Params' + JSON.stringify(req.params, null, 2))
-    }
+  get: function (req, res) {
     this.client.get(req.query.username, function (err, redisResp) {
       if (err) {
         setErrorResponse(res, err, 404)
@@ -67,17 +56,7 @@ var DeveloperHandler = {
       }
     })
   },
-  post: function (req, res, cb) {
-    console.log('POST')
-    if (req.body) {
-      console.log('Body' + JSON.stringify(req.body, null, 2))
-    }
-    if (req.query) {
-      console.log('Query' + JSON.stringify(req.query, null, 2))
-    }
-    if (req.params) {
-      console.log('Params' + JSON.stringify(req.params, null, 2))
-    }
+  post: function (req, res) {
     const username = req.body.developer.username
     const token = req.body.developer.token
     this.client.set(username, token, function (err, redisResp) {
@@ -88,23 +67,11 @@ var DeveloperHandler = {
       }
     })
   },
-  delete: function (req, res, cb) {
-    console.log('DELETE')
-    if (req.query) {
-      console.log('Query' + JSON.stringify(req.query, null, 2))
-    }
-    if (req.body) {
-      console.log('Body' + JSON.stringify(req.body, null, 2))
-    }
-    if (req.params) {
-      console.log('Params' + JSON.stringify(req.params, null, 2))
-    }
+  delete: function (req, res) {
     if (req.params.username === undefined) {
       setErrorResponse(res, 'Request must be in parameters', 500)
     } else {
       this.client.del(req.params.username, function (err, redisResp) {
-        console.log('Redis Response is ' + redisResp)
-        console.log('Error Response is ' + err)
         if (err) {
           setErrorResponse(res, err, 404)
         } else {
@@ -112,25 +79,6 @@ var DeveloperHandler = {
         }
       })
     }
-  },
-  put: function (req, res, cb) {
-    console.log('PUT')
-    if (req.body) {
-      console.log('Body' + JSON.stringify(req.body, null, 2))
-    }
-    if (req.query) {
-      console.log('Query' + JSON.stringify(req.query, null, 2))
-    }
-    if (req.params) {
-      console.log('Params' + JSON.stringify(req.params, null, 2))
-    }
-    this.client.set(req.query.username, req.query.token, function (err, redisResp) {
-      if (err) {
-        setErrorResponse(res, err, 404)
-      } else {
-        setStandardResponse(res, req.query.username, req.query.token)
-      }
-    })
   }
 }
 
