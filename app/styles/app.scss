@@ -19,9 +19,9 @@
 
 .title {
     text-align: center;
-    padding: 40px;
+    padding: 5vh 2vw 5vh 2vw;
     color: #7f91be;
-    font-size: calc(13px + 2vw)
+    font-size: calc(16px + 2vw)
 }
 
 .footer {
@@ -48,7 +48,7 @@
     @extend .flex;
     button {
         width: 150px;
-        margin: 20px auto;
+        margin: 3vw auto;
     }
 }
 
@@ -58,15 +58,15 @@
 
 .welcome_title {
     @extend .title;
-    width: 75%;
 }
 
 .logo {
-    padding-bottom: 30px;
+    padding-bottom: 2vh;
 }
 
 .username_form {
     @extend .logo;
+    width: 100vw;
 }
 
 body {
