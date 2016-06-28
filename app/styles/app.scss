@@ -21,7 +21,7 @@
     text-align: center;
     padding: 40px;
     color: #7f91be;
-    font-size: 60px;
+    font-size: calc(13px + 2vw)
 }
 
 .footer {
@@ -52,14 +52,13 @@
     }
 }
 
-.ciena-image-filler {
+.ciena-image {
     width: 200px;
 }
 
 .welcome_title {
     @extend .title;
-    width: 700px;
-    font-size: 40px;
+    width: 75%;
 }
 
 .logo {
@@ -79,9 +78,9 @@ body {
 }
 
 .result {
-    padding-top: 20px;
-    font-size: 20px;
-    text-align: left;
+    padding-top: 2vh;
+    font-size: calc(10px + 1vw);
+    text-align: center;
     white-space: normal;
     width: 50%;
 }
