@@ -42,43 +42,52 @@ var DeveloperHandler = {
     this.client = redis.createClient({password: process.env.REDIS})
   },
   get: function (req, res) {
-    this.client.get(req.query.username, function (err, redisResp) {
-      if (err) {
-        setErrorResponse(res, err, 404)
-      } else if (redisResp === null) {
-        setErrorResponse(res, 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com', 500)
-      } else if (req.query.token === '') {
-        setStandardResponse(res, req.query.username, redisResp)
-      } else if (req.query.token === redisResp) {
-        setStandardResponse(res, req.query.username, redisResp)
-      } else {
-        setErrorResponse(res, 'The token submitted does not match the token returned.', 500)
-      }
+    return new Promise((resolve, reject) => {
+      this.client.get(req.query.username, function (err, redisResp) {
+        if (err) {
+          setErrorResponse(res, err, 404)
+        } else if (redisResp === null) {
+          setErrorResponse(res, 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com', 500)
+        } else if (req.query.token === '') {
+          setStandardResponse(res, req.query.username, redisResp)
+        } else if (req.query.token === redisResp) {
+          setStandardResponse(res, req.query.username, redisResp)
+        } else {
+          setErrorResponse(res, 'The token submitted does not match the token returned.', 500)
+        }
+        resolve(err)
+      })
     })
   },
   post: function (req, res) {
-    const username = req.body.developer.username
-    const token = req.body.developer.token
-    this.client.set(username, token, function (err, redisResp) {
-      if (err) {
-        setErrorResponse(res, err, 404)
-      } else {
-        setStandardResponse(res, username, token)
-      }
-    })
-  },
-  delete: function (req, res) {
-    if (req.params.username === undefined) {
-      setErrorResponse(res, 'Request must be in parameters', 500)
-    } else {
-      this.client.del(req.params.username, function (err, redisResp) {
+    return new Promise((resolve, reject) => {
+      const username = req.body.developer.username
+      const token = req.body.developer.token
+      this.client.set(username, token, function (err, redisResp) {
         if (err) {
           setErrorResponse(res, err, 404)
         } else {
-          setStandardResponse(res, req.params.username, 'TokenWasDeleted')
+          setStandardResponse(res, username, token)
         }
+        resolve(err)
       })
-    }
+    })
+  },
+  delete: function (req, res) {
+    return new Promise((resolve, reject) => {
+      if (req.params.username === undefined) {
+        setErrorResponse(res, 'Request must be in parameters', 500)
+      } else {
+        this.client.del(req.params.username, function (err, redisResp) {
+          if (err) {
+            setErrorResponse(res, err, 404)
+          } else {
+            setStandardResponse(res, req.params.username, 'TokenWasDeleted')
+          }
+          resolve(err)
+        })
+      }
+    })
   }
 }
 

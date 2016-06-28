@@ -23,7 +23,6 @@ router.route('/')
     .post(DeveloperHandler.post.bind(DeveloperHandler))
 
 router.route('/:username')
-    .put(DeveloperHandler.put.bind(DeveloperHandler))
     .delete(DeveloperHandler.delete.bind(DeveloperHandler))
 
 module.exports = router
