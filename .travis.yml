@@ -10,6 +10,7 @@ before_install:
 - pr-bumper check
 install:
 - npm install
+- bower install
 after_success:
 - cat coverage/lcov.info | coveralls
 env:
