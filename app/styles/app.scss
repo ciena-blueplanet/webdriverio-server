@@ -98,12 +98,12 @@ body {
     }
 }
 
-@media screen and (max-width: 500px) {
-    .link {
+@media screen and (max-width: 400px) {
+    .bar {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: center;
-        align-items: center;
+        padding: 3px;
     }
 }
 
