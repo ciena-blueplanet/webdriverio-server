@@ -19,9 +19,9 @@
     "local-e2e-test": "wdio-client remote_e2e_test localhost:3000 dist tests/e2e",
     "b2e-test": "ember build --environment=e2e-test && npm run e2e-test",
     "update-screenshots": "wdio-client update_screenshots tests/e2e",
-    "build": "cd ember-app && ember build",
+    "build": "ember build",
     "lint-sass": "sass-lint *.scss",
-    "prepublish": "cd ember-app && ember build && mv dist ../static && cd -"
+    "prepublish": "bower install && ember build"
   },
   "repository": {
     "type": "git",
