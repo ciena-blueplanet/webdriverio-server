@@ -158,22 +158,7 @@ sudo service redis-server restart
 
 npm install bower -g
 
-# A temporary solution
-git clone https://github.com/pastorsj/webdriverio-server.git
-cd webdriverio-server
-git checkout sprint12
-npm install
-bower install
-cd ~
-
-# npm install -g webdriverio-server bower && webdriverio-server-init
-
-# Setup the front end
-# cd ~/.nvm/versions/node/v5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
-# cd /opt/node-envs/5.11.0/lib/node_modules/webdriverio-server/webdriverio-app
-# bower install # Install the bower dependencies for the front end
-# ember build # This builds the static assets for the front end
-# cd ~
+npm install -g webdriverio-server && webdriverio-server-init
 
 # Setup .bashrc
 echo "source ~/.bashrc" >> ~/.bash_profile
@@ -185,6 +170,6 @@ echo "\$ source ~/.bashrc && DISPLAY=:0 DEBUG=server webdriverio-server"
 echo ""
 
 echo "To run webdriverio-server as a service using tmux, follow the end of SETUP.md"
-echo "at https://github.com/pastorsj/webdriverio-server/blob/sprint12/SETUP.md"
+echo "at https://github.com/ciena-blueplanet/webdriverio-server/blob/master/SETUP.md"
 
 } # this ensures the entire script is downloaded

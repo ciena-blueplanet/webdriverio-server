@@ -23,4 +23,5 @@ mkdir -p screenshots
 
 cd build
 npm install
+bower install
 ./node_modules/.bin/webdriver-manager update --standalone

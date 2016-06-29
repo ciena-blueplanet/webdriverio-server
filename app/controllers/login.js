@@ -11,7 +11,6 @@ export default Ember.Controller.extend({
         type: 'string'
       }
     },
-    required: ['username', 'password'],
     type: 'object'
   },
   loginView: {

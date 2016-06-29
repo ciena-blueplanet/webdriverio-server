@@ -8,41 +8,19 @@
                 {{frost-bunsen-form
                 bunsenModel=loginModel
                 bunsenView=loginView
-                disabled=isFormDisabled
                 onChange=(action "formChange")
-                onValidation=(action "formValidation")
                 }}
             </div>
             <div class='login-result'>
             </div>
             <div class="login-button">
                 {{frost-button
-                disabled=(or isFormDisabled isFormInvalid)
                 onClick=(action "submitForm")
                 priority="primary"
                 size="medium"
-                text="Login"
+                text="Log in"
                 }}
             </div>
         </div>
-    </div>
-    <div class='login-footer'>
-        <span class='bar'>
-            <span class='link'>
-                {{#frost-link 'index'
-                priority='secondary'
-                size='small'
-                tab-index='-1'}}
-                Sign Up
-                {{/frost-link}}
-            </span>
-            <span class='link'>
-                <a href='https://www.github.com/ciena-blueplanet'>
-                    <div class='content'>
-                        Interested in Contributing?
-                    </div>
-                </a>
-            </span>
-        </span>
     </div>
 </div>
