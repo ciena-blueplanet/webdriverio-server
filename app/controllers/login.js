@@ -70,9 +70,9 @@ export default Ember.Controller.extend({
       })
       .catch((err) => {
         Ember.Logger.debug(err)
-        Ember.$('.result').addClass('failure')
-        Ember.$('.result').removeClass('success')
-        Ember.$('.result').text('The username and/or password do not match')
+        Ember.$('.login-result').addClass('failure')
+        Ember.$('.login-result').removeClass('success')
+        Ember.$('.login-result').text('Authentication Failed')
       })
       this.set('isFormDisabled', false)
     }

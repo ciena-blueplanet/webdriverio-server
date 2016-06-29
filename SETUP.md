@@ -16,7 +16,7 @@
 To run the shell script and setup the server automatically
 ```
 sudo apt-get install wget
-wget -O- https://raw.githubusercontent.com/pastorsj/webdriverio-server/sprint12/bin/bootstrap/ubuntu/14.04.sh | bash
+wget -O- https://raw.githubusercontent.com/ciena-blueplanet/webdriverio-server/master/bin/bootstrap/ubuntu/14.04.sh | bash
 ```
 This script should configure everything, including Node, Redis, xvfb, and Java
 

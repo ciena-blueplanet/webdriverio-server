@@ -124,7 +124,7 @@ describeModule(
           })
 
           it('should have the correct text', function () {
-            expect(jQueryPrototype.text.lastCall.args).to.eql(['The username and/or password do not match'])
+            expect(jQueryPrototype.text.lastCall.args).to.eql(['Authentication Failed'])
           })
         })
       })
