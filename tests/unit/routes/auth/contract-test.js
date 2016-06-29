@@ -1,3 +1,4 @@
+/* jshint expr:true */
 import { expect } from 'chai'
 import {
   describeModule,
@@ -5,10 +6,11 @@ import {
 } from 'ember-mocha'
 
 describeModule(
-  'route:portal',
-  'RegisterRoute',
+  'route:auth/contract',
+  'AuthContractRoute',
   {
-    unit: true
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
   },
   function () {
     it('exists', function () {

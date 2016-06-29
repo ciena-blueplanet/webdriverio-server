@@ -19,8 +19,9 @@
     "local-e2e-test": "wdio-client remote_e2e_test localhost:3000 dist tests/e2e",
     "b2e-test": "ember build --environment=e2e-test && npm run e2e-test",
     "update-screenshots": "wdio-client update_screenshots tests/e2e",
-    "build": "ember build",
-    "lint-sass": "sass-lint *.scss"
+    "build": "cd ember-app && ember build",
+    "lint-sass": "sass-lint *.scss",
+    "prepublish": "cd ember-app && ember build && mv dist ../static && cd -"
   },
   "repository": {
     "type": "git",
@@ -51,10 +52,12 @@
     "ember-sinon": "0.5.1",
     "eslint": "^1.10.3",
     "eslint-config-frost-standard": "^0.2.5",
+    "github": "^2.0.1",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
     "jasmine-node": "^1.14.5",
     "mocha": "^2.5.3",
+    "oauth": "^0.9.14",
     "request": "^2.72.0",
     "sass-lint": "^1.7.0",
     "webdriverio-client": "^1.0.3"

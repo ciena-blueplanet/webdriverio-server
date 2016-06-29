@@ -8,12 +8,29 @@ const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const multer = require('multer')
+const GitHubAPI = require('github')
+const oauth = require('oauth').OAuth2
 
 const app = express()
 
 const developers = require('../routes/developers')
 
 const processUpload = require('./process-upload')
+
+const OAuth = oauth
+const OAuth2 = new OAuth(process.env.GITHUB_CLIENT_ID, process.env.GITHUB_CLIENT_SECRET, 'https://github.com/', 'login/oauth/authorize', 'login/oauth/access_token')
+
+const github = new GitHubAPI({
+  // optional
+  debug: true,
+  protocol: 'https',
+  host: 'api.github.com', // should be api.github.com for GitHub
+  headers: {
+    'user-agent': 'Ciena Developers' // GitHub is happy with a unique user agent
+  },
+  timeout: 5000
+})
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
@@ -71,6 +88,37 @@ app.post('/', function (req, res) {
 })
 
 app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')))
+
+// ==================================================================
+//                       GitHub Authentication
+// ==================================================================
+
+app.get('/auth', function (req, res) {
+  res.writeHead(303, {
+    Location: OAuth2.getAuthorizeUrl({
+      redirect_uri: 'http://localhost:3000/auth/callback',
+      scope: ''
+    })
+  })
+  res.end()
+})
+
+app.get('/auth/callback', function (req, res) {
+  const code = req.query.code
+  OAuth2.getOAuthAccessToken(code, {}, function (err, access_token, refresh_token) {
+    if (err) {
+      console.log(err)
+    }
+    const accessToken = access_token
+    // authenticate github API
+    console.log('AccessToken: ' + accessToken + '\n')
+    github.authenticate({
+      type: 'oauth',
+      token: accessToken
+    })
+  })
+  res.redirect('/#/auth/contract')
+})
 
 // ==================================================================
 //                          Error Handling

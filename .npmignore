@@ -1,5 +1,4 @@
 # External Dependencies
-npm-debug.log
 node_modules
 bower_components
 
@@ -56,7 +55,17 @@ build/Release
 .node_repl_history
 
 # Compiled Output
-dist
 tmp
 .sass-cache
-workflow-screenshots
+
+# Ember app
+/app
+/bower.json
+/config
+/ember-cli-build.js
+/routes
+/spec
+/testem.js
+/tests
+
+
