@@ -20,7 +20,8 @@
     "b2e-test": "ember build --environment=e2e-test && npm run e2e-test",
     "update-screenshots": "wdio-client update_screenshots tests/e2e",
     "build": "ember build",
-    "lint-sass": "sass-lint *.scss"
+    "lint-sass": "sass-lint *.scss",
+    "prepublish": "ember build"
   },
   "repository": {
     "type": "git",
