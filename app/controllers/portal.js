@@ -23,23 +23,33 @@ function failure (message, err) {
 }
 
 export default Ember.Controller.extend({
-  data: Ember.computed(function () {
-    this.get('store').queryRecord('developer',
+  selectedIndex: 1,
+
+  init () {
+    this._super(...arguments)
+    this.set('data', [])
+
+    this.get('store').query('developer',
       {
         queryAll: 1
       })
       .then((res) => {
         console.log(res)
-        let filteredResult = _.filter(res, (item) => {
+        let filteredResult = res.filter((item) => {
           // Filters out the md5 hash (32 characters)
-          return item.token.length <= 30
+          return item.get('token').length <= 30
+        }).map((result) => {
+          return {
+            label: result.get('username'),
+            value: result.get('token')
+          }
         })
-        return filteredResult
+        this.set('data', filteredResult)
       })
       .catch((err) => {
-        throw err
+        Ember.Logger.debug(err)
       })
-  }),
+  },
   actions: {
     /**
      * When the user clicks the `Create User` button, this function is called. It first generates

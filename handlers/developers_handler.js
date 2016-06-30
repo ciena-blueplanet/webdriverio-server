@@ -42,12 +42,12 @@ function setStandardResponse (res, username, token) {
  * @param {object} res - The response object
  * @param {string} ret - The set of usernames and tokens returned from the query
  */
-function setStandardKeysResponse (res, ret) {
+function setStandardKeysResponse (res, developers) {
   res.status(200)
   res.format({
     json: function () {
       res.json({
-        ret
+        developers
       })
     }
   })
@@ -70,7 +70,7 @@ var DeveloperHandler = {
         }
         resolve({
           username: key,
-          token
+          token: token
         })
       })
     })
