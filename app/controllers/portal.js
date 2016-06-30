@@ -2,6 +2,26 @@ import Ember from 'ember'
 import generateToken from '../utils/generateToken'
 import _ from 'lodash'
 
+/**
+ * @param {String} message - The message displayed to the user when the call made to the backend succeeds
+ */
+function success (message) {
+  Ember.$('.result').removeClass('failure')
+  Ember.$('.result').addClass('success')
+  Ember.$('.result').text(message)
+}
+
+/**
+ * @param {String} message - The message displayed to the user when the call made to the backend fails
+ * @param {String} err - The actual error message
+ */
+function failure (message, err) {
+  Ember.$('.result').addClass('failure')
+  Ember.$('.result').removeClass('success')
+  Ember.$('.result').text(message)
+  Ember.Logger.debug(err)
+}
+
 export default Ember.Controller.extend({
   data: Ember.computed(function () {
     this.get('store').queryRecord('developer',
@@ -21,6 +41,11 @@ export default Ember.Controller.extend({
       })
   }),
   actions: {
+    /**
+     * When the user clicks the `Create User` button, this function is called. It first generates
+     * a random 30 character token. It then extracts the username and combines those two into a record
+     * which gets sent to the backend.
+     */
     createUser () {
       const token = generateToken(30)
       const username = this.get('info').username
@@ -30,17 +55,17 @@ export default Ember.Controller.extend({
       })
       .save()
       .then((res) => {
-        Ember.$('.result').removeClass('failure')
-        Ember.$('.result').addClass('success')
-        Ember.$('.result').text('The user with the username: ' + username + ' was successfully created.\nTheir testing token is: ' + token)
+        success('The user with the username: ' + username + ' was successfully created.\nTheir testing token is: ' + token)
       }).catch((err) => {
-        Ember.$('.result').addClass('failure')
-        Ember.$('.result').removeClass('success')
-        Ember.$('.result').text('An error has occured: \n' + err)
-        Ember.Logger.debug(err)
+        failure('An error has occured: \n' + err, err)
       })
       this.set('isFormDisabled', false)
     },
+    /**
+     * When the user clicks the `Get User` button, this function is called. It extracts the username
+     * from the `info` object, then query's for the record contains the key which is the username.
+     * It will either return that the user exists and the token is __ or that the user does not exist.
+     */
     getUserInfo () {
       const username = this.get('info').username
       const token = ''
@@ -49,18 +74,17 @@ export default Ember.Controller.extend({
         token
       })
         .then((res) => {
-          Ember.$('.result').removeClass('failure')
-          Ember.$('.result').addClass('success')
-          Ember.$('.result').text('For the user with this username: ' + res.get('username') + ', their testing token is: ' + res.get('token'))
+          success('For the user with this username: ' + res.get('username') + ', their testing token is: ' + res.get('token'))
         })
         .catch((err) => {
-          Ember.$('.result').addClass('failure')
-          Ember.$('.result').removeClass('success')
-          Ember.$('.result').text('No such user exists for the username: ' + username)
-          Ember.Logger.debug(err)
+          failure('No such user exists for the username: ' + username, err)
         })
       this.set('isFormDisabled', false)
     },
+    /**
+     * When the user clicks the `Update User` button, this function is called. It recreates the user
+     * and overwrites the token that was stored in the backend. This update will return the token created.
+     */
     updateUserInfo () {
       const token = generateToken(30)
       const username = this.get('info').username
@@ -70,17 +94,16 @@ export default Ember.Controller.extend({
       })
         .save()
         .then((res) => {
-          Ember.$('.result').removeClass('failure')
-          Ember.$('.result').addClass('success')
-          Ember.$('.result').text('The user with the username: ' + username + ' was successfully updated. Their testing token is: ' + token)
+          success('The user with the username: ' + username + ' was successfully updated. Their testing token is: ' + token)
         }).catch((err) => {
-          Ember.$('.result').addClass('failure')
-          Ember.$('.result').removeClass('success')
-          Ember.$('.result').text('An error has occured: \n' + err)
-          Ember.Logger.debug(err)
+          failure('An error has occured: \n' + err, err)
         })
       this.set('isFormDisabled', false)
     },
+    /**
+     * When the user click the `Delete User` button, this function is called. It will delete the user with the
+     * given username if it exists. It will return successfully if the user existed and was deleted.
+     */
     deleteUser () {
       const username = this.get('info').username
       const token = ''
@@ -92,21 +115,23 @@ export default Ember.Controller.extend({
           return developer.destroyRecord()
         })
         .then((res) => {
-          Ember.$('.result').removeClass('failure')
-          Ember.$('.result').addClass('success')
-          Ember.$('.result').text('The user with the username: ' + username + ' was successfully deleted.')
+          success('The user with the username: ' + username + ' was successfully deleted.')
         })
         .catch((err) => {
-          Ember.$('.result').addClass('failure')
-          Ember.$('.result').removeClass('success')
-          Ember.$('.result').text('An error has occured: \n' + err)
-          Ember.Logger.debug(err)
+          failure('An error has occured: \n' + err, err)
         })
       this.set('isFormDisabled', false)
     },
+    /**
+     * @param {Object} value - When a username is typed into the `GitHub Username` text box, the 
+     * value will include an entry for that username.
+     */
     formChange (value) {
       this.set('info', value)
     },
+    /**
+     * @param {Object} validation - a json object indicating the number of errors in the form
+     */
     formValidation (validation) {
       this.set('isFormInvalid', validation.errors.length !== 0)
     }
