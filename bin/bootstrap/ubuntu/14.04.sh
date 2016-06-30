@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -ex
 { # this ensures the entire script is downloaded
 
 # Install the base dependencies
@@ -13,7 +13,9 @@ sudo apt-get install -y \
     libcairo2 \
     nginx \
     python-pip \
-    unzip
+    unzip \
+    redis-server \
+    tmux
 
 # Install nodeenv and node version (defined by NODE_VERSION environment variable)
 if [ -z "$NODE_VERSION" ]
@@ -21,13 +23,12 @@ then
     NODE_VERSION=5.11.0
 fi
 
-sudo pip install nodeenv
-sudo mkdir -p /opt/node-envs
-cd /opt/node-envs
-sudo nodeenv --node=$NODE_VERSION --prebuilt $NODE_VERSION
-cd -
-USER_GROUP=$(groups $USER | awk '{print $1;}')
-sudo chown -R $USER:$USER_GROUP /opt/node-envs
+# Installing Node using NVM
+wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh | bash
+source ~/.profile
+. ~/.nvm/nvm.sh
+
+nvm install 5.11.0
 
 # Install xvfb, chrome and firefox
 sudo sh -c 'curl -sL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
@@ -144,17 +145,23 @@ sudo mv nginx.conf /etc/nginx/nginx.conf
 # Reload with the new config
 sudo service nginx reload
 
+# Start redis server
+sudo service redis-server restart
+
+npm install bower -g
+
+npm install -g webdriverio-server && webdriverio-server-init
+
 # Setup .bashrc
 echo "source ~/.bashrc" >> ~/.bash_profile
-echo "# Activate a node version from nodeenv" >> ~/.bashrc
-echo "source /opt/node-envs/${NODE_VERSION}/bin/activate" >> ~/.bashrc
+echo 'export NVM_DIR="$HOME/.nvm' >> ~/.bashrc
+echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh' >> ~/.bashrc
 echo "Please source ~/.bashrc to complete setup"
-echo "You can now do the following to run webdriverio-server:"
-echo ""
-echo "\$ source ~/.bashrc && npm install -g webdriverio-server && webdriverio-server-init && DISPLAY=:0 DEBUG=server webdriverio-server"
-echo ""
 echo "After the initial run, to run it again, you should only need:"
 echo "\$ source ~/.bashrc && DISPLAY=:0 DEBUG=server webdriverio-server"
 echo ""
+
+echo "To run webdriverio-server as a service using tmux, follow the end of SETUP.md"
+echo "at https://github.com/ciena-blueplanet/webdriverio-server/blob/master/SETUP.md"
 
 } # this ensures the entire script is downloaded

@@ -23,15 +23,6 @@ These instructions assume that you have set up a server (either Mac or Ubuntu) w
 - Chrome web browser installed
 - Redis instance
 
-In order to facilitate this for an Ubuntu 14.04 server, the following command can be used:
-
-```
-wget -qO- https://raw.githubusercontent.com/ciena-blueplanet/webdriverio-server/master/bin/bootstrap/ubuntu/14.04.sh | bash
-```
-
-This will configure a new system capable of running `webdriverio-server` using `xvfb` to allow headless execution of
-the Chrome browser to capture screenshots.
-
 ### Installation
 
     npm install -g webdriverio-server
@@ -39,6 +30,13 @@ the Chrome browser to capture screenshots.
 
 The first line will install both the `webdriverio-server` and `webdriver-manager` alongside it. The second line will
 initialize the build environment for the `webriverio-server`.
+
+### Setting up the server
+
+To setup the server, refer to SETUP.md.
+
+This will configure a new system capable of running `webdriverio-server` using `xvfb` to allow headless execution of
+the Chrome browser to capture screenshots.
 
 ### Starting the webdriver-io server node process
 

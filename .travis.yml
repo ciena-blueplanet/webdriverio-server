@@ -10,6 +10,11 @@ before_install:
 - pr-bumper check
 install:
 - npm install
+- bower install
+before_script:
+- "export DISPLAY=:99.0"
+- "sh -e /etc/init.d/xvfb start"
+- sleep 3 # give xvfb some time to start
 after_success:
 - cat coverage/lcov.info | coveralls
 env:

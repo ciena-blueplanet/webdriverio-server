@@ -1,15 +1,27 @@
 {
   "name": "webdriverio-server",
   "version": "2.2.0",
-  "description": "Server for running webdriverio tests",
+  "description": "Server for running webdriverio tests and a frontend for public access",
   "config": {
     "coverage_opts": "-x **/tests/** --report cobertura --report lcov --dir tests"
   },
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
   "scripts": {
-    "start": "node ./bin/www.js",
-    "lint": "eslint *.js bin routes src spec testUtils ",
+    "start": "npm run build && node ./bin/www.js",
+    "lint": "eslint *.js bin public test routes src spec testUtils && npm run lint-sass",
     "jasmine": "JASMINE_CONFIG_PATH=spec/support/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
-    "test": "npm run lint && npm run jasmine"
+    "test": "npm run lint && npm run ember-test && npm run jasmine",
+    "ember-test": "COVERAGE=true ember test",
+    "e2e-test": "wdio-client remote_e2e_test raphael.cyanoptics.com:3000 dist tests/e2e",
+    "local-e2e-test": "wdio-client remote_e2e_test localhost:3000 dist tests/e2e",
+    "b2e-test": "ember build --environment=e2e-test && npm run e2e-test",
+    "update-screenshots": "wdio-client update_screenshots tests/e2e",
+    "build": "ember build",
+    "lint-sass": "sass-lint *.scss",
+    "prepublish": "bower install && ember build"
   },
   "repository": {
     "type": "git",
@@ -35,12 +47,18 @@
   },
   "homepage": "https://github.com/ciena-blueplanet/webdriverio-server",
   "devDependencies": {
+    "blueimp-md5": "^2.3.0",
+    "ember-cli-code-coverage": "0.2.1",
+    "ember-sinon": "0.5.1",
     "eslint": "^1.10.3",
     "eslint-config-frost-standard": "^0.2.5",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
     "jasmine-node": "^1.14.5",
-    "request": "^2.72.0"
+    "mocha": "^2.5.3",
+    "request": "^2.72.0",
+    "sass-lint": "^1.7.0",
+    "webdriverio-client": "^1.0.3"
   },
   "dependencies": {
     "body-parser": "~1.12.0",
@@ -56,7 +74,43 @@
     "nodemon": "^1.9.2",
     "q": "^1.4.1",
     "redis": "^2.6.1",
-    "serve-favicon": "~2.2.0"
+    "serve-favicon": "~2.2.0",
+    "blueimp-md5": "^2.3.0",
+    "broccoli-asset-rev": "^2.4.2",
+    "ember-ajax": "0.7.1",
+    "ember-browserify": "1.1.9",
+    "ember-cli": "2.5.1",
+    "ember-cli-app-version": "^1.0.0",
+    "ember-cli-babel": "^5.1.6",
+    "ember-cli-dependency-checker": "^1.2.0",
+    "ember-cli-htmlbars": "^1.0.3",
+    "ember-cli-htmlbars-inline-precompile": "^0.3.1",
+    "ember-cli-inject-live-reload": "^1.4.0",
+    "ember-cli-mocha": "^0.10.4",
+    "ember-cli-release": "0.2.8",
+    "ember-cli-sass": "^5.3.1",
+    "ember-cli-sri": "^2.1.0",
+    "ember-cli-uglify": "^1.2.0",
+    "ember-computed-decorators": "0.2.2",
+    "ember-data": "^2.5.0",
+    "ember-export-application-global": "^1.0.5",
+    "ember-frost-bunsen": "6.1.0",
+    "ember-frost-core": "0.11.18",
+    "ember-frost-tabs": "2.0.1",
+    "ember-load-initializers": "^0.5.1",
+    "ember-lodash": "0.0.9",
+    "ember-one-way-controls": "0.8.3",
+    "ember-prop-types": "2.0.0",
+    "ember-redux": "1.4.0",
+    "ember-resolver": "^2.0.3",
+    "ember-safeguard": "0.0.2",
+    "ember-sortable": "1.8.1",
+    "ember-truth-helpers": "1.2.0",
+    "loader.js": "^4.0.1",
+    "node-sass": "^3.7.0",
+    "redux": "3.5.2",
+    "redux-thunk": "2.1.0",
+    "svg4everybody": "2.1.0"
   },
   "preferGlobal": true,
   "bin": {

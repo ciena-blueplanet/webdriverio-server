@@ -1,0 +1,19 @@
+{
+  "globals": {
+    "$": false,
+    "andThen": false,
+    "chai": false,
+    "currentPath": false,
+    "Ember": false,
+    "sinon": false,
+    "describe": false,
+    "jasmine": false,
+    "beforeEach": false,
+    "afterEach": false,
+    "beforeAll": false,
+    "afterAll": false,
+    "it": false,
+    "xit": false,
+    "visit": false
+  }
+}

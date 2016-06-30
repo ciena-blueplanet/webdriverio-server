@@ -59,7 +59,7 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
   })
 })
 
-app.use('/', express.static(path.join(__dirname, '..', 'webdriverio-app/dist')))
+app.use('/', express.static(path.join(__dirname, '..', '/dist')))
 
 app.post('/', function (req, res) {
   if (done) {
@@ -78,9 +78,7 @@ app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')
 
 // catch 404 and forward to error handler
 app.use(function (req, res) {
-  console.log(req.path)
   res.status(404).send('Not Found')
-  res.end()
 })
 
 // error handler
