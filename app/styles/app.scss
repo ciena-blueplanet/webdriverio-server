@@ -44,6 +44,8 @@
     padding: 2px;
 }
 
+// Login Route 
+
 .login-main {
      @extend .flex;
     align-items: center;
@@ -112,6 +114,18 @@ body {
     white-space: none;
     width: 100%;
 }
+
+// Portal Route
+
+.portal-bar {
+    background-color: #344250;
+}
+
+.main-body {
+    top: 53px;
+    padding: 53px 0px 0px 0px;
+}
+
 
 @media screen and (max-width: 800px) {
     .footer {

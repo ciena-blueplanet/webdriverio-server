@@ -1,72 +1,33 @@
-<div class="container">
-    <div class='main'>
-        <div class='title'>
-            Admin Portal
-        </div>
-        <div class='username_form'>
-            {{frost-bunsen-form
-            bunsenModel=portalModel
-            bunsenView=portalView
-            disabled=isFormDisabled
-            onChange=(action "formChange")
-            onValidation=(action "formValidation")
-            }}
-        </div>
-        <div class='bar'>
-          <div class='link'>
-            {{frost-button
-            disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "createUser")
-            priority="secondary"
-            size="medium"
-            text="Create User"
-            }}
-          </div>
-          <div class='link'>
-            {{frost-button
-            disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "updateUserInfo")
-            priority="secondary"
-            size="medium"
-            text="Update User"
-            }}
-          </div>
-          <div class='link'>
-            {{frost-button
-            disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "getUserInfo")
-            priority="secondary"
-            size="medium"
-            text="Get User"
-            }}
-          </div>
-          <div class='link'>
-            {{frost-button
-            disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "deleteUser")
-            priority="secondary"
-            size="medium"
-            text="Delete User"
-            }}
-          </div>
-      </div>
-      <div class='result'>
-      </div>
+<div class='portal-bar'>
+    <div class='bp-logo'>
+        <img src='./images/bp-logo.png'>
     </div>
-    <div class='footer'>
-        <span class='blue-planet-image'>
-        </span>
-        <span class='bar'>
-            <span class='link'>
-                <a href='https://www.github.com/ciena-blueplanet'>
-                    <div class='content'>
-                        Interested in Contributing?
-                    </div>
-                </a>
-            </span>
-        </span>
-        <span class='cblue-planet-image'>
-            <img src="./images/blue_planet_logo.png">
-        </span>
-    </div>
+</div>
+<div class='main-body'>
+    {{#frost-object-browser as |slot|}}
+        {{#block-slot slot 'info-bar'}}
+            {{#frost-info-bar as |slot|}}
+                {{#block-slot slot 'title'}}
+                    Resources
+                {{/block-slot}}
+                {{#block-slot slot 'actions' as |controls|}}
+                    {{controls.button
+                    icon='frost/infobar-create'
+                    onClick=(action 'createUser')
+                    text='Create'
+                    }}
+                {{/block-slot}}
+            {{/frost-info-bar}}
+        {{/block-slot}}
+        {{#block-slot slot 'actions' as |controls selections|}}
+            {{controls.button
+            priority="secondary"
+            text='Restrict'
+            }}
+            {{controls.button
+            priority="secondary"
+            text='Generation token'
+            }}
+        {{/block-slot}}
+    {{/frost-object-browser}}
 </div>
