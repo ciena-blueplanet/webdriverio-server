@@ -1,40 +1,25 @@
 import Ember from 'ember'
 import generateToken from '../utils/generateToken'
+import _ from 'lodash'
 
 export default Ember.Controller.extend({
-  portalModel: {
-    properties: {
-      username: {
-        type: 'string'
-      }
-    },
-    required: ['username'],
-    type: 'object'
-  },
-  portalView: {
-    containers: [
+  data: Ember.computed(function () {
+    this.get('store').queryRecord('developer',
       {
-        id: 'main',
-        rows: [
-          [
-            {
-              label: 'GitHub Username',
-              model: 'username'
-            }
-          ]
-        ]
-      }
-    ],
-    rootContainers: [
-      {
-        container: 'main',
-        label: 'Main'
-      }
-    ],
-    type: 'form',
-    version: '1.0'
-  },
-  isFormInvalid: true,
+        queryAll: 1
+      })
+      .then((res) => {
+        console.log(res)
+        let filteredResult = _.filter(res, (item) => {
+          // Filters out the md5 hash (32 characters)
+          return item.token.length <= 30
+        })
+        return filteredResult
+      })
+      .catch((err) => {
+        throw err
+      })
+  }),
   actions: {
     createUser () {
       const token = generateToken(30)

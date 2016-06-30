@@ -1,0 +1,22 @@
+// Portal Route
+
+.portal-bar {
+    background-color: #344250;
+}
+
+.frost-object-browser-actions {
+    // background-color: yellowgreen;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    max-height: 83%;
+    width: calc(100% - 50px);
+    z-index: -1;
+}
+
+.selection {
+    padding-left: 50px;
+    padding-top: 40px;
+}
+

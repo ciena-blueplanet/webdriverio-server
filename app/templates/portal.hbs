@@ -3,23 +3,23 @@
         <img src='./images/bp-logo.png'>
     </div>
 </div>
-<div class='main-body'>
-    {{#frost-object-browser as |slot|}}
-        {{#block-slot slot 'info-bar'}}
-            {{#frost-info-bar as |slot|}}
-                {{#block-slot slot 'title'}}
-                    Resources
-                {{/block-slot}}
-                {{#block-slot slot 'actions' as |controls|}}
-                    {{controls.button
-                    icon='frost/infobar-create'
-                    onClick=(action 'createUser')
-                    text='Create'
-                    }}
-                {{/block-slot}}
-            {{/frost-info-bar}}
-        {{/block-slot}}
-        {{#block-slot slot 'actions' as |controls selections|}}
+{{#frost-object-browser as |slot|}}
+    {{#block-slot slot 'info-bar'}}
+        {{#frost-info-bar as |slot|}}
+            {{#block-slot slot 'title'}}
+                Resources
+            {{/block-slot}}
+            {{#block-slot slot 'actions' as |controls|}}
+                {{controls.button
+                icon='frost/infobar-create'
+                onClick=(action 'createUser')
+                text='Create'
+                }}
+            {{/block-slot}}
+        {{/frost-info-bar}}
+    {{/block-slot}}
+    <div class='actions'>
+        {{#block-slot slot 'actions' as |controls|}}
             {{controls.button
             priority="secondary"
             text='Restrict'
@@ -29,5 +29,11 @@
             text='Generation token'
             }}
         {{/block-slot}}
-    {{/frost-object-browser}}
+    </div>
+{{/frost-object-browser}}
+<div class='selection'>
+    {{frost-select
+        data=data
+        selected=selectedIndex
+    }}
 </div>
