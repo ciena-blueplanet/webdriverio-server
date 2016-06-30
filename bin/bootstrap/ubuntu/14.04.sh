@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+set -ex
 { # this ensures the entire script is downloaded
 
 # Install the base dependencies
@@ -29,14 +29,6 @@ source ~/.profile
 . ~/.nvm/nvm.sh
 
 nvm install 5.11.0
-
-# sudo pip install nodeenv
-# sudo mkdir -p /opt/node-envs
-# cd /opt/node-envs
-# sudo nodeenv --node=$NODE_VERSION --prebuilt $NODE_VERSION
-# cd -
-# USER_GROUP=$(groups $USER | awk '{print $1;}')
-# sudo chown -R $USER:$USER_GROUP /opt/node-envs
 
 # Install xvfb, chrome and firefox
 sudo sh -c 'curl -sL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'

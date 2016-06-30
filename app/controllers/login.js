@@ -46,12 +46,24 @@ export default Ember.Controller.extend({
   },
   isFormInvalid: true,
   actions: {
+    /**
+     * @param {Object} value - the json object containing the username and password typed in
+     * by the user
+     */
     formChange (value) {
       this.set('loginInfo', value)
     },
+    /**
+     * @param {Object} validation - a json object indicating the number of errors in the form
+     */
     formValidation (validation) {
       this.set('isFormInvalid', validation.errors.length !== 0)
     },
+    /**
+     * When the user clicks the `Log In` button, this function will extract the username and password
+     * typed in and attempt to validate those against the hashed version stored in the database. If the
+     * username and password match, they are redirected to the admin portal route.
+     */
     submitForm () {
       const {username, password} = this.get('loginInfo')
       this.get('store').queryRecord('developer', {

@@ -5,48 +5,48 @@
         </div>
         <div class='username_form'>
             {{frost-bunsen-form
-            bunsenModel=portalModel
-            bunsenView=portalView
-            disabled=isFormDisabled
-            onChange=(action "formChange")
-            onValidation=(action "formValidation")
+              bunsenModel=portalModel
+              bunsenView=portalView
+              disabled=isFormDisabled
+              onChange=(action "formChange")
+              onValidation=(action "formValidation")
             }}
         </div>
         <div class='bar'>
           <div class='link'>
             {{frost-button
-            disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "createUser")
-            priority="secondary"
-            size="medium"
-            text="Create User"
+              disabled=(or isFormDisabled isFormInvalid)
+              onClick=(action "createUser")
+              priority="secondary"
+              size="medium"
+              text="Create User"
             }}
           </div>
           <div class='link'>
             {{frost-button
-            disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "updateUserInfo")
-            priority="secondary"
-            size="medium"
-            text="Update User"
+              disabled=(or isFormDisabled isFormInvalid)
+              onClick=(action "updateUserInfo")
+              priority="secondary"
+              size="medium"
+              text="Update User"
             }}
           </div>
           <div class='link'>
             {{frost-button
-            disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "getUserInfo")
-            priority="secondary"
-            size="medium"
-            text="Get User"
+              disabled=(or isFormDisabled isFormInvalid)
+              onClick=(action "getUserInfo")
+              priority="secondary"
+              size="medium"
+              text="Get User"
             }}
           </div>
           <div class='link'>
             {{frost-button
-            disabled=(or isFormDisabled isFormInvalid)
-            onClick=(action "deleteUser")
-            priority="secondary"
-            size="medium"
-            text="Delete User"
+              disabled=(or isFormDisabled isFormInvalid)
+              onClick=(action "deleteUser")
+              priority="secondary"
+              size="medium"
+              text="Delete User"
             }}
           </div>
       </div>
@@ -54,19 +54,15 @@
       </div>
     </div>
     <div class='footer'>
-        <span class='blue-planet-image'>
-        </span>
         <span class='bar'>
             <span class='link'>
-                <a href='https://www.github.com/ciena-blueplanet'>
-                    <div class='content'>
-                        Interested in Contributing?
-                    </div>
-                </a>
+              {{#frost-link 'login'
+                priority='secondary'
+                size='medium'
+              }}
+              Log out
+              {{/frost-link}}
             </span>
-        </span>
-        <span class='cblue-planet-image'>
-            <img src="./images/blue_planet_logo.png">
         </span>
     </div>
 </div>

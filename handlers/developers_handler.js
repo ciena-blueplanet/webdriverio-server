@@ -38,9 +38,20 @@ function setStandardResponse (res, username, token) {
 }
 
 var DeveloperHandler = {
+  /**
+   * This function initializes the redis client. It is extracted from the routes code because
+   * when testing any http requests made to Redis, I did not want to initilize the client since that would require
+   * Redis to be running while the tests were running.
+   */
   init: function () {
     this.client = redis.createClient({password: process.env.REDIS})
   },
+  /**
+   * @param {Object} req - The request object, containing the username and the token in the query
+   * @param {Object} res - The response object, which will be send back to the front end after the request has been returned.
+   *                       It contains the status code and the json with either the username and token or the cooresponding error.
+   * @returns {Object} err - This function will always resolve with the err object, since we are required to either resolve or reject the promise.
+   */
   get: function (req, res) {
     return new Promise((resolve, reject) => {
       this.client.get(req.query.username, function (err, redisResp) {
@@ -59,6 +70,12 @@ var DeveloperHandler = {
       })
     })
   },
+  /**
+   * @param {Object} req - The request object, containing the username and the token in the body
+   * @param {Object} res - The response object, which will be send back to the front end after the request has been returned.
+   *                       It contains the status code and the json with either the username and token or the cooresponding error.
+   * @returns {Object} err - This function will always resolve with the err object, since we are required to either resolve or reject the promise.
+   */
   post: function (req, res) {
     return new Promise((resolve, reject) => {
       const username = req.body.developer.username
@@ -73,6 +90,12 @@ var DeveloperHandler = {
       })
     })
   },
+  /**
+   * @param {Object} req - The request object, containing the username and the token in the parameters
+   * @param {Object} res - The response object, which will be send back to the front end after the request has been returned.
+   *                       It contains the status code and the json with either the username and token or the cooresponding error.
+   * @returns {Object} err - This function will always resolve with the err object, since we are required to either resolve or reject the promise.
+   */
   delete: function (req, res) {
     return new Promise((resolve, reject) => {
       if (req.params.username === undefined) {
