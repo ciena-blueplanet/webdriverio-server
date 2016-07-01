@@ -1,6 +1,5 @@
 import Ember from 'ember'
 import generateToken from '../utils/generateToken'
-import _ from 'lodash'
 
 /**
  * @param {String} message - The message displayed to the user when the call made to the backend succeeds
@@ -23,8 +22,39 @@ function failure (message, err) {
 }
 
 export default Ember.Controller.extend({
+  portalModel: {
+    properties: {
+      username: {
+        type: 'string'
+      }
+    },
+    type: 'object'
+  },
+  portalView: {
+    containers: [
+      {
+        id: 'main',
+        rows: [
+          [
+            {
+              label: 'Username',
+              model: 'username'
+            }
+          ]
+        ]
+      }
+    ],
+    rootContainers: [
+      {
+        container: 'main',
+        label: 'Main'
+      }
+    ],
+    type: 'form',
+    version: '1.0'
+  },
+  isFormInvalid: true,
   selectedIndex: 1,
-
   init () {
     this._super(...arguments)
     this.set('data', [])
@@ -144,6 +174,17 @@ export default Ember.Controller.extend({
      */
     formValidation (validation) {
       this.set('isFormInvalid', validation.errors.length !== 0)
+    },
+    confirmHandler: function () {
+      this.notifications.addNotification({
+        message: 'Confirmed',
+        type: 'success',
+        autoClear: true,
+        clearDuration: 2000
+      })
+    },
+    myCustomAction: function () {
+      console.log('My Custom action triggered')
     }
   }
 })

@@ -1,3 +1,5 @@
+<div class='portal-bar'>
+</div>
 {{#frost-object-browser as |slot|}}
     {{#block-slot slot 'info-bar'}}
         {{#frost-info-bar as |slot|}}
@@ -5,11 +7,36 @@
                 Resources
             {{/block-slot}}
             {{#block-slot slot 'actions' as |controls|}}
-                {{controls.button
-                icon='frost/infobar-create'
-                onClick=(action 'createUser')
-                text='Create'
-                }}
+                {{#frost-modal modalName='create-modal' as |slot|}}
+                {{#block-slot slot 'target'}}
+                    {{controls.button
+                    icon='frost/infobar-create'
+                    text='Create'
+                    }}
+                {{/block-slot}}
+                {{#block-slot slot 'header'}}
+                    <div class="primary-title">
+                        Create user
+                    </div>
+                {{/block-slot}}
+                {{#block-slot slot 'body'}}
+                    <div class='username_form'>
+                        {{frost-bunsen-form
+                        bunsenModel=portalModel
+                        bunsenView=portalView
+                        onChange=(action "formChange")
+                        onValidation=(action "formValidation")
+                        }}
+                    </div>
+                {{/block-slot}}
+                {{#block-slot slot 'footer' as |controls close|}}
+                    {{controls.cancel}}
+                    {{controls.confirm
+                    onConfirm=(action 'confirmHandler')
+                    text='Create'
+                    }}
+                {{/block-slot}}
+                {{/frost-modal}}
             {{/block-slot}}
         {{/frost-info-bar}}
     {{/block-slot}}

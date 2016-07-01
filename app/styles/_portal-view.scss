@@ -2,6 +2,7 @@
 
 .portal-bar {
     background-color: #344250;
+    height: 60px;
 }
 
 .frost-object-browser-actions {
@@ -10,7 +11,7 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-end;
-    max-height: 83%;
+    max-height: 90vh;
     width: calc(100% - 50px);
     z-index: -1;
 }
@@ -19,4 +20,14 @@
     padding-left: 50px;
     padding-top: 40px;
 }
+
+.primary-title {
+    font-size: 20px;
+}
+
+.ps-content {
+    margin-top: 100px;
+}
+
+
 
