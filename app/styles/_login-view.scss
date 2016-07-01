@@ -9,7 +9,7 @@
 
 .login {
     border-left-width: 4px;
-    border-left-color: #1253a5;
+    border-left-color: #db002a;
     border-left-style: solid;
     box-shadow: 0px 0px 50px 20px #e2e2e2;
     padding-top: 40px;
@@ -27,4 +27,12 @@
 
 .form {
     padding-top: 15px;
+}
+
+.login-result {
+    @extend .result;
+    font-size: 14px;
+    padding-bottom: 10px;
+    white-space: none;
+    width: 100%;
 }
