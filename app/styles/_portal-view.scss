@@ -2,7 +2,10 @@
 
 .portal-bar {
     background-color: #33424f;
-    height: 60px;
+    div {
+        background-color: #33424f;
+        padding-right: 3px;
+    }
 }
 
 .frost-object-browser-actions {
@@ -70,6 +73,8 @@ td {
 
 #admin_title {
     color: #404041;
+    padding-top: 10px;
+    font-size: 20px;
 }
 
 .frost-select {
@@ -98,8 +103,9 @@ td {
     display: none;
 }
 
-
-
-
-
-
+#logout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
