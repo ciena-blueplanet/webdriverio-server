@@ -10,6 +10,7 @@ Router.map(function () {
   this.route('portal')
   this.route('auth', function () {
     this.route('contract')
+    this.route('denied');
   })
 })
 
