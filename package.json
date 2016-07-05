@@ -21,7 +21,7 @@
     "update-screenshots": "wdio-client update_screenshots tests/e2e",
     "build": "ember build",
     "lint-sass": "sass-lint *.scss",
-    "prepublish": "bower install && ember build"
+    "prepublish": "ember build"
   },
   "repository": {
     "type": "git",
