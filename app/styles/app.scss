@@ -36,11 +36,12 @@
 .bar {
     display: flex;
     align-items: center;
-    a {
-        @extend .frost-link;
-        @extend .small;
-        @extend .secondary;
-    }
+}
+
+a {
+    @extend .frost-link;
+    @extend .small;
+    @extend .secondary;
 }
 
 .link {
