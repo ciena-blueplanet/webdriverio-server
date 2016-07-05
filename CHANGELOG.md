@@ -1,3 +1,6 @@
+# 2.3.1
+* Deleted /routes from npmignore
+
 # 2.3.0
 * Added an Admin Portal, allowing administrators to add developers automatically to the server without verifying with GitHub
 * Updated backend express application to work with ember-data requests
