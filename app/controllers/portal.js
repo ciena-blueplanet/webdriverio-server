@@ -37,31 +37,35 @@ export default Ember.Controller.extend({
   init () {
     this._super(...arguments)
     this.set('data', [])
-
-    this.get('store').query('developer',
-      {
-        queryAll: 1
-      })
-      .then((res) => {
-        let filteredResult = res.filter((item) => {
-          // Filters out the md5 hash (32 characters)
-          return item.get('token').length <= 30
-        }).map((result) => {
-          return {
-            label: result.get('username'),
-            value: result.get('token')
-          }
-        })
-        this.set('data', filteredResult)
-      })
-      .catch((err) => {
-        Ember.Logger.debug(err)
-      })
+    this.send('getAll')
   },
   username: '',
   token: '',
   selectedIndex: 1,
   actions: {
+    getAll: function () {
+      this.get('store').query('developer',
+        {
+          queryAll: 1
+        })
+        .then((res) => {
+          let filteredResult = res.filter((item) => {
+            // Filters out the md5 hash (32 characters)
+            console.log(item)
+            return item.get('token').length <= 30
+          }).map((result) => {
+            return {
+              label: result.get('username'),
+              value: result.get('token')
+            }
+          })
+          console.log('Filtered: ' + JSON.stringify(filteredResult, null, 2))
+          this.set('data', filteredResult)
+        })
+        .catch((err) => {
+          Ember.Logger.debug(err)
+        })
+    },
     /**
      * @param {Object} value - When a username is typed into the `GitHub Username` text box, the
      * value will include an entry for that username.

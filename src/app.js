@@ -9,12 +9,12 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 const GitHubAPI = require('github')
-const http = require('http')
 const oauth = require('oauth').OAuth2
 
 const app = express()
 
 const developers = require('../routes/developers')
+const Verify = require('../handlers/github_api_handler')
 
 const processUpload = require('./process-upload')
 
@@ -22,8 +22,7 @@ const OAuth = oauth
 const OAuth2 = new OAuth(process.env.GITHUB_CLIENT_ID, process.env.GITHUB_CLIENT_SECRET, 'https://github.com/', 'login/oauth/authorize', 'login/oauth/access_token')
 
 const github = new GitHubAPI({
-  // optional
-  debug: true,
+  debug: false,
   protocol: 'https',
   host: 'api.github.com', // should be api.github.com for GitHub
   headers: {
@@ -114,7 +113,6 @@ app.get('/auth/callback', function (req, res) {
     }
     const accessToken = access_token
     // authenticate github API
-    console.log('AccessToken: ' + accessToken + '\n')
     github.authenticate({
       type: 'oauth',
       token: accessToken
@@ -128,74 +126,15 @@ app.get('/auth/callback', function (req, res) {
       const sixMonthsAgo = new Date()
       const accountOpened = new Date(result.created_at)
       const user = result.login
-      console.log(user)
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 20)
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
       if (sixMonthsAgo.getTime() < accountOpened.getTime()) {
-        // res.redirect('/#/auth/denied')
+        res.redirect('/#/auth/denied')
+      } else {
+        Verify(github, res, user, sixMonthsAgo)
       }
-      // Must have contributed to 2 repos in last 6 months
-      checkPublicContributions(github, res, user, sixMonthsAgo)
-      // Have two personal repos
-      checkNumberRepos(github, res)
     })
   })
-  res.redirect('/#/auth/contract')
 })
-
-function checkPublicContributions (github, res, user, sixMonthsAgo) {
-  const pages = 3
-  let total = 0
-  for (let i = 0; i < pages; i++) {
-    github.activity.getEventsForUserPublic({
-      user,
-      page: i,
-      per_page: 100
-    }, (err, result) => {
-      if (err) {
-        throw err
-      }
-      let repoEvent = ''
-      result.forEach((event) => {
-        repoEvent = new Date(event.created_at)
-        if (sixMonthsAgo.getTime() < repoEvent.getTime()) {
-          if (event.type === 'PullRequestEvent') {
-            github.repos.getById({
-              id: event.repo.id
-            }, (err, result) => {
-              if (err) {
-                throw err
-              }
-              if (result.owner.login !== user) {
-                total++
-              }
-            })
-          }
-        }
-      })
-    })
-  }
-  if (total < 2) {
-    // res.redirect('/#/auth/denied')
-  }
-}
-
-function checkNumberRepos (github, res) {
-  github.repos.getAll({
-  }, (err, result) => {
-    if (err) {
-      throw err
-    }
-    let total = 0
-    result.forEach((repo) => {
-      if (!repo.fork) {
-        total++
-      }
-    })
-    if (total < 2) {
-      // res.redirect('/#/auth/denied')
-    }
-  })
-}
 
 // ==================================================================
 //                          Error Handling
