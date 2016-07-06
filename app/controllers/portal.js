@@ -41,7 +41,7 @@ export default Ember.Controller.extend({
   },
   username: '',
   token: '',
-  selectedIndex: 1,
+  selectedIndex: [0],
   actions: {
     getAll: function () {
       this.get('store').query('developer',
@@ -51,7 +51,6 @@ export default Ember.Controller.extend({
         .then((res) => {
           let filteredResult = res.filter((item) => {
             // Filters out the md5 hash (32 characters)
-            console.log(item)
             return item.get('token').length <= 30
           }).map((result) => {
             return {
@@ -59,7 +58,6 @@ export default Ember.Controller.extend({
               value: result.get('token')
             }
           })
-          console.log('Filtered: ' + JSON.stringify(filteredResult, null, 2))
           this.set('data', filteredResult)
         })
         .catch((err) => {
@@ -95,7 +93,7 @@ export default Ember.Controller.extend({
       }
     },
     createUser: function (element) {
-      this.get('store').createRecord('developer', {
+      return this.get('store').createRecord('developer', {
         username: element.label,
         token: element.value
       })
@@ -104,13 +102,13 @@ export default Ember.Controller.extend({
         console.log('For the user with this username: ' + res.get('username') + ', their testing token is: ' + res.get('token'))
       })
       .catch((err) => {
-        const data = this.get('data').toArray()
-        const index = data.indexOf({element})
+        const data = this.get('data')
+        const index = data.indexOf(element)
         if (index !== -1) {
           data.splice(index, 1)
         }
         this.set('data', Ember.A(data))
-        throw err
+        Ember.Logger.debug(err)
       })
     },
     /**
@@ -123,12 +121,13 @@ export default Ember.Controller.extend({
         label: username,
         value: token
       }
-      const index = this.get('data').indexOf({element})
+      this.send('createUser', element)
+      const data = this.get('data').toArray()
+      const index = data.indexOf(element)
       if (index === -1) {
-        const data = this.get('data').toArray()
         data.unshift(element)
         this.set('data', Ember.A(data))
-        this.set('selectedIndex', 0)
+        this.set('selectedIndex', [0])
         this.send('onChangeHandler', token)
       } else {
         console.log('This person with username ' + username + 'already exists')
