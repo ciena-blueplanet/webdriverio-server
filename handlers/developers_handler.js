@@ -40,7 +40,7 @@ function setStandardResponse (res, username, token) {
 /**
  * Set the response object to be in the format of a successful reponse
  * @param {object} res - The response object
- * @param {string} ret - The set of usernames and tokens returned from the query
+ * @param {string} developers - The set of usernames and tokens returned from the query
  */
 function setStandardKeysResponse (res, developers) {
   res.status(200)

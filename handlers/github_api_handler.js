@@ -1,7 +1,15 @@
-function getRepoByID (github, event, user) {
+/**
+ * Gets a repository on github by its id and checks if the owner
+ * of the repo is the current user
+ * @param {Object} github - Allows for API calls to be made to the github api server
+ * @param {Object} repo_information - The returned object containing information on repositories contributed to by the user
+ * @param {String} user - The owner of the account to be validated
+ * @returns {Promise} Either returns that the repository is owned by the user or not
+ */
+function getRepoByID (github, repo_information, user) {
   return new Promise((resolve, reject) => {
     github.repos.getById({
-      id: event.repo.id
+      id: repo_information.repo.id
     }, (err, result) => {
       if (err) {
         throw err
@@ -21,16 +29,31 @@ function getRepoByID (github, event, user) {
   })
 }
 
+/**
+ * Removes duplicate items (repositories) from an array by creating a set from the array
+ * and then converting it back into an array. (Since sets can't contain duplicates)
+ * @param {Array} repoSet - A set of objects containing repository information
+ * @returns {Array} A unique set of objects containing repository information
+ */
 function removeDuplicates (repoSet) {
   return Array.from(new Set(repoSet))
 }
 
-function getPageOfRepos (github, user, i, sixMonthsAgo) {
+/**
+ * Gets a page of GitHub account events, each page containing 100 events, which can be
+ * push events, pull request events, issue events etc...
+ * @param {Object} github - Allows for API calls to be made to the github api server
+ * @param {String} user - The owner of the account to be validated
+ * @param {Number} pageNumber - The page number of account events
+ * @param {Number} sixMonthsAgo - The current time minus 6 months
+ * @returns {Promise} Returns the number of repos that are not owned by the user and are unique
+ */
+function getPageOfRepos (github, user, pageNumber, sixMonthsAgo) {
   return new Promise((resolve, reject) => {
     let pset = []
     github.activity.getEventsForUserPublic({
       user,
-      page: i,
+      page: pageNumber,
       per_page: 100
     }, (err, result) => {
       if (err) {
@@ -61,6 +84,12 @@ function getPageOfRepos (github, user, i, sixMonthsAgo) {
   })
 }
 
+/**
+ * Makes sure that the number of repos contributed to in the last six months exceeds 2
+ * @param {Object} github - Allows for API calls to be made to the github api server
+ * @param {Object} res - The result object, allowing either the user to be redirected to a denied access
+ * page or a contract/success page
+ */
 function checkNumberRepos (github, res) {
   github.repos.getAll({
   }, (err, result) => {
@@ -81,6 +110,15 @@ function checkNumberRepos (github, res) {
   })
 }
 
+/**
+ * Checks whether the user has an account that is at least six months old. If
+ * that condition is met, the next check is called.
+ * @param {Object} github - Allows for API calls to be made to the github api server
+ * @param {Object} res - The result object, allowing either the user to be redirected to a denied access
+ * page or a contract/success page
+ * @param {String} user - The owner of the account being validated
+ * @param {Number} sixMonthsAgo - The current time minus 6 months
+ */
 const Verify = function (github, res, user, sixMonthsAgo) {
   const pages = 3
   let eventPSet = []
