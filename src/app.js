@@ -14,7 +14,7 @@ const oauth = require('oauth').OAuth2
 const app = express()
 
 const developers = require('../routes/developers')
-const Verify = require('../handlers/github_api_handler')
+const GitHub_Handler = require('../handlers/github_api_handler')
 
 const processUpload = require('./process-upload')
 
@@ -130,7 +130,7 @@ app.get('/auth/callback', function (req, res) {
       if (sixMonthsAgo.getTime() < accountOpened.getTime()) {
         res.redirect('/#/auth/denied')
       } else {
-        Verify(github, res, user, sixMonthsAgo)
+        GitHub_Handler.verify(github, res, user, sixMonthsAgo)
       }
     })
   })

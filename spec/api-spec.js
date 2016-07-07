@@ -38,6 +38,15 @@ function get (username) {
   }
 }
 
+function getAll () {
+  const keys = Object.keys(db)
+  let ret = {}
+  keys.forEach((key) => {
+    ret[key] = db.get(key)
+  })
+  res.json(ret)
+}
+
 /**
  * Mocks the redis del command
  * @param {string} username - The username of the developer
@@ -62,6 +71,12 @@ beforeEach(() => {
     },
     del: function (username, cb) {
       remove(username)
+      cb(null)
+    },
+    keys: function (key, cb) {
+      if (key.toString() === '*') {
+        getAll()
+      }
       cb(null)
     }
   })
@@ -139,6 +154,31 @@ describe('Get Requests', () => {
         })
         expect(redisResponse).toEqual({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
         done()
+      })
+  })
+
+  it('should get a user with the correct token after an post happens using the getValue call', (done) => {
+    const key = {username: 'testuser'}
+    const reqPost = {
+      body: {
+        developer: {
+          username: 'testuser',
+          token: 'acompletelynewandoriginaltoken'
+        }
+      }
+    }
+    server.post(reqPost, res)
+      .then((err) => {
+        if (err) {
+          done.fail(err)
+        } else {
+          expect(res.status).toHaveBeenCalledWith(200)
+          server.getValue(key.username)
+            .then((res) => {
+              expect(res.username).toEqual(key.username)
+              done()
+            })
+        }
       })
   })
 })
