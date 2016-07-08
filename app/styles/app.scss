@@ -3,6 +3,12 @@
 @import './login-view';
 @import './portal-view';
 
+.link-a {
+    @extend .frost-link;
+    @extend .small;
+    @extend .secondary;
+}
+
 .flex {
     display: flex;
     flex-direction: column;
@@ -38,14 +44,12 @@
     align-items: center;
 }
 
-a {
-    @extend .frost-link;
-    @extend .small;
-    @extend .secondary;
-}
 
 .link {
     padding: 2px;
+    a {
+        @extend .link-a
+    }
 }
 
 .blue-planet-image {
