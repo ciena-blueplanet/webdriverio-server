@@ -39,12 +39,7 @@ function get (username) {
 }
 
 function getAll () {
-  const keys = Object.keys(db)
-  let ret = {}
-  keys.forEach((key) => {
-    ret[key] = db.get(key)
-  })
-  res.json(ret)
+  return Array.from(db.keys())
 }
 
 /**
@@ -75,9 +70,10 @@ beforeEach(() => {
     },
     keys: function (key, cb) {
       if (key.toString() === '*') {
-        getAll()
+        cb(null, getAll())
+      } else {
+        cb(null)
       }
-      cb(null)
     }
   })
   server.init()
@@ -181,6 +177,57 @@ describe('Get Requests', () => {
         }
       })
   })
+
+  it('should get all users in the database', (done) => {
+    const reqPost1 = {
+      body: {
+        developer: {
+          username: 'testuser1',
+          token: 'acompletelynewandoriginaltoken2'
+        }
+      }
+    }
+    const reqPost2 = {
+      body: {
+        developer: {
+          username: 'testuser2',
+          token: 'acompletelynewandoriginaltoken2'
+        }
+      }
+    }
+    spyOn(server, 'getValue').and.callFake(
+      function (username) {
+        let ret = {}
+        if (db.get(username)) {
+          ret = {username, token: db.get(username)}
+        } else {
+          done.fail()
+        }
+        return Promise.resolve(ret)
+      }
+    )
+    server.post(reqPost1, res)
+      .then((err) => {
+        if (err) {
+          done.fail(err)
+        } else {
+          expect(res.status).toHaveBeenCalledWith(200)
+          server.post(reqPost2, res)
+            .then((err) => {
+              if (err) {
+                done.fail(err)
+              } else {
+                expect(res.status).toHaveBeenCalledWith(200)
+                server.get({query: {queryAll: 1}})
+                  .then((res) => {
+                    expect(res).toEqual(getAll())
+                    done()
+                  })
+              }
+            })
+        }
+      })
+  })
 })
 
 describe('Delete Requests', () => {
@@ -225,5 +272,33 @@ describe('Delete Requests', () => {
             })
         }
       })
+  })
+})
+
+describe('Response Tests', () => {
+  let resSpy
+  beforeEach(function () {
+    resSpy = jasmine.createSpyObj('res', ['status', 'format', 'json'])
+  })
+  it('should format the standard response correctly', function () {
+    server.setStandardResponse(resSpy, 'test', 'test-token')
+    expect(resSpy.status).toHaveBeenCalledWith(200)
+    expect(resSpy.format).toHaveBeenCalledWith({
+      json: jasmine.any(Function)
+    })
+  })
+  it('should format the error response correctly', function () {
+    server.setErrorResponse(resSpy, 'Failure', 500)
+    expect(resSpy.status).toHaveBeenCalledWith(500)
+    expect(resSpy.format).toHaveBeenCalledWith({
+      json: jasmine.any(Function)
+    })
+  })
+  it('should format the standard keys response correctly', function () {
+    server.setStandardKeysResponse(resSpy, ['test1', 'test2'])
+    expect(resSpy.status).toHaveBeenCalledWith(200)
+    expect(resSpy.format).toHaveBeenCalledWith({
+      json: jasmine.any(Function)
+    })
   })
 })

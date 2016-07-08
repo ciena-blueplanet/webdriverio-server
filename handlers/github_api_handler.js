@@ -1,5 +1,14 @@
-const fs = require('fs')
-const GitHub_Handler = {
+const _ = require('lodash')
+const githubAPI = {
+  /**
+   * Removes duplicate items (repositories) from an array by creating a set from the array
+   * and then converting it back into an array. (Since sets can't contain duplicates)
+   * @param {Array} repoSet - A set of objects containing repository information
+   * @returns {Array} A unique set of objects containing repository information
+   */
+  removeDuplicates: function (repoSet) {
+    return _.uniqWith(repoSet, _.isEqual)
+  },
   /**
    * Gets a repository on github by its id and checks if the owner
    * of the repo is the current user
@@ -55,13 +64,13 @@ const GitHub_Handler = {
           repoEvent = new Date(event.created_at)
           if (sixMonthsAgo.getTime() < repoEvent.getTime()) {
             if (event.type === 'PullRequestEvent') {
-              pset.push(GitHub_Handler.getRepoByID(github, event, user))
+              pset.push(githubAPI.getRepoByID(github, event, user))
             }
           }
         })
         Promise.all(pset).then((values) => {
           let numRepos = 0
-          values = removeDuplicates(values)
+          values = githubAPI.removeDuplicates(values)
           values.forEach((element) => {
             if (element.isPublic) {
               numRepos++
@@ -107,14 +116,15 @@ const GitHub_Handler = {
    * page or a contract/success page
    * @param {String} user - The owner of the account being validated
    * @param {Number} sixMonthsAgo - The current time minus 6 months
+   * @returns {Promise} - The set of promises containing the results of the query for pages of repos
    */
   verify: function (github, res, user, sixMonthsAgo) {
     const pages = 3
     let eventPSet = []
     for (let i = 0; i < pages; i++) {
-      eventPSet.push(GitHub_Handler.getPageOfRepos(github, user, i, sixMonthsAgo))
+      eventPSet.push(githubAPI.getPageOfRepos(github, user, i, sixMonthsAgo))
     }
-    Promise.all(eventPSet).then((values) => {
+    return Promise.all(eventPSet).then((values) => {
       let total = 0
       values.forEach((element) => {
         total += element.total
@@ -122,20 +132,10 @@ const GitHub_Handler = {
       if (total < 2) {
         res.redirect('/#/auth/denied')
       } else {
-        GitHub_Handler.checkNumberRepos(github, res)
+        githubAPI.checkNumberRepos(github, res)
       }
     })
   }
 }
 
-/**
- * Removes duplicate items (repositories) from an array by creating a set from the array
- * and then converting it back into an array. (Since sets can't contain duplicates)
- * @param {Array} repoSet - A set of objects containing repository information
- * @returns {Array} A unique set of objects containing repository information
- */
-function removeDuplicates (repoSet) {
-  return Array.from(new Set(repoSet))
-}
-
-module.exports = GitHub_Handler
+module.exports = githubAPI

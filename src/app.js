@@ -14,7 +14,7 @@ const oauth = require('oauth').OAuth2
 const app = express()
 
 const developers = require('../routes/developers')
-const GitHub_Handler = require('../handlers/github_api_handler')
+const githubAPI = require('../handlers/github_api_handler')
 
 const processUpload = require('./process-upload')
 
@@ -24,9 +24,9 @@ const OAuth2 = new OAuth(process.env.GITHUB_CLIENT_ID, process.env.GITHUB_CLIENT
 const github = new GitHubAPI({
   debug: false,
   protocol: 'https',
-  host: 'api.github.com', // should be api.github.com for GitHub
+  host: 'api.github.com',
   headers: {
-    'user-agent': 'Ciena Developers' // GitHub is happy with a unique user agent
+    'user-agent': 'Ciena Developers'
   },
   timeout: 5000
 })
@@ -130,7 +130,7 @@ app.get('/auth/callback', function (req, res) {
       if (sixMonthsAgo.getTime() < accountOpened.getTime()) {
         res.redirect('/#/auth/denied')
       } else {
-        GitHub_Handler.verify(github, res, user, sixMonthsAgo)
+        githubAPI.verify(github, res, user, sixMonthsAgo)
       }
     })
   })
