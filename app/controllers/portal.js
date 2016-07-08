@@ -1,5 +1,6 @@
 import Ember from 'ember'
 import generateToken from '../utils/generateToken'
+const TOKEN_LENGTH = 30
 
 export default Ember.Controller.extend({
   portalModel: {
@@ -43,6 +44,9 @@ export default Ember.Controller.extend({
   token: '',
   selectedIndex: [0],
   actions: {
+    /**
+     * Gets all users and their tokens from the database
+     */
     getAll: function () {
       this.get('store').query('developer',
         {
@@ -51,7 +55,7 @@ export default Ember.Controller.extend({
         .then((res) => {
           let filteredResult = res.filter((item) => {
             // Filters out the md5 hash (32 characters)
-            return item.get('token').length <= 30
+            return item.get('token').length <= TOKEN_LENGTH
           }).map((result) => {
             return {
               label: result.get('username'),
@@ -77,6 +81,9 @@ export default Ember.Controller.extend({
     formValidation (validation) {
       this.set('isFormInvalid', validation.errors.length !== 0)
     },
+    /**
+     * Updates the resticted buttons depending on the token generated
+     */
     updateDOM: function () {
       Ember.$('#username_label').text(this.get('username'))
       Ember.$('#token_label').text(this.get('token'))
@@ -114,7 +121,7 @@ export default Ember.Controller.extend({
     /**
      * Creates a user if they do not exist already and populates them in the selection of data
      */
-    confirmHandler: function () {
+    createUserHandler: function () {
       const username = this.get('info').username
       const token = generateToken(30)
       const element = {
@@ -133,8 +140,11 @@ export default Ember.Controller.extend({
         console.log('This person with username ' + username + 'already exists')
       }
     },
+    /**
+     * Generates a new token for the given user
+     */
     generateHandler: function () {
-      const token = generateToken(30)
+      const token = generateToken(TOKEN_LENGTH)
       const element = {
         label: this.get('username'),
         value: token
@@ -143,6 +153,9 @@ export default Ember.Controller.extend({
       this.set('token', token)
       this.send('updateDOM')
     },
+    /**
+     * Restricts the user by generating a token equal to ~
+     */
     restrictHandler: function () {
       const token = '~'
       const element = {
@@ -153,15 +166,23 @@ export default Ember.Controller.extend({
       this.set('token', token)
       this.send('updateDOM')
     },
+    /**
+     * Unrestricts the user by generating a new token
+     */
     unrestrictHandler: function () {
       this.send('generateHandler')
     },
+    /**
+     * When a username is chosen from the list, their information is retrieved
+     * and displayed on the DOM
+     * @param {String} token - The token associated with the user
+     */
     onChangeHandler: function (token) {
       token = token.toString()
       const result = Ember.$.grep(this.get('data'), function (element) {
         return element.value === token
       })
-      if (result.length > 0) {
+      if (result.length) {
         this.setProperties({
           username: result[0].label,
           token: token

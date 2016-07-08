@@ -1,3 +1,4 @@
+'use strict'
 const numReposDB1 = require('./mocks/checkNumberRepos.1')
 const numReposDB2 = require('./mocks/checkNumberRepos.2')
 const repoPagesDB = require('./mocks/getPageOfRepos')

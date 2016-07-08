@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "npm run build && node ./bin/www.js",
-    "lint": "eslint *.js bin public test routes src spec testUtils && npm run lint-sass",
+    "lint": "eslint *.js bin public test routes src spec testUtils handlers && npm run lint-sass",
     "jasmine": "JASMINE_CONFIG_PATH=spec/support/jasmine.json istanbul cover $npm_config_coverage_opts jasmine",
     "test": "npm run lint && npm run ember-test && npm run jasmine",
     "ember-test": "COVERAGE=true ember test",

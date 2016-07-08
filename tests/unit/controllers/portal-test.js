@@ -239,7 +239,7 @@ describeModule(
       })
     })
 
-    describe('confirmHandler()', function () {
+    describe('createUserHandler()', function () {
       beforeEach(function () {
         controller.set('info', {
           username: 'jdoe'
@@ -250,7 +250,7 @@ describeModule(
             username: 'jdoe'
           })
         })
-        controller.actions.confirmHandler.call(controller)
+        controller.actions.createUserHandler.call(controller)
       })
 
       it('should add the record with the correct username to the data array', function () {

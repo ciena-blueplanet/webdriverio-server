@@ -42,7 +42,7 @@
                 {{#block-slot slot 'footer' as |controls close|}}
                     {{controls.cancel}}
                     {{controls.confirm
-                      onConfirm=(action 'confirmHandler')
+                      onConfirm=(action 'createUserHandler')
                       text='Create'
                     }}
                 {{/block-slot}}

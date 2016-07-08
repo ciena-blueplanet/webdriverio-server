@@ -13,14 +13,14 @@ const githubAPI = {
    * Gets a repository on github by its id and checks if the owner
    * of the repo is the current user
    * @param {Object} github - Allows for API calls to be made to the github api server
-   * @param {Object} repo_information - The returned object containing information on repositories contributed to by the user
+   * @param {Object} repoInformation - The returned object containing information on repositories contributed to by the user
    * @param {String} user - The owner of the account to be validated
    * @returns {Promise} Either returns that the repository is owned by the user or not
    */
-  getRepoByID: function (github, repo_information, user) {
+  getRepoByID: function (github, repoInformation, user) {
     return new Promise((resolve, reject) => {
       github.repos.getById({
-        id: repo_information.repo.id
+        id: repoInformation.repo.id
       }, (err, result) => {
         if (err) {
           throw err
@@ -54,14 +54,14 @@ const githubAPI = {
       github.activity.getEventsForUserPublic({
         user,
         page: pageNumber,
-        per_page: 100
+        perpage: 100
       }, (err, result) => {
         if (err) {
           throw err
         }
         let repoEvent = ''
         result.forEach((event) => {
-          repoEvent = new Date(event.created_at)
+          repoEvent = new Date(event.createdat)
           if (sixMonthsAgo.getTime() < repoEvent.getTime()) {
             if (event.type === 'PullRequestEvent') {
               pset.push(githubAPI.getRepoByID(github, event, user))

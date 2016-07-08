@@ -14,10 +14,10 @@ var DeveloperHandler = {
     this.client = redis.createClient({password: process.env.REDIS})
   },
   /**
-   * Set the response object to be in the format of a successful reponse
-   * @param {object} res - The response object
-   * @param {string} username - The given username
-   * @param {object} token - The given testing-token
+   * Set the response Object to be in the format of a successful reponse
+   * @param {Object} res - The response Object
+   * @param {String} username - The given username
+   * @param {String} token - The given testing-token
    */
   setStandardResponse: function (res, username, token) {
     res.status(200)
@@ -31,9 +31,9 @@ var DeveloperHandler = {
     })
   },
   /**
-   * Set the response object to be in the format of a successful reponse
-   * @param {object} res - The response object
-   * @param {string} developers - The set of usernames and tokens returned from the query
+   * Set the response Object to be in the format of a successful reponse
+   * @param {Object} res - The response Object
+   * @param {String[]} developers - The set of usernames and tokens returned from the query
    */
   setStandardKeysResponse: function (res, developers) {
     res.status(200)
@@ -46,9 +46,9 @@ var DeveloperHandler = {
     })
   },
   /**
-   * Sets the response object to be in the format of an error.
-   * @param {object} res - The response object
-   * @param {string} err - The specific error
+   * Sets the response Object to be in the format of an error.
+   * @param {Object} res - The response Object
+   * @param {String} err - The specific error
    * @param {Number} statusCode - The http status code
    */
   setErrorResponse: function (res, err, statusCode) {
@@ -78,10 +78,10 @@ var DeveloperHandler = {
     })
   },
   /**
-   * @param {Object} req - The request object, containing the username and the token in the query
-   * @param {Object} res - The response object, which will be send back to the front end after the request has been returned.
+   * @param {Object} req - The request Object, containing the username and the token in the query
+   * @param {Object} res - The response Object, which will be send back to the front end after the request has been returned.
    *                       It contains the status code and the json with either the username and token or the cooresponding error.
-   * @returns {Object} err - This function will always resolve with the err object, since we are required to either resolve or reject the promise.
+   * @returns {Promise} err - This function will always resolve with the err Object, since we are required to either resolve or reject the promise.
    */
   get: function (req, res) {
     return new Promise((resolve, reject) => {
@@ -91,12 +91,12 @@ var DeveloperHandler = {
           if (err) {
             DeveloperHandler.setErrorResponse(res, err, 404)
           } else {
-            for (let key in keys) {
-              pset.push(DeveloperHandler.getValue(keys[key]))
-            }
-            Promise.all(pset).then((values) => {
-              DeveloperHandler.setStandardKeysResponse(res, values)
-            }, (reason) => {
+            keys.map((item) => {
+              pset.push(DeveloperHandler.getValue(item))
+            })
+            Promise.all(pset).then((value) => {
+              DeveloperHandler.setStandardKeysResponse(res, value)
+            }).catch((reason) => {
               DeveloperHandler.setErrorResponse(res, reason, 404)
             })
           }
@@ -121,10 +121,10 @@ var DeveloperHandler = {
     })
   },
   /**
-   * @param {Object} req - The request object, containing the username and the token in the body
-   * @param {Object} res - The response object, which will be send back to the front end after the request has been returned.
+   * @param {Object} req - The request Object, containing the username and the token in the body
+   * @param {Object} res - The response Object, which will be send back to the front end after the request has been returned.
    *                       It contains the status code and the json with either the username and token or the cooresponding error.
-   * @returns {Object} err - This function will always resolve with the err object, since we are required to either resolve or reject the promise.
+   * @returns {Promise} - This function will always resolve with the err Object, since we are required to either resolve or reject the promise.
    */
   post: function (req, res) {
     return new Promise((resolve, reject) => {
@@ -141,10 +141,10 @@ var DeveloperHandler = {
     })
   },
   /**
-   * @param {Object} req - The request object, containing the username and the token in the parameters
-   * @param {Object} res - The response object, which will be send back to the front end after the request has been returned.
+   * @param {Object} req - The request Object, containing the username and the token in the parameters
+   * @param {Object} res - The response Object, which will be send back to the front end after the request has been returned.
    *                       It contains the status code and the json with either the username and token or the cooresponding error.
-   * @returns {Object} err - This function will always resolve with the err object, since we are required to either resolve or reject the promise.
+   * @returns {Promise} err - This function will always resolve with the err Object, since we are required to either resolve or reject the promise.
    */
   delete: function (req, res) {
     return new Promise((resolve, reject) => {

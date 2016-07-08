@@ -1,3 +1,4 @@
+'use strict'
 const server = require('../handlers/developers_handler.js')
 const redis = require('redis')
 
