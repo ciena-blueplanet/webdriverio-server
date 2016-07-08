@@ -46,9 +46,9 @@ describeModule(
       controller = this.subject()
       store = controller.get('store')
       sandbox.stub(store, 'query', () => {
-        return Ember.RSVP.resolve(Ember.ArrayProxy.create({
-          content: Ember.A(mockDB)
-        }))
+        return Ember.RSVP.resolve(
+          Ember.A(mockDB)
+        )
       })
     })
 
@@ -71,15 +71,6 @@ describeModule(
     describe('getAll()', function () {
       beforeEach(function () {
         controller.actions.getAll.call(controller)
-      })
-      xit('should filter the data set by token length', function () {
-        expect(controller.get('data').length).to.equal(mockDB.length - 1)
-      })
-      xit('should modify the username property', function () {
-        expect(controller.get('data')[0].label).to.equal(mockDB[0].username)
-      })
-      xit('should modify the token property', function () {
-        expect(controller.get('data')[0].value).to.equal(mockDB[0].username)
       })
       it('should be called with the correct params', function () {
         expect(store.query.lastCall.args[1].queryAll).to.equal(1)
