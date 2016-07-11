@@ -1,3 +1,4 @@
+'use strict'
 const _ = require('lodash')
 // This is the maximum number of account events that can be returned from a single query to the GitHub API
 const MAX_EVENTS = 100

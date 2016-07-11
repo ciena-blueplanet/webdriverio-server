@@ -31,7 +31,8 @@ const github = new GitHubAPI({
   timeout: 5000
 })
 
-const baseUrl = 'localhost:3000'
+// const baseUrl = 'localhost:3000'
+const deploymentURL = 'wdio.bp.cyaninc.com'
 const MINIMUM_ACCOUNT_LIFETIME = 6
 
 // view engine setup
@@ -99,7 +100,7 @@ app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')
 app.get('/auth', function (req, res) {
   res.writeHead(303, {
     Location: OAuth2.getAuthorizeUrl({
-      'redirect_uri': 'http://' + baseUrl + '/auth/callback',
+      'redirect_uri': 'http://' + deploymentURL + '/auth/callback',
       scope: ''
     })
   })

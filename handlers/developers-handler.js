@@ -1,3 +1,4 @@
+'use strict'
 /**
  * A Redis client for node.js
  * https://github.com/NodeRedis/node_redis
