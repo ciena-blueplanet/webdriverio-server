@@ -35,7 +35,12 @@ function get (username) {
   if (token !== undefined) {
     res.json(token)
   } else {
-    res.json({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
+    res.json(
+      {
+        error: 'The username provided does not match any username. ' +
+        'Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'
+      }
+    )
   }
 }
 
@@ -149,7 +154,10 @@ describe('Get Requests', () => {
         expect(res.format).toHaveBeenCalledWith({
           json: jasmine.any(Function)
         })
-        expect(redisResponse).toEqual({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
+        expect(redisResponse).toEqual({
+          error: 'The username provided does not match any username. ' +
+          'Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'
+        })
         done()
       })
   })
@@ -263,7 +271,11 @@ describe('Delete Requests', () => {
                     expect(res.format).toHaveBeenCalledWith({
                       json: jasmine.any(Function)
                     })
-                    expect(redisResponse).toEqual({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
+                    expect(redisResponse).toEqual({
+                      error: 'The username provided does not match any username. ' +
+                      'Please make sure that you are signed up as an authorized ' +
+                      'ciena developer on www.cienadevelopers.com'
+                    })
                     done()
                   })
               }

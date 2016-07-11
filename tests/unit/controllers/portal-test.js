@@ -117,8 +117,6 @@ describeModule(
     describe('updateDOM()', function () {
       beforeEach(function () {
         sandbox.spy(jQueryPrototype, 'text')
-        sandbox.spy(jQueryPrototype, 'show')
-        sandbox.spy(jQueryPrototype, 'hide')
         controller.set('username', 'test')
       })
 
@@ -135,14 +133,6 @@ describeModule(
         it('should update the token label', function () {
           expect(jQueryPrototype.text.secondCall.args[0]).to.equal('test-token')
         })
-
-        it('should call show three times', function () {
-          expect(jQueryPrototype.show.callCount).to.equal(3)
-        })
-
-        it('should call hide two times', function () {
-          expect(jQueryPrototype.hide.callCount).to.equal(2)
-        })
       })
 
       describe('restricted token', function () {
@@ -157,14 +147,6 @@ describeModule(
 
         it('should update the token label', function () {
           expect(jQueryPrototype.text.secondCall.args[0]).to.equal('~')
-        })
-
-        it('should call show four times', function () {
-          expect(jQueryPrototype.show.callCount).to.equal(4)
-        })
-
-        it('should call hide one times', function () {
-          expect(jQueryPrototype.hide.callCount).to.equal(1)
         })
       })
     })

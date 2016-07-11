@@ -165,7 +165,9 @@ function getResponse (err, res, req, redisResp) {
   if (err) {
     DeveloperHandler.setErrorResponse(res, err, 404)
   } else if (redisResp === null) {
-    DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com', 500)
+    DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. ' +
+                                           'Please make sure that you are signed up as an authorized ' +
+                                           'ciena developer on www.cienadevelopers.com', 500)
   } else if (req.query.token === '' || req.query.token === redisResp) {
     DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
   } else {

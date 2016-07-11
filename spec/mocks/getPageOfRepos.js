@@ -94,7 +94,8 @@ module.exports = [
           'type': 'User',
           'site_admin': false
         },
-        'body': '#PATCH#\r\n\r\n# CHANGELOG\r\n* Deleted /routes from npmignore\r\n* Deleted `bower install` from the prepublish script',
+        'body': '#PATCH#\r\n\r\n# CHANGELOG\r\n* Deleted ' +
+                '/routes from npmignore\r\n* Deleted `bower install` from the prepublish script',
         'created_at': '2016-07-05T16:11:27Z',
         'updated_at': '2016-07-05T16:11:27Z',
         'closed_at': null,
@@ -130,7 +131,8 @@ module.exports = [
             },
             'private': false,
             'html_url': 'https://github.com/pastorsj/webdriverio-server',
-            'description': 'webdriverio-server - If you want a remote server to do selenium testing, this is a better way',
+            'description': 'webdriverio-server - If you want a remote server ' +
+                           'to do selenium testing, this is a better way',
             'fork': true,
             'default_branch': 'master'
           }
@@ -170,7 +172,8 @@ module.exports = [
             },
             'private': false,
             'html_url': 'https://github.com/ciena-blueplanet/webdriverio-server',
-            'description': 'webdriverio-server - If you want a remote server to do selenium testing, this is a better way',
+            'description': 'webdriverio-server - If you want a remote ' +
+                           'server to do selenium testing, this is a better way',
             'fork': false,
             'homepage': null,
             'size': 1777,

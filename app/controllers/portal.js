@@ -102,7 +102,9 @@ export default Ember.Controller.extend({
       })
       .save()
       .then((res) => {
-        Ember.Logger.debug('For the user with this username: ' + res.get('username') + ', their testing token is: ' + res.get('token'))
+        Ember.Logger.debug('For the user with this username: ' +
+                          res.get('username') + ', their testing token is: ' +
+                          res.get('token'))
       })
       .catch((err) => {
         const data = this.get('data')

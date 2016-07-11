@@ -59,7 +59,7 @@ const githubAPI = {
       github.activity.getEventsForUserPublic({
         user,
         page: pageNumber,
-        per_page: MAX_EVENTS
+        'per_page': MAX_EVENTS
       }, (err, result) => {
         if (err) {
           throw err

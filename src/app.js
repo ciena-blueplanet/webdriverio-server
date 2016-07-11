@@ -31,7 +31,7 @@ const github = new GitHubAPI({
   timeout: 5000
 })
 
-const base_url = 'localhost:3000'
+const baseUrl = 'localhost:3000'
 const MINIMUM_ACCOUNT_LIFETIME = 6
 
 // view engine setup
@@ -99,7 +99,7 @@ app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')
 app.get('/auth', function (req, res) {
   res.writeHead(303, {
     Location: OAuth2.getAuthorizeUrl({
-      redirect_uri: 'http://' + base_url + '/auth/callback',
+      'redirect_uri': 'http://' + baseUrl + '/auth/callback',
       scope: ''
     })
   })
@@ -108,11 +108,10 @@ app.get('/auth', function (req, res) {
 
 app.get('/auth/callback', function (req, res) {
   const code = req.query.code
-  OAuth2.getOAuthAccessToken(code, {}, function (err, access_token, refresh_token) {
+  OAuth2.getOAuthAccessToken(code, {}, function (err, accessToken, refreshToken) {
     if (err) {
       throw err
     }
-    const accessToken = access_token
     // authenticate github API
     github.authenticate({
       type: 'oauth',
