@@ -1,25 +1,6 @@
 import Ember from 'ember'
 import generateToken from '../utils/generateToken'
-
-/**
- * @param {String} message - The message displayed to the user when the call made to the backend succeeds
- */
-function success (message) {
-  Ember.$('.result').removeClass('failure')
-  Ember.$('.result').addClass('success')
-  Ember.$('.result').text(message)
-}
-
-/**
- * @param {String} message - The message displayed to the user when the call made to the backend fails
- * @param {String} err - The actual error message
- */
-function failure (message, err) {
-  Ember.$('.result').addClass('failure')
-  Ember.$('.result').removeClass('success')
-  Ember.$('.result').text(message)
-  Ember.Logger.debug(err)
-}
+const TOKEN_LENGTH = 30
 
 export default Ember.Controller.extend({
   portalModel: {
@@ -38,7 +19,7 @@ export default Ember.Controller.extend({
         rows: [
           [
             {
-              label: 'GitHub Username',
+              label: 'Username',
               model: 'username'
             }
           ]
@@ -55,90 +36,42 @@ export default Ember.Controller.extend({
     version: '1.0'
   },
   isFormInvalid: true,
+  init () {
+    this._super(...arguments)
+    this.set('data', [])
+    this.send('getAll')
+  },
+  username: '',
+  token: '',
+  selectedIndex: [0],
+  restricted: false,
   actions: {
     /**
-     * When the user clicks the `Create User` button, this function is called. It first generates
-     * a random 30 character token. It then extracts the username and combines those two into a record
-     * which gets sent to the backend.
+     * Gets all users and their tokens from the database
      */
-    createUser () {
-      const token = generateToken(30)
-      const username = this.get('info').username
-      this.get('store').createRecord('developer', {
-        username,
-        token
-      })
-      .save()
-      .then((res) => {
-        success('The user with the username: ' + username + ' was successfully created.\nTheir testing token is: ' + token)
-      }).catch((err) => {
-        failure('An error has occured: \n' + err, err)
-      })
-      this.set('isFormDisabled', false)
-    },
-    /**
-     * When the user clicks the `Get User` button, this function is called. It extracts the username
-     * from the `info` object, then query's for the record contains the key which is the username.
-     * It will either return that the user exists and the token is __ or that the user does not exist.
-     */
-    getUserInfo () {
-      const username = this.get('info').username
-      const token = ''
-      this.get('store').queryRecord('developer', {
-        username,
-        token
-      })
+    getAll: function () {
+      this.get('store').query('developer',
+        {
+          queryAll: 1
+        })
         .then((res) => {
-          success('For the user with this username: ' + res.get('username') + ', their testing token is: ' + res.get('token'))
+          let filteredResult = res.filter((item) => {
+            // Filters out the md5 hash (32 characters)
+            return item.get('token').length <= TOKEN_LENGTH
+          }).map((result) => {
+            return {
+              label: result.get('username'),
+              value: result.get('token')
+            }
+          })
+          this.set('data', filteredResult)
         })
         .catch((err) => {
-          failure('No such user exists for the username: ' + username, err)
+          Ember.Logger.debug(err)
         })
-      this.set('isFormDisabled', false)
     },
     /**
-     * When the user clicks the `Update User` button, this function is called. It recreates the user
-     * and overwrites the token that was stored in the backend. This update will return the token created.
-     */
-    updateUserInfo () {
-      const token = generateToken(30)
-      const username = this.get('info').username
-      this.get('store').createRecord('developer', {
-        username,
-        token
-      })
-        .save()
-        .then((res) => {
-          success('The user with the username: ' + username + ' was successfully updated. Their testing token is: ' + token)
-        }).catch((err) => {
-          failure('An error has occured: \n' + err, err)
-        })
-      this.set('isFormDisabled', false)
-    },
-    /**
-     * When the user click the `Delete User` button, this function is called. It will delete the user with the
-     * given username if it exists. It will return successfully if the user existed and was deleted.
-     */
-    deleteUser () {
-      const username = this.get('info').username
-      const token = ''
-      this.get('store').queryRecord('developer', {
-        username,
-        token
-      })
-        .then((developer) => {
-          return developer.destroyRecord()
-        })
-        .then((res) => {
-          success('The user with the username: ' + username + ' was successfully deleted.')
-        })
-        .catch((err) => {
-          failure('An error has occured: \n' + err, err)
-        })
-      this.set('isFormDisabled', false)
-    },
-    /**
-     * @param {Object} value - When a username is typed into the `GitHub Username` text box, the 
+     * @param {Object} value - When a username is typed into the `GitHub Username` text box, the
      * value will include an entry for that username.
      */
     formChange (value) {
@@ -149,6 +82,112 @@ export default Ember.Controller.extend({
      */
     formValidation (validation) {
       this.set('isFormInvalid', validation.errors.length !== 0)
+    },
+    /**
+     * Updates the resticted buttons depending on the token generated
+     */
+    updateDOM: function () {
+      Ember.$('#username_label').text(this.get('username'))
+      Ember.$('#token_label').text(this.get('token'))
+      Ember.$('.general_info').show()
+      if (this.get('token') === '~') {
+        this.set('restricted', true)
+      } else {
+        this.set('restricted', false)
+      }
+    },
+    createUser: function (element) {
+      return this.get('store').createRecord('developer', {
+        username: element.label,
+        token: element.value
+      })
+      .save()
+      .then((res) => {
+        Ember.Logger.debug('For the user with this username: ' +
+                          res.get('username') + ', their testing token is: ' +
+                          res.get('token'))
+      })
+      .catch((err) => {
+        const data = this.get('data')
+        const index = data.indexOf(element)
+        if (index !== -1) {
+          data.splice(index, 1)
+        }
+        this.set('data', Ember.A(data))
+        Ember.Logger.debug(err)
+      })
+    },
+    /**
+     * Creates a user if they do not exist already and populates them in the selection of data
+     */
+    createUserHandler: function () {
+      const username = this.get('info').username
+      const token = generateToken(30)
+      const element = {
+        label: username,
+        value: token
+      }
+      this.send('createUser', element)
+      const data = this.get('data').toArray()
+      const index = data.indexOf(element)
+      if (index === -1) {
+        data.unshift(element)
+        this.set('data', Ember.A(data))
+        this.set('selectedIndex', [0])
+        this.send('onChangeHandler', token)
+      } else {
+        window.alert('This person with username ' + username + 'already exists')
+      }
+    },
+    /**
+     * Generates a new token for the given user
+     */
+    generateHandler: function () {
+      const token = generateToken(TOKEN_LENGTH)
+      const element = {
+        label: this.get('username'),
+        value: token
+      }
+      this.send('createUser', element)
+      this.set('token', token)
+      this.send('updateDOM')
+    },
+    /**
+     * Restricts the user by generating a token equal to ~
+     */
+    restrictHandler: function () {
+      const token = '~'
+      const element = {
+        label: this.get('username'),
+        value: token
+      }
+      this.send('createUser', element)
+      this.set('token', token)
+      this.send('updateDOM')
+    },
+    /**
+     * Unrestricts the user by generating a new token
+     */
+    unrestrictHandler: function () {
+      this.send('generateHandler')
+    },
+    /**
+     * When a username is chosen from the list, their information is retrieved
+     * and displayed on the DOM
+     * @param {String} token - The token associated with the user
+     */
+    onChangeHandler: function (token) {
+      token = token.toString()
+      const result = Ember.$.grep(this.get('data'), function (element) {
+        return element.value === token
+      })
+      if (result.length) {
+        this.setProperties({
+          username: result[0].label,
+          token: token
+        })
+        this.send('updateDOM')
+      }
     }
   }
 })

@@ -1,68 +1,110 @@
-<div class="container">
-    <div class='main'>
-        <div class='title'>
-            Admin Portal
-        </div>
-        <div class='username_form'>
-            {{frost-bunsen-form
-              bunsenModel=portalModel
-              bunsenView=portalView
-              disabled=isFormDisabled
-              onChange=(action "formChange")
-              onValidation=(action "formValidation")
-            }}
-        </div>
-        <div class='bar'>
-          <div class='link'>
-            {{frost-button
-              disabled=(or isFormDisabled isFormInvalid)
-              onClick=(action "createUser")
-              priority="secondary"
-              size="medium"
-              text="Create User"
-            }}
-          </div>
-          <div class='link'>
-            {{frost-button
-              disabled=(or isFormDisabled isFormInvalid)
-              onClick=(action "updateUserInfo")
-              priority="secondary"
-              size="medium"
-              text="Update User"
-            }}
-          </div>
-          <div class='link'>
-            {{frost-button
-              disabled=(or isFormDisabled isFormInvalid)
-              onClick=(action "getUserInfo")
-              priority="secondary"
-              size="medium"
-              text="Get User"
-            }}
-          </div>
-          <div class='link'>
-            {{frost-button
-              disabled=(or isFormDisabled isFormInvalid)
-              onClick=(action "deleteUser")
-              priority="secondary"
-              size="medium"
-              text="Delete User"
-            }}
-          </div>
-      </div>
-      <div class='result'>
-      </div>
+<div class='portal-bar'>
+    <div id='logout'>
+        {{#frost-link 'login'
+          design='info-bar'
+          icon='frost/home'
+        }}
+        Logout
+        {{/frost-link}}
     </div>
-    <div class='footer'>
-        <span class='bar'>
-            <span class='link'>
-              {{#frost-link 'login'
-                priority='secondary'
-                size='medium'
-              }}
-              Log out
-              {{/frost-link}}
-            </span>
-        </span>
+</div>
+{{#frost-object-browser as |slot|}}
+    {{#block-slot slot 'info-bar'}}
+        {{#frost-info-bar as |slot|}}
+            {{#block-slot slot 'title'}}
+                <div id='admin_title'>
+                    Admin Portal
+                </div>
+            {{/block-slot}}
+            {{#block-slot slot 'actions' as |controls|}}
+                {{#frost-modal modalName='create-modal' as |slot|}}
+                {{#block-slot slot 'target'}}
+                    {{controls.button
+                      icon='frost/infobar-create'
+                      text='Create'
+                    }}
+                {{/block-slot}}
+                {{#block-slot slot 'header'}}
+                    <div class='primary_title'>
+                        Create User
+                    </div>
+                {{/block-slot}}
+                {{#block-slot slot 'body'}}
+                    <div class='username_form'>
+                        {{frost-bunsen-form
+                          bunsenModel=portalModel
+                          bunsenView=portalView
+                          onChange=(action "formChange")
+                          onValidation=(action "formValidation")
+                        }}
+                    </div>
+                {{/block-slot}}
+                {{#block-slot slot 'footer' as |controls close|}}
+                    {{controls.cancel}}
+                    {{controls.confirm
+                      disabled=isFormInvalid
+                      onConfirm=(action 'createUserHandler')
+                      text='Create'
+                    }}
+                {{/block-slot}}
+                {{/frost-modal}}
+            {{/block-slot}}
+        {{/frost-info-bar}}
+    {{/block-slot}}
+{{/frost-object-browser}}
+<div class='actions'>
+    {{#unless restricted}}
+    <span class='action_restrict'>
+        {{frost-button
+            onClick=(action 'restrictHandler')
+            size='medium'
+            priority="secondary"
+            text='Restrict'
+        }}
+    </span>
+    <span class='action_generate'>
+        {{frost-button
+            onClick=(action 'generateHandler')
+            priority="secondary"
+            size='medium'
+            text='Generate token'
+        }}
+    </span>
+    {{/unless}}
+    {{#if restricted}}
+    <span class='action_unrestrict'>
+        {{frost-button
+            onClick=(action 'unrestrictHandler')
+            size='medium'
+            priority="secondary"
+            text='Unrestrict'
+        }}
+    </span>
+    {{/if}}
+</div>
+<div class='selection'>
+    <div class='portal_text'>
+        GitHub users
     </div>
+    {{frost-select
+      data=data
+      selected=selectedIndex
+      onChange=(action 'onChangeHandler')
+    }}
+    <table>
+        <tr class='general_info'>
+            <td class='portal_text_a' id='portal_username_label'>Username</td>
+            <td class='portal_text_b' id='username_label'>pastorsj</td>
+        </tr>
+        <tr class='general_info'>
+            <td class='portal_text_a' id='portal_token_label'>Token</td>
+            <td class='portal_text_b' id='token_label'>123456</td>
+        </tr>
+        {{#if restricted}}
+        <tr class='restricted_info'>
+            <td class='portal_text_a' id='restrict_checkbox'><img src='./images/check.png'></td>
+            <td class='portal_text_b' id='restrict_label'>Restricted</td>
+        </tr>
+        {{/if}}
+    </table>
 </div>

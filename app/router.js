@@ -6,9 +6,12 @@ const Router = Ember.Router.extend({
 })
 
 Router.map(function () {
-  this.route('login')
-  this.route('register')
+  this.route('login', {path: '/login'})
   this.route('portal')
+  this.route('auth', function () {
+    this.route('contract')
+    this.route('denied');
+  })
 })
 
 export default Router

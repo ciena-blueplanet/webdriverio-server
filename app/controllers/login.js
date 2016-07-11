@@ -77,9 +77,11 @@ export default Ember.Controller.extend({
         })
       })
       .then((res) => {
+        window._isAuthenticated_ = true
         this.transitionToRoute('portal')
       })
       .catch((err) => {
+        window._isAuthenticated_ = false
         Ember.Logger.debug(err)
         Ember.$('.login-result').addClass('failure')
         Ember.$('.login-result').removeClass('success')

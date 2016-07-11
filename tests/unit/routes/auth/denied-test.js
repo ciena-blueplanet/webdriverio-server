@@ -5,15 +5,15 @@ import {
 } from 'ember-mocha'
 
 describeModule(
-  'route:portal',
-  'RegisterRoute',
+  'route:auth/denied',
+  'AuthDeniedRoute',
   {
     unit: true
   },
-  function () {
-    it('exists', function () {
+  function() {
+    it('exists', function() {
       let route = this.subject()
       expect(route).to.be.ok
-    })
+    });
   }
-)
+);

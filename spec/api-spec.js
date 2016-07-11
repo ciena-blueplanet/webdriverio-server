@@ -1,4 +1,5 @@
-const server = require('../handlers/developers_handler.js')
+'use strict'
+const server = require('../handlers/developers-handler.js')
 const redis = require('redis')
 
 var redisResponse = ''
@@ -34,8 +35,17 @@ function get (username) {
   if (token !== undefined) {
     res.json(token)
   } else {
-    res.json({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
+    res.json(
+      {
+        error: 'The username provided does not match any username. ' +
+        'Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'
+      }
+    )
   }
+}
+
+function getAll () {
+  return Array.from(db.keys())
 }
 
 /**
@@ -63,6 +73,13 @@ beforeEach(() => {
     del: function (username, cb) {
       remove(username)
       cb(null)
+    },
+    keys: function (key, cb) {
+      if (key.toString() === '*') {
+        cb(null, getAll())
+      } else {
+        cb(null)
+      }
     }
   })
   server.init()
@@ -137,8 +154,84 @@ describe('Get Requests', () => {
         expect(res.format).toHaveBeenCalledWith({
           json: jasmine.any(Function)
         })
-        expect(redisResponse).toEqual({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
+        expect(redisResponse).toEqual({
+          error: 'The username provided does not match any username. ' +
+          'Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'
+        })
         done()
+      })
+  })
+
+  it('should get a user with the correct token after an post happens using the getValue call', (done) => {
+    const key = {username: 'testuser'}
+    const reqPost = {
+      body: {
+        developer: {
+          username: 'testuser',
+          token: 'acompletelynewandoriginaltoken'
+        }
+      }
+    }
+    server.post(reqPost, res)
+      .then((err) => {
+        if (err) {
+          done.fail(err)
+        } else {
+          expect(res.status).toHaveBeenCalledWith(200)
+          server.getValue(key.username)
+            .then((res) => {
+              expect(res.username).toEqual(key.username)
+              done()
+            })
+        }
+      })
+  })
+
+  it('should get all users in the database', (done) => {
+    const reqPost1 = {
+      body: {
+        developer: {
+          username: 'testuser1',
+          token: 'acompletelynewandoriginaltoken2'
+        }
+      }
+    }
+    const reqPost2 = {
+      body: {
+        developer: {
+          username: 'testuser2',
+          token: 'acompletelynewandoriginaltoken2'
+        }
+      }
+    }
+    spyOn(server, 'getValue').and.callFake(
+      function (username) {
+        if (db.get(username)) {
+          return Promise.resolve({username, token: db.get(username)})
+        }
+        done.fail()
+      }
+    )
+    server.post(reqPost1, res)
+      .then((err) => {
+        if (err) {
+          done.fail(err)
+        } else {
+          expect(res.status).toHaveBeenCalledWith(200)
+          server.post(reqPost2, res)
+            .then((err) => {
+              if (err) {
+                done.fail(err)
+              } else {
+                expect(res.status).toHaveBeenCalledWith(200)
+                server.get({query: {queryAll: 1}})
+                  .then((res) => {
+                    expect(res).toEqual(getAll())
+                    done()
+                  })
+              }
+            })
+        }
       })
   })
 })
@@ -178,12 +271,44 @@ describe('Delete Requests', () => {
                     expect(res.format).toHaveBeenCalledWith({
                       json: jasmine.any(Function)
                     })
-                    expect(redisResponse).toEqual({error: 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'})
+                    expect(redisResponse).toEqual({
+                      error: 'The username provided does not match any username. ' +
+                      'Please make sure that you are signed up as an authorized ' +
+                      'ciena developer on www.cienadevelopers.com'
+                    })
                     done()
                   })
               }
             })
         }
       })
+  })
+})
+
+describe('Response Tests', () => {
+  let resSpy
+  beforeEach(function () {
+    resSpy = jasmine.createSpyObj('res', ['status', 'format', 'json'])
+  })
+  it('should format the standard response correctly', function () {
+    server.setStandardResponse(resSpy, 'test', 'test-token')
+    expect(resSpy.status).toHaveBeenCalledWith(200)
+    expect(resSpy.format).toHaveBeenCalledWith({
+      json: jasmine.any(Function)
+    })
+  })
+  it('should format the error response correctly', function () {
+    server.setErrorResponse(resSpy, 'Failure', 500)
+    expect(resSpy.status).toHaveBeenCalledWith(500)
+    expect(resSpy.format).toHaveBeenCalledWith({
+      json: jasmine.any(Function)
+    })
+  })
+  it('should format the standard keys response correctly', function () {
+    server.setStandardKeysResponse(resSpy, ['test1', 'test2'])
+    expect(resSpy.status).toHaveBeenCalledWith(200)
+    expect(resSpy.format).toHaveBeenCalledWith({
+      json: jasmine.any(Function)
+    })
   })
 })

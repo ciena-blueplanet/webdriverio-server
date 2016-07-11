@@ -1,0 +1,95 @@
+// Portal Route
+
+.portal-bar {
+    background-color: #33424f;
+    div {
+        background-color: #33424f;
+        padding-right: 3px;
+    }
+}
+
+.frost-object-browser-actions {
+    // background-color: yellowgreen;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    max-height: 90vh;
+    width: calc(100% - 50px);
+    z-index: -1;
+}
+
+.selection {
+    padding-left: 50px;
+    padding-top: 40px;
+}
+
+.ps-content {
+    margin-top: 100px;
+}
+
+.text {
+    font-size: 16px;
+}
+
+.portal_text_a {
+    font-size: 18px;
+    color: #666666;
+    text-align: right;
+}
+
+.portal_text_b {
+    font-size: 18px;
+    color: #231f20;
+    text-align: left;
+}
+
+table {
+    border: none;
+    margin-left: 15%;
+}
+
+td {
+    padding: 10px;
+}
+
+.general_info {
+    display: none;
+}
+
+.primary_title {
+    font-size: 20px;
+    padding: 10px;
+}
+
+.portal_text {
+    color: #666666;
+    padding-bottom: 10px;
+}
+
+#admin_title {
+    color: #404041;
+    padding-top: 10px;
+    font-size: 20px;
+}
+
+.frost-select {
+    border-color: #009EEF;
+}
+
+.actions {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+#logout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.items-selected {
+    display: none;
+}

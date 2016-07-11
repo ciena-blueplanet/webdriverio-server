@@ -9,23 +9,75 @@ import {
 
 const jQueryPrototype = Object.getPrototypeOf($('body'))
 
+let mockDB = [
+  {
+    username: 'test1',
+    token: 'test-token1'
+  },
+  {
+    username: 'test2',
+    token: 'test-token2'
+  },
+  {
+    username: 'test3',
+    token: 'test-token3'
+  },
+  {
+    username: 'test4',
+    token: 'test-token4'
+  },
+  {
+    username: 'test5',
+    token: '123456789098765432134567890987654321234567890'
+  }
+]
+
 describeModule(
   'controller:portal',
   'PortalController',
   {
-    unit: true
+    unit: true,
+    needs: ['model:developer']
   },
   function () {
     let controller, sandbox, store
-
     beforeEach(function () {
       sandbox = sinon.sandbox.create()
       controller = this.subject()
       store = controller.get('store')
+      sandbox.stub(store, 'query', () => {
+        return Ember.RSVP.resolve(
+          Ember.A(mockDB)
+        )
+      })
     })
 
     afterEach(function () {
       sandbox.restore()
+    })
+
+    describe('initial state', function () {
+      it('should initialize username', function () {
+        expect(controller.get('username')).to.equal('')
+      })
+      it('should initialize a token', function () {
+        expect(controller.get('token')).to.equal('')
+      })
+      it('should set the selectedIndex to 1', function () {
+        expect(controller.get('selectedIndex')).to.eql([0])
+      })
+    })
+
+    describe('getAll()', function () {
+      beforeEach(function () {
+        controller.actions.getAll.call(controller)
+      })
+      it('should be called with the correct params', function () {
+        expect(store.query.lastCall.args[1].queryAll).to.equal(1)
+      })
+      it('shoudl be called with the correct model', function () {
+        expect(store.query.lastCall.args[0]).to.equal('developer')
+      })
     })
 
     describe('formChange()', function () {
@@ -61,58 +113,84 @@ describeModule(
         expect(controller.get('isFormInvalid')).to.equal(false)
       })
     })
+
+    describe('updateDOM()', function () {
+      beforeEach(function () {
+        sandbox.spy(jQueryPrototype, 'text')
+        controller.set('username', 'test')
+      })
+
+      describe('unrestricted token', function () {
+        beforeEach(function () {
+          controller.set('token', 'test-token')
+          controller.actions.updateDOM.call(controller)
+        })
+
+        it('should update the username label', function () {
+          expect(jQueryPrototype.text.firstCall.args[0]).to.equal('test')
+        })
+
+        it('should update the token label', function () {
+          expect(jQueryPrototype.text.secondCall.args[0]).to.equal('test-token')
+        })
+      })
+
+      describe('restricted token', function () {
+        beforeEach(function () {
+          controller.set('token', '~')
+          controller.actions.updateDOM.call(controller)
+        })
+
+        it('should update the username label', function () {
+          expect(jQueryPrototype.text.firstCall.args[0]).to.equal('test')
+        })
+
+        it('should update the token label', function () {
+          expect(jQueryPrototype.text.secondCall.args[0]).to.equal('~')
+        })
+      })
+    })
+
     describe('createUser()', function () {
       let returnVal
+      let record = {
+        label: 'test',
+        value: 'test-token'
+      }
 
       beforeEach(function () {
         returnVal = {
-          username: 'jdoe',
-          token: 'randomtestingtoken'
+          username: record.label,
+          token: record.value
         }
         controller.set('info', returnVal)
-        sandbox.spy(jQueryPrototype, 'addClass')
-        sandbox.spy(jQueryPrototype, 'removeClass')
-        sandbox.spy(jQueryPrototype, 'text')
       })
 
       describe('Creation is successful', function () {
         beforeEach(function () {
           sandbox.stub(store, 'createRecord', () => {
             return Ember.Object.create({
-              username: returnVal.username,
+              username: record.label,
+              token: record.value,
               save: sandbox.spy(() => {
                 return Ember.RSVP.resolve(returnVal)
               })
             })
           })
-          controller.actions.createUser.call(controller)
+          controller.actions.createUser.call(controller, record)
         })
-        
+
         describe('Parameters Checking', function () {
-          it('Makes sure that the username is the same username as the one set in the info object', function () {
-            expect(store.createRecord.lastCall.args[1].username).to.equal(returnVal.username)
+          it('Makes sure that the username is the same username as the passed-in token', function () {
+            expect(store.createRecord.lastCall.args[1].username).to.equal(record.label)
           })
 
-          it('Makes sure that the token is 30 characters long', function () {
-            expect(store.createRecord.lastCall.args[1].token.length).to.equal(30)
+          it('Makes sure that the token is the same as the passed-in token', function () {
+            expect(store.createRecord.lastCall.args[1].token).to.equal(record.value)
           })
 
           it('Makes sure that the first argument passed into the createRecord is the developer model', function () {
             expect(store.createRecord.lastCall.args[0]).to.equal('developer')
-          })
-        })
-
-        describe('Ember JQuery Calls', function () {
-          it('should have a success class', function () {
-            expect(jQueryPrototype.addClass.lastCall.args).to.eql(['success'])
-          })
-
-          it('should not have a failure class', function () {
-            expect(jQueryPrototype.removeClass.lastCall.args).to.eql(['failure'])
-          })
-
-          it('should have updated the text attribute', function () {
-            expect(jQueryPrototype.text.callCount).to.equal(1)
           })
         })
       })
@@ -122,13 +200,19 @@ describeModule(
           sandbox.stub(store, 'createRecord', () => {
             return Ember.Object.create({
               username: returnVal.username,
+              token: returnVal.token,
               save: sandbox.spy(() => {
                 return Ember.RSVP.reject()
               })
             })
           })
           sandbox.stub(Ember.Logger, 'debug')
-          controller.actions.createUser.call(controller)
+          controller.set('data', Ember.A([record]))
+          controller.actions.createUser.call(controller, record)
+        })
+
+        it('should get rid of the single record in data', function () {
+          expect(controller.get('data').toArray().length).to.equal(0)
         })
 
         it('should call the debug function once when the promise reaches the catch statement', function () {
@@ -137,241 +221,88 @@ describeModule(
       })
     })
 
-    describe('getUserInfo()', function () {
-      let returnVal
-
+    describe('createUserHandler()', function () {
       beforeEach(function () {
-        returnVal = {
+        controller.set('info', {
           username: 'jdoe'
-        }
-        controller.set('info', returnVal)
-        sandbox.spy(jQueryPrototype, 'addClass')
-        sandbox.spy(jQueryPrototype, 'removeClass')
-        sandbox.spy(jQueryPrototype, 'text')
+        })
+        controller.set('data', Ember.A([{label: 'test1', value: '1234'}]))
+        sandbox.stub(controller.actions, 'createUser', () => {
+          return Ember.Object.create({
+            username: 'jdoe'
+          })
+        })
+        controller.actions.createUserHandler.call(controller)
       })
 
-      describe('Promise is successful', function () {
-        beforeEach(function () {
-          sandbox.stub(store, 'queryRecord', () => {
-            const returnValue = Ember.Object.create(returnVal)
-            return Ember.RSVP.resolve(returnValue)
-          })
-          controller.actions.getUserInfo.call(controller)
-        })
-
-        it('Makes sure that the username is the same username as the one set in the info object', function () {
-          expect(store.queryRecord.lastCall.args[1].username).to.equal(returnVal.username)
-        })
-
-        it('Makes sure that the token is blank', function () {
-          expect(store.queryRecord.lastCall.args[1].token).to.equal('')
-        })
-
-        it('Makes sure that the first argument passed into the queryRecord is the developer model', function () {
-          expect(store.queryRecord.lastCall.args[0]).to.equal('developer')
-        })
-
-        describe('Ember JQuery Calls', function () {
-          it('should have a success class', function () {
-            expect(jQueryPrototype.addClass.lastCall.args).to.eql(['success'])
-          })
-
-          it('should not have a failure class', function () {
-            expect(jQueryPrototype.removeClass.lastCall.args).to.eql(['failure'])
-          })
-
-          it('should have updated the text attribute', function () {
-            expect(jQueryPrototype.text.callCount).to.equal(1)
-          })
-        })
+      it('should add the record with the correct username to the data array', function () {
+        expect(controller.get('data')[0].label).to.equal('jdoe')
       })
 
-      describe('Promise is unsuccessful', function () {
-        beforeEach(function () {
-          sandbox.stub(store, 'queryRecord', () => {
-            return Ember.RSVP.reject()
-          })
-          controller.actions.getUserInfo.call(controller)
-        })
+      it('should add the record with a token to the data array', function () {
+        expect(controller.get('data')[0].value.length).to.equal(30)
+      })
 
-        describe('Ember JQuery Calls', function () {
-          it('should have a failure class', function () {
-            expect(jQueryPrototype.addClass.lastCall.args).to.eql(['failure'])
-          })
-
-          it('should not have a success class', function () {
-            expect(jQueryPrototype.removeClass.lastCall.args).to.eql(['success'])
-          })
-
-          it('should have the correct text', function () {
-            expect(jQueryPrototype.text.lastCall.args).to.eql(['No such user exists for the username: ' + returnVal.username])
-          })
-        })
+      it('should set the selectedIndex to 0', function () {
+        expect(controller.get('selectedIndex')).to.eql([0])
       })
     })
 
-    describe('updateUserInfo()', function () {
-      let returnVal
-
+    describe('generateHandler() and unrestrictHandler()', function () {
       beforeEach(function () {
-        returnVal = {
-          username: 'jdoe',
-          token: 'randomtestingtoken'
-        }
-        controller.set('info', returnVal)
-        sandbox.spy(jQueryPrototype, 'addClass')
-        sandbox.spy(jQueryPrototype, 'removeClass')
-        sandbox.spy(jQueryPrototype, 'text')
-      })
-
-      describe('Update is successful', function () {
-        beforeEach(function () {
-          sandbox.stub(store, 'createRecord', () => {
-            return Ember.Object.create({
-              username: returnVal.username,
-              save: sandbox.spy(() => {
-                return Ember.RSVP.resolve(returnVal)
-              })
-            })
-          })
-          controller.actions.updateUserInfo.call(controller)
-        })
-        
-        describe('Parameters Checking', function () {
-          it('Makes sure that the username is the same username as the one set in the info object', function () {
-            expect(store.createRecord.lastCall.args[1].username).to.equal(returnVal.username)
-          })
-
-          it('Makes sure that the token is 30 characters long', function () {
-            expect(store.createRecord.lastCall.args[1].token.length).to.equal(30)
-          })
-
-          it('Makes sure that the first argument passed into the createRecord is the developer model', function () {
-            expect(store.createRecord.lastCall.args[0]).to.equal('developer')
-          })
-        })
-
-        describe('Ember JQuery Calls', function () {
-          it('should have a success class', function () {
-            expect(jQueryPrototype.addClass.lastCall.args).to.eql(['success'])
-          })
-
-          it('should not have a failure class', function () {
-            expect(jQueryPrototype.removeClass.lastCall.args).to.eql(['failure'])
-          })
-
-          it('should have updated the text attribute', function () {
-            expect(jQueryPrototype.text.callCount).to.equal(1)
+        controller.set('username', 'test')
+        sandbox.stub(controller.actions, 'createUser', () => {
+          return Ember.Object.create({
+            username: 'jdoe'
           })
         })
       })
 
-      describe('Update is unsuccessful', function () {
-        beforeEach(function () {
-          sandbox.stub(store, 'createRecord', () => {
-            return Ember.Object.create({
-              username: returnVal.username,
-              save: sandbox.spy(() => {
-                return Ember.RSVP.reject()
-              })
-            })
-          })
-          sandbox.stub(Ember.Logger, 'debug')
-          controller.actions.updateUserInfo.call(controller)
-        })
+      it('should set a token to be 30 characters long', function () {
+        controller.actions.generateHandler.call(controller)
+        expect(controller.get('token').length).to.equal(30)
+      })
 
-        it('should call the debug function once when the promise reaches the catch statement', function () {
-          expect(Ember.Logger.debug.callCount).to.equal(1)
-        })
+      it('should set a token to be 30 characters long', function () {
+        controller.actions.unrestrictHandler.call(controller)
+        expect(controller.get('token').length).to.equal(30)
       })
     })
 
-    describe('deleteUser()', function () {
-      let returnVal
-
+    describe('restrictHandler()', function () {
       beforeEach(function () {
-        returnVal = {
-          username: 'jdoe'
-        }
-        controller.set('info', returnVal)
-        sandbox.spy(jQueryPrototype, 'addClass')
-        sandbox.spy(jQueryPrototype, 'removeClass')
-        sandbox.spy(jQueryPrototype, 'text')
+        controller.set('username', 'test')
+        sandbox.stub(controller.actions, 'createUser', () => {
+          return Ember.Object.create({
+            username: 'jdoe'
+          })
+        })
+        controller.actions.restrictHandler.call(controller)
       })
 
-      describe('Delete was successful', function () {
-        beforeEach(function () {
-          sandbox.stub(store, 'queryRecord', () => {
-            return Ember.RSVP.resolve({
-              username: returnVal.username,
-              destroyRecord: sandbox.spy(() => {
-                return Ember.RSVP.resolve(returnVal)
-              })
-            })
-          })
-          controller.actions.deleteUser.call(controller)
+      it('should set a token to be ~', function () {
+        expect(controller.get('token')).to.equal('~')
+      })
+    })
+
+    describe('onChangeHandler', function () {
+      beforeEach(function () {
+        let val = mockDB.map((item) => {
+          return {
+            label: item.username,
+            value: item.token
+          }
         })
-
-        describe('Parameters Checking', function () {
-          it('Makes sure that the username is the same username as the one set in the info object', function () {
-            expect(store.queryRecord.lastCall.args[1].username).to.equal(returnVal.username)
-          })
-
-          it('Makes sure that the token is blank', function () {
-            expect(store.queryRecord.lastCall.args[1].token).to.equal('')
-          })
-
-          it('Makes sure that the first argument passed into the queryRecord is the developer model', function () {
-            expect(store.queryRecord.lastCall.args[0]).to.equal('developer')
-          })
-        })
-
-        describe('Ember JQuery Calls', function () {
-          it('should have a success class', function () {
-            expect(jQueryPrototype.addClass.lastCall.args).to.eql(['success'])
-          })
-
-          it('should not have a failure class', function () {
-            expect(jQueryPrototype.removeClass.lastCall.args).to.eql(['failure'])
-          })
-
-          it('should have updated the text attribute', function () {
-            expect(jQueryPrototype.text.callCount).to.equal(1)
-          })
-        })
+        controller.set('data', Ember.A(val))
+        controller.actions.onChangeHandler.call(controller, mockDB[1].token)
       })
 
-      describe('Delete is unsuccessful', function () {
-        beforeEach(function () {
-          sandbox.stub(store, 'queryRecord', () => {
-            return Ember.RSVP.resolve({
-              username: returnVal.username,
-              destroyRecord: sandbox.spy(() => {
-                return Ember.RSVP.reject(returnVal)
-              })
-            })
-          })
-          sandbox.stub(Ember.Logger, 'debug')
-          controller.actions.deleteUser.call(controller)
-        })
+      it('should set the username to the matching token', function () {
+        expect(controller.get('username')).to.equal(mockDB[1].username)
+      })
 
-        it('should call the debug function once when the promise reaches the catch statement', function () {
-          expect(Ember.Logger.debug.callCount).to.equal(1)
-        })
-
-        describe('Ember JQuery Calls', function () {
-          it('should have a failure class', function () {
-            expect(jQueryPrototype.addClass.lastCall.args).to.eql(['failure'])
-          })
-
-          it('should not have a success class', function () {
-            expect(jQueryPrototype.removeClass.lastCall.args).to.eql(['success'])
-          })
-
-          it('should have updated the text attribute', function () {
-            expect(jQueryPrototype.text.callCount).to.equal(1)
-          })
-        })
+      it('should set the token to the token parameter', function () {
+        expect(controller.get('token')).to.equal(mockDB[1].token)
       })
     })
   }
