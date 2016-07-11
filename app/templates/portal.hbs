@@ -52,20 +52,13 @@
     {{/block-slot}}
 {{/frost-object-browser}}
 <div class='actions'>
+    {{#unless restricted}}
     <span class='action_restrict'>
         {{frost-button
             onClick=(action 'restrictHandler')
             size='medium'
             priority="secondary"
             text='Restrict'
-        }}
-    </span>
-    <span class='action_unrestrict'>
-        {{frost-button
-            onClick=(action 'unrestrictHandler')
-            size='medium'
-            priority="secondary"
-            text='Unrestrict'
         }}
     </span>
     <span class='action_generate'>
@@ -76,6 +69,17 @@
             text='Generate token'
         }}
     </span>
+    {{/unless}}
+    {{#if restricted}}
+    <span class='action_unrestrict'>
+        {{frost-button
+            onClick=(action 'unrestrictHandler')
+            size='medium'
+            priority="secondary"
+            text='Unrestrict'
+        }}
+    </span>
+    {{/if}}
 </div>
 <div class='selection'>
     <div class='portal_text'>
@@ -95,9 +99,11 @@
             <td class='portal_text_a' id='portal_token_label'>Token</td>
             <td class='portal_text_b' id='token_label'>123456</td>
         </tr>
+        {{#if restricted}}
         <tr class='restricted_info'>
             <td class='portal_text_a' id='restrict_checkbox'><img src='./images/check.png'></td>
             <td class='portal_text_b' id='restrict_label'>Restricted</td>
         </tr>
+        {{/if}}
     </table>
 </div>

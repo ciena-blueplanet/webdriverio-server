@@ -43,6 +43,7 @@ export default Ember.Controller.extend({
   username: '',
   token: '',
   selectedIndex: [0],
+  restricted: false,
   actions: {
     /**
      * Gets all users and their tokens from the database
@@ -88,15 +89,10 @@ export default Ember.Controller.extend({
       Ember.$('#username_label').text(this.get('username'))
       Ember.$('#token_label').text(this.get('token'))
       Ember.$('.general_info').show()
-      Ember.$('.action_generate').show()
       if (this.get('token') === '~') {
-        Ember.$('.restricted_info').show()
-        Ember.$('.action_unrestrict').show()
-        Ember.$('.action_restrict').hide()
+        this.set('restricted', true)
       } else {
-        Ember.$('.restricted_info').hide()
-        Ember.$('.action_restrict').show()
-        Ember.$('.action_unrestrict').hide()
+        this.set('restricted', false)
       }
     },
     createUser: function (element) {
@@ -137,7 +133,7 @@ export default Ember.Controller.extend({
         this.set('selectedIndex', [0])
         this.send('onChangeHandler', token)
       } else {
-        alert('This person with username ' + username + 'already exists')
+        window.alert('This person with username ' + username + 'already exists')
       }
     },
     /**
