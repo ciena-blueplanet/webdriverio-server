@@ -9,6 +9,7 @@ export default Ember.Controller.extend({
         type: 'string'
       }
     },
+    required: ['username'],
     type: 'object'
   },
   portalView: {

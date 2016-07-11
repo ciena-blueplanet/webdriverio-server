@@ -42,6 +42,7 @@
                 {{#block-slot slot 'footer' as |controls close|}}
                     {{controls.cancel}}
                     {{controls.confirm
+                      disabled=isFormInvalid
                       onConfirm=(action 'createUserHandler')
                       text='Create'
                     }}
