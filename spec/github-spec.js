@@ -4,7 +4,7 @@ const numReposDB2 = require('./mocks/checkNumberRepos.2')
 const repoPagesDB = require('./mocks/getPageOfRepos')
 const repoDB1 = require('./mocks/getRepoByID.1')
 const repoDB2 = require('./mocks/getRepoByID.2')
-const githubAPI = require('../handlers/github_api_handler')
+const githubAPI = require('../handlers/github-api-handler')
 const GitHubAPI = require('github')
 
 const github = new GitHubAPI()
@@ -40,8 +40,6 @@ describe('Github API Testing', function () {
     expect(res.length).toEqual(1)
   })
   describe('getRepoByID()', function () {
-    // result = getRepoByID
-    // repo_information = getPageOfRepos
     describe('owned by user', function () {
       it('should return that the repo is owned by the user', function () {
         githubAPI.getRepoByID(github, repoPagesDB[0], 'pastorsj').then((res) => {

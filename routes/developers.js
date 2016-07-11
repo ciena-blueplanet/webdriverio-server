@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser') // parses info from POST
 const methodOverride = require('method-override') // used to manipulate POST data
-const DeveloperHandler = require('../handlers/developers_handler.js')
+const DeveloperHandler = require('../handlers/developers-handler.js')
 
 router.use(bodyParser.urlencoded({ extended: true }))
 

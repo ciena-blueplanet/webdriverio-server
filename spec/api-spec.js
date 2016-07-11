@@ -1,5 +1,5 @@
 'use strict'
-const server = require('../handlers/developers_handler.js')
+const server = require('../handlers/developers-handler.js')
 const redis = require('redis')
 
 var redisResponse = ''
@@ -198,13 +198,10 @@ describe('Get Requests', () => {
     }
     spyOn(server, 'getValue').and.callFake(
       function (username) {
-        let ret = {}
         if (db.get(username)) {
-          ret = {username, token: db.get(username)}
-        } else {
-          done.fail()
+          return Promise.resolve({username, token: db.get(username)})
         }
-        return Promise.resolve(ret)
+        done.fail()
       }
     )
     server.post(reqPost1, res)

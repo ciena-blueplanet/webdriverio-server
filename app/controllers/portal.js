@@ -106,7 +106,7 @@ export default Ember.Controller.extend({
       })
       .save()
       .then((res) => {
-        console.log('For the user with this username: ' + res.get('username') + ', their testing token is: ' + res.get('token'))
+        Ember.Logger.debug('For the user with this username: ' + res.get('username') + ', their testing token is: ' + res.get('token'))
       })
       .catch((err) => {
         const data = this.get('data')
@@ -137,7 +137,7 @@ export default Ember.Controller.extend({
         this.set('selectedIndex', [0])
         this.send('onChangeHandler', token)
       } else {
-        console.log('This person with username ' + username + 'already exists')
+        alert('This person with username ' + username + 'already exists')
       }
     },
     /**

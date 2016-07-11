@@ -1,4 +1,3 @@
-/* jshint expr:true */
 import { expect } from 'chai'
 import {
   describeModule,
@@ -9,8 +8,7 @@ describeModule(
   'route:auth/denied',
   'AuthDeniedRoute',
   {
-    // Specify the other units that are required for this test.
-    // needs: ['controller:foo']
+    unit: true
   },
   function() {
     it('exists', function() {

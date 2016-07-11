@@ -1,4 +1,9 @@
 const _ = require('lodash')
+// This is the maximum number of account events that can be returned from a single query to the GitHub API
+const MAX_EVENTS = 100
+const REPOS_CONTRIBUTED_TO = 2
+const REPOS_OWNED = 2
+const PAGES_TO_QUERY = 3
 const githubAPI = {
   /**
    * Removes duplicate items (repositories) from an array by creating a set from the array
@@ -45,37 +50,37 @@ const githubAPI = {
    * @param {Object} github - Allows for API calls to be made to the github api server
    * @param {String} user - The owner of the account to be validated
    * @param {Number} pageNumber - The page number of account events
-   * @param {Number} sixMonthsAgo - The current time minus 6 months
+   * @param {Number} reviewStartTime - The current time minus 6 months, for now
    * @returns {Promise} Returns the number of repos that are not owned by the user and are unique
    */
-  getPageOfRepos: function (github, user, pageNumber, sixMonthsAgo) {
+  getPageOfRepos: function (github, user, pageNumber, reviewStartTime) {
     return new Promise((resolve, reject) => {
       let pset = []
       github.activity.getEventsForUserPublic({
         user,
         page: pageNumber,
-        perpage: 100
+        per_page: MAX_EVENTS
       }, (err, result) => {
         if (err) {
           throw err
         }
         let repoEvent = ''
         result.forEach((event) => {
-          repoEvent = new Date(event.createdat)
-          if (sixMonthsAgo.getTime() < repoEvent.getTime()) {
+          repoEvent = new Date(event.created_at)
+          if (reviewStartTime.getTime() < repoEvent.getTime()) {
             if (event.type === 'PullRequestEvent') {
               pset.push(githubAPI.getRepoByID(github, event, user))
             }
           }
         })
         Promise.all(pset).then((values) => {
-          let numRepos = 0
           values = githubAPI.removeDuplicates(values)
-          values.forEach((element) => {
-            if (element.isPublic) {
-              numRepos++
+          let numRepos = _.reduce(values, (sum, repo) => {
+            if (repo.isPublic) {
+              return ++sum
             }
-          })
+            return sum
+          }, 0)
           resolve({
             total: numRepos
           })
@@ -95,13 +100,13 @@ const githubAPI = {
       if (err) {
         throw err
       }
-      let total = 0
-      result.forEach((repo) => {
+      let total = _.reduce(result, (sum, repo) => {
         if (!repo.fork) {
-          total++
+          return ++sum
         }
-      })
-      if (total < 2) {
+        return sum
+      }, 0)
+      if (total < REPOS_OWNED) {
         res.redirect('/#/auth/denied')
       } else {
         res.redirect('/#/auth/contract')
@@ -115,21 +120,20 @@ const githubAPI = {
    * @param {Object} res - The result object, allowing either the user to be redirected to a denied access
    * page or a contract/success page
    * @param {String} user - The owner of the account being validated
-   * @param {Number} sixMonthsAgo - The current time minus 6 months
+   * @param {Number} reviewStartTime - The current time minus 6 months, for now
    * @returns {Promise} - The set of promises containing the results of the query for pages of repos
    */
-  verify: function (github, res, user, sixMonthsAgo) {
-    const pages = 3
+  verify: function (github, res, user, reviewStartTime) {
+    const pages = PAGES_TO_QUERY
     let eventPSet = []
     for (let i = 0; i < pages; i++) {
-      eventPSet.push(githubAPI.getPageOfRepos(github, user, i, sixMonthsAgo))
+      eventPSet.push(githubAPI.getPageOfRepos(github, user, i, reviewStartTime))
     }
     return Promise.all(eventPSet).then((values) => {
-      let total = 0
-      values.forEach((element) => {
-        total += element.total
-      })
-      if (total < 2) {
+      let total = _.reduce(values, (sum, n) => {
+        return sum + n.total
+      }, 0)
+      if (total < REPOS_CONTRIBUTED_TO) {
         res.redirect('/#/auth/denied')
       } else {
         githubAPI.checkNumberRepos(github, res)

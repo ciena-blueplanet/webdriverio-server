@@ -14,7 +14,7 @@ const oauth = require('oauth').OAuth2
 const app = express()
 
 const developers = require('../routes/developers')
-const githubAPI = require('../handlers/github_api_handler')
+const githubAPI = require('../handlers/github-api-handler')
 
 const processUpload = require('./process-upload')
 
@@ -32,6 +32,7 @@ const github = new GitHubAPI({
 })
 
 const base_url = 'localhost:3000'
+const MINIMUM_ACCOUNT_LIFETIME = 6
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -123,14 +124,14 @@ app.get('/auth/callback', function (req, res) {
         throw err
       }
       // Account must be open for longer than 6 months
-      const sixMonthsAgo = new Date()
+      const reviewStartTime = new Date()
       const accountOpened = new Date(result.created_at)
       const user = result.login
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
-      if (sixMonthsAgo.getTime() < accountOpened.getTime()) {
+      reviewStartTime.setMonth(reviewStartTime.getMonth() - MINIMUM_ACCOUNT_LIFETIME)
+      if (reviewStartTime.getTime() < accountOpened.getTime()) {
         res.redirect('/#/auth/denied')
       } else {
-        githubAPI.verify(github, res, user, sixMonthsAgo)
+        githubAPI.verify(github, res, user, reviewStartTime)
       }
     })
   })

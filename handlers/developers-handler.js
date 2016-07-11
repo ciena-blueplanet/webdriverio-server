@@ -14,7 +14,7 @@ var DeveloperHandler = {
     this.client = redis.createClient({password: process.env.REDIS})
   },
   /**
-   * Set the response Object to be in the format of a successful reponse
+   * Set the response Object to be in the format of a successful response
    * @param {Object} res - The response Object
    * @param {String} username - The given username
    * @param {String} token - The given testing-token
@@ -31,9 +31,15 @@ var DeveloperHandler = {
     })
   },
   /**
-   * Set the response Object to be in the format of a successful reponse
+   * Set the response Object to be in the format of a successful response
    * @param {Object} res - The response Object
-   * @param {String[]} developers - The set of usernames and tokens returned from the query
+   * @param {String[]} developers - An array of objects containing key-value pairs of usernames and tokens
+   * [
+   *  {
+   *    username: {String}
+   *    token: {String}
+   *  },
+   * ]
    */
   setStandardKeysResponse: function (res, developers) {
     res.status(200)
@@ -66,7 +72,7 @@ var DeveloperHandler = {
    */
   getValue: function (username) {
     return new Promise((resolve, reject) => {
-      this.client.get(username, function (err, token) {
+      this.client.get(username, (err, token) => {
         if (err) {
           reject(err)
         }
@@ -85,36 +91,14 @@ var DeveloperHandler = {
    */
   get: function (req, res) {
     return new Promise((resolve, reject) => {
-      let pset = []
       if (req.query.queryAll) {
-        this.client.keys('*', function (err, keys) {
-          if (err) {
-            DeveloperHandler.setErrorResponse(res, err, 404)
-          } else {
-            keys.map((item) => {
-              pset.push(DeveloperHandler.getValue(item))
-            })
-            Promise.all(pset).then((value) => {
-              DeveloperHandler.setStandardKeysResponse(res, value)
-            }).catch((reason) => {
-              DeveloperHandler.setErrorResponse(res, reason, 404)
-            })
-          }
+        this.client.keys('*', (err, keys) => {
+          getKeysResponse(err, res, keys)
           resolve(keys)
         })
       } else {
-        this.client.get(req.query.username, function (err, redisResp) {
-          if (err) {
-            DeveloperHandler.setErrorResponse(res, err, 404)
-          } else if (redisResp === null) {
-            DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com', 500)
-          } else if (req.query.token === '') {
-            DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
-          } else if (req.query.token === redisResp) {
-            DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
-          } else {
-            DeveloperHandler.setErrorResponse(res, 'The token submitted does not match the token returned.', 500)
-          }
+        this.client.get(req.query.username, (err, redisResp) => {
+          getResponse(err, res, req, redisResp)
           resolve(err)
         })
       }
@@ -130,7 +114,7 @@ var DeveloperHandler = {
     return new Promise((resolve, reject) => {
       const username = req.body.developer.username
       const token = req.body.developer.token
-      this.client.set(username, token, function (err, redisResp) {
+      this.client.set(username, token, (err, redisResp) => {
         if (err) {
           DeveloperHandler.setErrorResponse(res, err, 404)
         } else {
@@ -151,7 +135,7 @@ var DeveloperHandler = {
       if (req.params.username === undefined) {
         DeveloperHandler.setErrorResponse(res, 'Request must be in parameters', 500)
       } else {
-        this.client.del(req.params.username, function (err, redisResp) {
+        this.client.del(req.params.username, (err, redisResp) => {
           if (err) {
             DeveloperHandler.setErrorResponse(res, err, 404)
           } else {
@@ -161,6 +145,31 @@ var DeveloperHandler = {
         })
       }
     })
+  }
+}
+
+function getKeysResponse (err, res, keys) {
+  if (err) {
+    DeveloperHandler.setErrorResponse(res, err, 404)
+  } else {
+    const pset = keys.map((item) => DeveloperHandler.getValue(item))
+    Promise.all(pset).then((value) => {
+      DeveloperHandler.setStandardKeysResponse(res, value)
+    }).catch((reason) => {
+      DeveloperHandler.setErrorResponse(res, reason, 404)
+    })
+  }
+}
+
+function getResponse (err, res, req, redisResp) {
+  if (err) {
+    DeveloperHandler.setErrorResponse(res, err, 404)
+  } else if (redisResp === null) {
+    DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com', 500)
+  } else if (req.query.token === '' || req.query.token === redisResp) {
+    DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
+  } else {
+    DeveloperHandler.setErrorResponse(res, 'The token submitted does not match the token returned.', 500)
   }
 }
 
