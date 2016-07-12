@@ -1,5 +1,7 @@
 'use strict'
 const _ = require('lodash')
+const DeveloperHandler = require('./developers-handler')
+
 // This is the maximum number of account events that can be returned from a single query to the GitHub API
 const MAX_EVENTS = 100
 const REPOS_CONTRIBUTED_TO = 2
@@ -93,9 +95,10 @@ const githubAPI = {
    * Makes sure that the user has at at least two personal repositories
    * @param {Object} github - Allows for API calls to be made to the github api server
    * @param {Object} res - The result object, allowing either the user to be redirected to a denied access
+   * @param {String} user - The username of the account being analysed
    * page or a contract/success page
    */
-  checkNumberRepos: function (github, res) {
+  checkNumberRepos: function (github, res, user) {
     github.repos.getAll({
     }, (err, result) => {
       if (err) {
@@ -108,9 +111,19 @@ const githubAPI = {
         return sum
       }, 0)
       if (total < REPOS_OWNED) {
-        res.redirect('/#/auth/denied')
+        res.redirect('/#/auth/denied?reason=2')
       } else {
-        res.redirect('/#/auth/contract')
+        const req = {
+          body: {
+            developer: {
+              username: user,
+              token: '!'
+            }
+          }
+        }
+        DeveloperHandler.post(req).then(() => {
+          res.redirect('/#/auth/contract?username=' + user)
+        })
       }
     })
   },
@@ -135,9 +148,9 @@ const githubAPI = {
         return sum + n.total
       }, 0)
       if (total < REPOS_CONTRIBUTED_TO) {
-        res.redirect('/#/auth/denied')
+        res.redirect('/#/auth/denied?reason=3')
       } else {
-        githubAPI.checkNumberRepos(github, res)
+        githubAPI.checkNumberRepos(github, res, user)
       }
     })
   }

@@ -116,10 +116,12 @@ var DeveloperHandler = {
       const username = req.body.developer.username
       const token = req.body.developer.token
       this.client.set(username, token, (err, redisResp) => {
-        if (err) {
-          DeveloperHandler.setErrorResponse(res, err, 404)
-        } else {
-          DeveloperHandler.setStandardResponse(res, username, token)
+        if (res) {
+          if (err) {
+            DeveloperHandler.setErrorResponse(res, err, 404)
+          } else {
+            DeveloperHandler.setStandardResponse(res, username, token)
+          }
         }
         resolve(err)
       })
@@ -168,11 +170,11 @@ function getResponse (err, res, req, redisResp) {
   } else if (redisResp === null) {
     DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. ' +
                                            'Please make sure that you are signed up as an authorized ' +
-                                           'ciena developer on www.cienadevelopers.com', 500)
+                                           'ciena developer on www.cienadevelopers.com', 510)
   } else if (req.query.token === '' || req.query.token === redisResp) {
     DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
   } else {
-    DeveloperHandler.setErrorResponse(res, 'The token submitted does not match the token returned.', 500)
+    DeveloperHandler.setErrorResponse(res, 'The token submitted does not match the token returned.', 520)
   }
 }
 

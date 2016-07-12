@@ -31,8 +31,8 @@ const github = new GitHubAPI({
   timeout: 5000
 })
 
-// const baseUrl = 'localhost:3000'
-const deploymentURL = 'wdio.bp.cyaninc.com'
+const baseUrl = 'localhost:3000'
+// const deploymentURL = 'wdio.bp.cyaninc.com'
 const MINIMUM_ACCOUNT_LIFETIME = 6
 
 // view engine setup
@@ -100,7 +100,7 @@ app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')
 app.get('/auth', function (req, res) {
   res.writeHead(303, {
     Location: OAuth2.getAuthorizeUrl({
-      'redirect_uri': 'http://' + deploymentURL + '/auth/callback',
+      'redirect_uri': 'http://' + baseUrl + '/auth/callback',
       scope: ''
     })
   })
@@ -129,7 +129,7 @@ app.get('/auth/callback', function (req, res) {
       const user = result.login
       reviewStartTime.setMonth(reviewStartTime.getMonth() - MINIMUM_ACCOUNT_LIFETIME)
       if (reviewStartTime.getTime() < accountOpened.getTime()) {
-        res.redirect('/#/auth/denied')
+        res.redirect('/#/auth/denied?reason=1')
       } else {
         githubAPI.verify(github, res, user, reviewStartTime)
       }
