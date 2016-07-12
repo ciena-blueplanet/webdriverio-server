@@ -1,3 +1,9 @@
+# 2.4.0
+* Added the ability for a developers to authorize their account through GitHub OAuth
+* Updated the admin portal to look more professional
+* Included the ability to restrict a user by changing their token
+* Added the ability to further verify a developer's account using the GitHub api
+
 # 2.3.1
 * Deleted /routes from npmignore
 
