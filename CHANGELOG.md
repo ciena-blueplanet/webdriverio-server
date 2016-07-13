@@ -1,3 +1,6 @@
+# 2.4.1
+* Fixed a path in a generate token test
+
 # 2.4.0
 * Added the ability for a developers to authorize their account through GitHub OAuth
 * Updated the admin portal to look more professional
