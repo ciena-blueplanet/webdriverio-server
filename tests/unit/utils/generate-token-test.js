@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import {it} from 'ember-mocha'
 import {describe} from 'mocha'
-import {generateToken} from 'webdriverio-server/app/utils/generateToken'
+import {generateToken} from 'webdriverio-server/utils/generateToken'
 
 describe('Generate Token', function () {
   describe('General Case', function () {
