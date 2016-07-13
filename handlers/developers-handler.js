@@ -99,8 +99,17 @@ var DeveloperHandler = {
         })
       } else {
         this.client.get(req.query.username, (err, redisResp) => {
-          getResponse(err, res, req, redisResp)
-          resolve(err)
+          let response = {}
+          console.log('Get')
+          console.log(res)
+          console.log('Reponse gotten')
+          response = getResponse(err, res, req, redisResp, resolve, reject)
+          if (response.resolve) {
+            console.log('Response resolved')
+            resolve(response.resolve)
+          }
+          console.log('Rejected')
+          reject(response.reject)
         })
       }
     })
@@ -166,15 +175,29 @@ function getKeysResponse (err, res, keys) {
 
 function getResponse (err, res, req, redisResp) {
   if (err) {
-    DeveloperHandler.setErrorResponse(res, err, 404)
+    if (res) {
+      DeveloperHandler.setErrorResponse(res, err, 404)
+    }
+    return {reject: err}
   } else if (redisResp === null) {
-    DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. ' +
+    if (res) {
+      DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. ' +
                                            'Please make sure that you are signed up as an authorized ' +
                                            'ciena developer on www.cienadevelopers.com', 510)
+    }
+    return {reject: 'Error, this username does not exist: ' + req.query.username}
   } else if (req.query.token === '' || req.query.token === redisResp) {
-    DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
+    console.log('Token' + req.query.token)
+    console.log(req.query.token)
+    if (res) {
+      DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
+    }
+    return {resolve: req.query.token}
   } else {
-    DeveloperHandler.setErrorResponse(res, 'The token submitted does not match the token returned.', 520)
+    if (res) {
+      DeveloperHandler.setErrorResponse(res, 'The token submitted does not match the token returned.', 520)
+    }
+    return {reject: req.query.token}
   }
 }
 

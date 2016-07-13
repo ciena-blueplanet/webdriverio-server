@@ -16,7 +16,7 @@ export default Ember.Route.extend({
     return this.get('store').queryRecord('developer',
       {
         username: params.username,
-        token: '~'
+        token: '!'
       })
       .then((res) => {
         return {
