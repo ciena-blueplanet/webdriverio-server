@@ -63,7 +63,6 @@ tmp
 /bower.json
 /config
 /ember-cli-build.js
-/routes
 /spec
 /testem.js
 /tests

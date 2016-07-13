@@ -1,6 +1,6 @@
 {
   "name": "webdriverio-server",
-  "version": "2.3.0",
+  "version": "2.4.1",
   "description": "Server for running webdriverio tests and a frontend for public access",
   "config": {
     "coverage_opts": "-x **/tests/** --report cobertura --report lcov --dir tests"
@@ -52,14 +52,16 @@
     "debug": "~2.1.1",
     "express": "~4.12.2",
     "jade": "~1.9.2",
+    "lodash": "^4.3.0",
+    "github": "^2.0.1",
     "morgan": "~1.5.1",
-    "multer": "^0.1.8",
-    "q": "^1.4.1",
-    "serve-favicon": "~2.2.0",
-    "oauth": "^0.9.14",
     "redis": "^2.6.1",
+    "method-override": "^2.3.6",
+    "multer": "^0.1.8",
+    "oauth": "^0.9.14",
+    "q": "^1.4.1",
     "blueimp-md5": "^2.3.0",
-    "github": "^2.0.1"
+    "serve-favicon": "~2.2.0"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.2",
@@ -115,8 +117,6 @@
     "jasmine-node": "^1.14.5",
     "liquid-fire": "0.23.1",
     "loader.js": "^4.0.1",
-    "lodash": "^4.13.1",
-    "method-override": "^2.3.6",
     "mocha": "^2.5.3",
     "node-sass": "^3.7.0",
     "nodemon": "^1.9.2",
