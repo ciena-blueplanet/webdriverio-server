@@ -1,5 +1,5 @@
 ## Configuration Instructions for sending e2e tests to the webdriverio-server
-1. Create a config.json file in the base directory of your project
+1. Create a config.json file in the tests/e2e directory of your project
 2. Inside of the config.json, add the following lines of code
   ```
   {

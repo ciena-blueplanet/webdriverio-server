@@ -24,8 +24,6 @@ export default Ember.Route.extend({
         }
       })
       .catch((err) => {
-        console.log(JSON.stringify(err, null, 2))
-        console.log('Error Status' + err['errors'][0].status)
         if (err.errors[0].status === '510') {
           this.transitionTo('auth.denied', {queryParams: {reason: 5}})
         } else if (err.errors[0].status === '520') {

@@ -95,7 +95,7 @@ describeModule(
           expect(store.queryRecord.lastCall.args[0]).to.equal('developer')
         })
 
-        it('Insert description here', function () {
+        it('transitionToRoute should be called once', function () {
           expect(controller.transitionToRoute.callCount).to.equal(1)
         })
       })

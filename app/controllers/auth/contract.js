@@ -10,8 +10,6 @@ export default Ember.Controller.extend({
     onInputHandler: function () {
       this.set('checked', !this.get('checked'))
       this.set('disabled', !this.get('checked'))
-      console.log('Checked? ' + this.get('checked'))
-      console.log('Disabled?', this.get('disabled'))
     },
     submitForm: function () {
       this.set('confirmed', true)
@@ -26,8 +24,8 @@ export default Ember.Controller.extend({
       .save()
       .then((res) => {
         Ember.Logger.debug('For the user with this username: ' +
-                          res.get('username') + ', their testing token is: ' +
-                          res.get('token'))
+                          username + ', their testing token is: ' +
+                          token)
       })
       .catch((err) => {
         window.alert('An error has occured. Please contact the admin and give them this message:\n' + err)
