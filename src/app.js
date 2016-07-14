@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 const GitHubAPI = require('github')
+const DeveloperHandler = require('../handlers/developers-handler.js')
 const oauth = require('oauth').OAuth2
 
 const app = express()
@@ -88,6 +89,39 @@ app.post('/', function (req, res) {
     const entryPoint = req.body['entry-point'] || 'demo'
     const testsFolder = req.body['tests-folder'] || 'tests/e2e'
     processUpload.newFile(filename, entryPoint, testsFolder, res)
+  }
+})
+
+// ==================================================================
+//                   Configuration Settings
+// ==================================================================
+
+app.get('/authconfig', function (req, res) {
+  if (!req.headers) {
+    res.send('Error: Headers do not exist')
+    res.end()
+  } else {
+    const username = req.headers.username
+    const token = req.headers.token
+    const request = {
+      query: {
+        username,
+        token
+      }
+    }
+    if (!username || !token) {
+      res.send(`Your config.json file must contain a valid username and token.\n
+       Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
+      res.end()
+    } else {
+      DeveloperHandler.get(request).then((redisResponse) => {
+        res.send(redisResponse)
+        res.end()
+      }).catch((err) => {
+        res.send(err)
+        res.end()
+      })
+    }
   }
 })
 

@@ -4,8 +4,6 @@ const childProcess = require('child_process')
 const debug = require('debug')('server')
 const path = require('path')
 const fs = require('fs')
-const _ = require('lodash')
-const DeveloperHandler = require('../handlers/developers-handler.js')
 
 const ns = {
   scriptPath: path.join(__dirname, './exec.sh')
@@ -88,52 +86,11 @@ const watchChild = function (child, seconds) {
 ns.newFile = function (filename, entryPoint, testsFolder, res) {
   const seconds = Math.floor(new Date().getTime() / 1000)
   debug('START: ------------ ' + seconds)
-  let stats = _.sortBy(getStatsofDirectoriesAndFolders(path.join(__dirname, '..')), (file) => {
-    const time = new Date(file.birthtime)
-    return time.getTime()
-  })
-  const dir = stats[stats.length - 1].fileName
-  const configFile = JSON.parse(fs.readFileSync(path.join(dir, 'tests', 'e2e/config.json')))
-  if (!configFile || !configFile.username || !configFile.token) {
-    debug(`You must provided a config file in the tests/e2e directory containing
-           your testing token and username.\nIf this is the first time you have seen this message,
-           you need to sign up to become an authorized Ciena developer to\n be able to submit tests
-           to this server. Please visit http://wdio.bp.cyaninc.com to sign up`)
-    res.end()
-  } else {
-    const request = {
-      query: {
-        username: configFile.username,
-        token: configFile.token
-      }
-    }
-    DeveloperHandler.get(request, null).then((redisResponse) => {
-      console.log(redisResponse)
-      console.log('You have been verified as a authorized Ciena Developer. Welcome back!')
-      const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
-      watchChild(child, seconds)
-      res.send(seconds.toString())
-      res.end()
-    }).catch((err) => {
-      if (err) {
-        console.log('Error ' + err)
-        debug(`The config.json file you provided has the wrong username or token.
-              Please fix the issue and resubmit your tests.`)
-        res.send(seconds.toString())
-        res.end()
-      }
-    })
-  }
-}
 
-var getStatsofDirectoriesAndFolders = function (dir) {
-  let results = []
-  fs.readdirSync(dir).forEach(function (file) {
-    let stat = fs.statSync(dir + '/' + file)
-    stat.fileName = file
-    results.push(stat)
-  })
-  return results
+  const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
+  watchChild(child, seconds)
+  res.send(seconds.toString())
+  res.end()
 }
 
 module.exports = ns

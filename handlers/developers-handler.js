@@ -100,15 +100,10 @@ var DeveloperHandler = {
       } else {
         this.client.get(req.query.username, (err, redisResp) => {
           let response = {}
-          console.log('Get')
-          console.log(res)
-          console.log('Reponse gotten')
           response = getResponse(err, res, req, redisResp, resolve, reject)
           if (response.resolve) {
-            console.log('Response resolved')
             resolve(response.resolve)
           }
-          console.log('Rejected')
           reject(response.reject)
         })
       }
@@ -185,10 +180,8 @@ function getResponse (err, res, req, redisResp) {
                                            'Please make sure that you are signed up as an authorized ' +
                                            'ciena developer on www.cienadevelopers.com', 510)
     }
-    return {reject: 'Error, this username does not exist: ' + req.query.username}
+    return {reject: 'This username does not exist: ' + req.query.username}
   } else if (req.query.token === '' || req.query.token === redisResp) {
-    console.log('Token' + req.query.token)
-    console.log(req.query.token)
     if (res) {
       DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
     }
@@ -197,7 +190,7 @@ function getResponse (err, res, req, redisResp) {
     if (res) {
       DeveloperHandler.setErrorResponse(res, 'The token submitted does not match the token returned.', 520)
     }
-    return {reject: req.query.token}
+    return {reject: 'The token submitted does not match the token returned.'}
   }
 }
 
