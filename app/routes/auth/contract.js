@@ -6,6 +6,10 @@ import Ember from 'ember'
  * 520 - The user has already signed up (Reason = 4)
  */
 
+const USER_DOES_NOT_EXIST = 5
+const ALREADY_HAS_ACCOUNT = 4
+const ERROR_ROUTE = 0
+
 export default Ember.Route.extend({
   queryParams: {
     username: {
@@ -25,11 +29,11 @@ export default Ember.Route.extend({
       })
       .catch((err) => {
         if (err.errors[0].status === '510') {
-          this.transitionTo('auth.denied', {queryParams: {reason: 5}})
+          this.transitionTo('auth.denied', {queryParams: {reason: USER_DOES_NOT_EXIST}})
         } else if (err.errors[0].status === '520') {
-          this.transitionTo('auth.denied', {queryParams: {reason: 4}})
+          this.transitionTo('auth.denied', {queryParams: {reason: ALREADY_HAS_ACCOUNT}})
         } else {
-          this.transitionTo('auth.denied', {queryParams: {reason: 0}})
+          this.transitionTo('auth.denied', {queryParams: {reason: ERROR_ROUTE}})
         }
         Ember.Logger.debug(err)
       })

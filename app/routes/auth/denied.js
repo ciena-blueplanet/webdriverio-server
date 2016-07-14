@@ -1,5 +1,7 @@
 import Ember from 'ember'
 
+const NO_REASON = 6
+
 export default Ember.Route.extend({
   queryParams: {
     reason: {
@@ -10,7 +12,7 @@ export default Ember.Route.extend({
     if (params.reason) {
       return params.reason
     }
-    return 6
+    return NO_REASON
   },
   setupController: function (controller, model) {
     controller.set('reason', model)

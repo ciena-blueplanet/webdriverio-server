@@ -7,6 +7,8 @@ const MAX_EVENTS = 100
 const REPOS_CONTRIBUTED_TO = 2
 const REPOS_OWNED = 2
 const PAGES_TO_QUERY = 3
+const NOT_ENOUGH_PERSONAL_REPOS = 2
+const NOT_ENOUGH_PUBLIC_REPOS = 3
 const githubAPI = {
   /**
    * Removes duplicate items (repositories) from an array by creating a set from the array
@@ -111,7 +113,7 @@ const githubAPI = {
         return sum
       }, 0)
       if (total < REPOS_OWNED) {
-        res.redirect('/#/auth/denied?reason=2')
+        res.redirect('/#/auth/denied?reason=' + NOT_ENOUGH_PERSONAL_REPOS)
       } else {
         const req = {
           body: {
@@ -148,7 +150,7 @@ const githubAPI = {
         return sum + n.total
       }, 0)
       if (total < REPOS_CONTRIBUTED_TO) {
-        res.redirect('/#/auth/denied?reason=3')
+        res.redirect('/#/auth/denied?reason=' + NOT_ENOUGH_PUBLIC_REPOS)
       } else {
         githubAPI.checkNumberRepos(github, res, user)
       }
