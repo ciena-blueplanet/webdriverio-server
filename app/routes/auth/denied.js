@@ -7,7 +7,10 @@ export default Ember.Route.extend({
     }
   },
   model: function (params) {
-    return params.reason
+    if (params.reason) {
+      return params.reason
+    }
+    return 6
   },
   setupController: function (controller, model) {
     controller.set('reason', model)

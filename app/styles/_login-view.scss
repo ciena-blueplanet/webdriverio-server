@@ -30,9 +30,11 @@
 }
 
 .login-result {
-    @extend .result;
-    font-size: 14px;
+    font-size: 10.5pt;
+    color: #d1625e;
     padding-bottom: 10px;
     white-space: none;
     width: 100%;
+    margin: 0 auto;
+    text-align: center;
 }

@@ -149,6 +149,7 @@ export default Ember.Controller.extend({
         value: token
       }
       this.send('createUser', element)
+      this.send('updateData', this.get('username'), token)
       this.set('token', token)
       this.send('updateDOM')
     },
@@ -162,6 +163,7 @@ export default Ember.Controller.extend({
         value: token
       }
       this.send('createUser', element)
+      this.send('updateData', this.get('username'), token)
       this.set('token', token)
       this.send('updateDOM')
     },
@@ -188,6 +190,15 @@ export default Ember.Controller.extend({
         })
         this.send('updateDOM')
       }
+    },
+    updateData: function (username, token) {
+      let data = this.get('data').map((item) => {
+        if (item.label === username.toString()) {
+          item.value = token
+        }
+        return item
+      })
+      this.set('data', Ember.A(data))
     }
   }
 })

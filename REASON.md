@@ -14,6 +14,8 @@ and those reasons are reflected in the single query param in the url.
   * This means the developer already has an account and cannot receive another testing token tied to their username
 5. reason = 5
   * This means the username provided does not exist on the backend db. The developer must sign up using their GitHub credentials
+6. reason = 6
+  * This means the user tried to access the denied page with a reason parameter.
 6. reason = 0
   * Something has gone wrong on the backend. View `/app/routes/contract.js' for an example of reason = 0
 
