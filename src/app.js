@@ -11,6 +11,11 @@ const multer = require('multer')
 const GitHubAPI = require('github')
 const DeveloperHandler = require('../handlers/developers-handler.js')
 const oauth = require('oauth').OAuth2
+const mongoose = require('mongoose')
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy
+const User = require('../models/user')
+const md5 = require('blueimp-md5')
 
 const app = express()
 
@@ -44,6 +49,15 @@ app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
+app.use(express.static(path.join(__dirname, 'public')))
+
+app.use(require('express-session')({
+  secret: 'random-secret1025',
+  resave: false,
+  saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/developers', developers)
@@ -169,6 +183,52 @@ app.get('/auth/callback', function (req, res) {
       }
     })
   })
+})
+
+// ==================================================================
+//                        Login Authentication
+// ==================================================================
+
+mongoose.connect('mongodb://localhost/authentication')
+passport.serializeUser((user, done) => {
+  done(null, user.id)
+})
+
+passport.deserializeUser(function (id, done) {
+  User.findById(id, (err, user) => {
+    done(err, user)
+  })
+})
+
+passport.use(new LocalStrategy((username, password, done) => {
+  User.findOne({ username: md5(username) }, (err, user) => {
+    if (err) {
+      return done(err)
+    }
+    if (!user || user.password !== md5(password)) {
+      return done(null, false)
+    }
+    return done(null, user)
+  })
+}))
+
+app.get('/logout', (req, res) => {
+  req.logout()
+  res.end()
+})
+
+const isAuthenticated = function (req, res, next) {
+  if (req.isAuthenticated()) {
+    return next()
+  }
+  res.send('NotAuthenticated')
+}
+
+app.get('/portal', isAuthenticated, (req, res) => {
+})
+
+app.post('/login', passport.authenticate('local', {successRedirect: '/#/portal', failureRedirect: '/#/login?failure=1'}), (req, res) => {
+  res.redirect('/#/portal')
 })
 
 // ==================================================================

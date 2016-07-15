@@ -4,16 +4,47 @@ import {
   it
 } from 'ember-mocha'
 
+const jQueryPrototype = Object.getPrototypeOf($('body'))
+
 describeModule(
-  'route:portal',
+  'route:login',
   'LoginRoute',
   {
     unit: true
   },
   function () {
-    it('exists', function () {
-      let route = this.subject()
-      expect(route).to.be.ok
+    let route, sandbox
+    beforeEach(function () {
+      sandbox = sinon.sandbox.create()
+      route = this.subject()
+      sandbox.stub(jQueryPrototype, 'text')
+    })
+
+    afterEach(function () {
+      sandbox.restore()
+    })
+    describe('model()', function () {
+      let params
+      describe('Failed Authentication', function () {
+        beforeEach(function () {
+          params = {
+            failure: 1
+          }
+          route.model(params)
+        })
+        it('should update the login-result text', function () {
+          expect(jQueryPrototype.text.firstCall.args[0]).to.equal('Authentication Failed')
+        })
+      })
+      describe('No Params', function () {
+        beforeEach(function () {
+          params = {}
+          route.model(params)
+        })
+        it('should not update the login-result text', function () {
+          expect(jQueryPrototype.text.callCount).to.equal(0)
+        })
+      })
     })
   }
 )

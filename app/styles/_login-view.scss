@@ -14,19 +14,34 @@
     box-shadow: 0px 0px 50px 20px #e2e2e2;
     padding-top: 40px;
     padding-left: 40px;
-    button {
-        width: 150px;
+    width: calc(20vw + 10%);
+    form {
+        padding-top: 15px;
     }
 }
 
 .login-button {
     @extend .flex;
     align-items: flex-end;
+    button {
+        width: calc(250px-1vw);
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 
-.form {
-    padding-top: 15px;
+.login-input { 
+    text-align: left;
+    input {
+        width: 10vw;
+    }
+}
+
+.login-text {
+    font-size: 18px;
+    color: #666666;
+    text-align: right;
 }
 
 .login-result {
@@ -37,4 +52,17 @@
     width: 100%;
     margin: 0 auto;
     text-align: center;
+}
+
+@media screen and (max-width: 1000px) {
+    #login-image {
+        padding-left: 10px;
+    }
+    .login {
+        width: calc(25vw + 30%);
+        padding-left: 0px;
+    }
+    .login-input input { 
+        width: 20vw;
+    }
 }

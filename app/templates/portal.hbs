@@ -1,11 +1,12 @@
 <div class='portal-bar'>
     <div id='logout'>
-        {{#frost-link 'login'
-          design='info-bar'
+        {{#frost-button
           icon='frost/home'
+          text='Logout'
+          size='large'
+          onClick=(action 'logout')
         }}
-        Logout
-        {{/frost-link}}
+        {{/frost-button}}
     </div>
 </div>
 {{#frost-object-browser as |slot|}}

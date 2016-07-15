@@ -4,23 +4,31 @@
             <span id='login-image' class='blue-planet-image'>
                 <img src="./images/ciena_logo.png">
             </span>
-            <div class="form">
-                {{frost-bunsen-form
-                  bunsenModel=loginModel
-                  bunsenView=loginView
-                  onChange=(action "formChange")
-                }}
-            </div>
-            <div class='login-result'>
-            </div>
-            <div class="login-button">
-                {{frost-button
-                  onClick=(action "submitForm")
-                  priority="primary"
-                  size="medium"
-                  text="Log in"
-                }}
-            </div>
+            <form action="/login" method="post">
+                <table>
+                    <tr>
+                        <td class='login-text'>
+                            Username:
+                        </td>
+                        <td class='login-input'>
+                            <input type="text" name="username"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class='login-text'>
+                            Password:
+                        </td>
+                        <td class='login-input'>
+                            <input type="password" name="password"/>
+                        </td>
+                    </tr>
+                </table>
+                <div class='login-result'>
+                </div>
+                <div class='login-button'>
+                    <button class='medium frost-button primary' type="submit">Log in</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

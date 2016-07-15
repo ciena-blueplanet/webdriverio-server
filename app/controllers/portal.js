@@ -191,6 +191,11 @@ export default Ember.Controller.extend({
         this.send('updateDOM')
       }
     },
+    /**
+     * Updates the data object which is used in the frost select
+     * @param {String} username - The username of the updated user
+     * @param {String} token - The updated token
+     */
     updateData: function (username, token) {
       let data = this.get('data').map((item) => {
         if (item.label === username.toString()) {
@@ -199,6 +204,16 @@ export default Ember.Controller.extend({
         return item
       })
       this.set('data', Ember.A(data))
+    },
+    /**
+     * Logs the user out by calling the logout route. This route is being
+     * listened to by Passport and will logout the user and end the session. Then it will
+     * return successfully and we will transition to the index page.
+     */
+    logout: function () {
+      Ember.$.get('/logout', () => {
+        this.transitionToRoute('index')
+      })
     }
   }
 })

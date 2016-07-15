@@ -305,6 +305,32 @@ describeModule(
         expect(controller.get('token')).to.equal(mockDB[1].token)
       })
     })
+
+    describe('updateData()', function () {
+      let fakeDB, updatedData
+      beforeEach(function () {
+        fakeDB = [
+          {
+            label: 'test1',
+            value: 'test-token1'
+          },
+          {
+            label: 'test2',
+            value: 'test-token2'
+          }
+        ]
+        updatedData = {
+          username: 'test1',
+          token: 'updated-token'
+        }
+        controller.set('data', Ember.A(fakeDB))
+        controller.actions.updateData.call(controller, updatedData.username, updatedData.token)
+      })
+
+      it('should update the fakeDB', function () {
+        expect(controller.get('data')[0].value).to.equal(updatedData.token)
+      })
+    })
   }
 )
 
