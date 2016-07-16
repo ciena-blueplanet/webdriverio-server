@@ -23,6 +23,9 @@ var DeveloperHandler = {
    * @param {String} token - The given testing-token
    */
   setStandardResponse: function (res, username, token) {
+    if (!res) {
+      return
+    }
     res.status(200)
     res.format({
       json: function () {
@@ -45,6 +48,9 @@ var DeveloperHandler = {
    * ]
    */
   setStandardKeysResponse: function (res, developers) {
+    if (!res) {
+      return
+    }
     res.status(200)
     res.format({
       json: function () {
@@ -61,6 +67,9 @@ var DeveloperHandler = {
    * @param {Number} statusCode - The http status code
    */
   setErrorResponse: function (res, err, statusCode) {
+    if (!res) {
+      return
+    }
     res.status(statusCode)
     res.format({
       json: function () {
@@ -81,7 +90,7 @@ var DeveloperHandler = {
         }
         resolve({
           username,
-          token: token
+          token
         })
       })
     })
@@ -102,11 +111,12 @@ var DeveloperHandler = {
       } else {
         this.client.get(req.query.username, (err, redisResp) => {
           let response = {}
-          response = getResponse(err, res, req, redisResp, resolve, reject)
+          response = getResponse(err, res, req, redisResp)
           if (response.resolve) {
             resolve(response.resolve)
+          } else {
+            reject(response.reject)
           }
-          reject(response.reject)
         })
       }
     })
@@ -122,14 +132,13 @@ var DeveloperHandler = {
       const username = req.body.developer.username
       const token = req.body.developer.token
       this.client.set(username, token, (err, redisResp) => {
-        if (res) {
-          if (err) {
-            DeveloperHandler.setErrorResponse(res, err, 404)
-          } else {
-            DeveloperHandler.setStandardResponse(res, username, token)
-          }
+        if (err) {
+          DeveloperHandler.setErrorResponse(res, err, 404)
+          reject(err)
+        } else {
+          DeveloperHandler.setStandardResponse(res, username, token)
+          resolve(redisResp)
         }
-        resolve(err)
       })
     })
   },
@@ -143,14 +152,16 @@ var DeveloperHandler = {
     return new Promise((resolve, reject) => {
       if (req.params.username === undefined) {
         DeveloperHandler.setErrorResponse(res, 'Request must be in parameters', 500)
+        reject('Request must be in parameters')
       } else {
         this.client.del(req.params.username, (err, redisResp) => {
           if (err) {
             DeveloperHandler.setErrorResponse(res, err, 404)
+            reject(err)
           } else {
             DeveloperHandler.setStandardResponse(res, req.params.username, 'TokenWasDeleted')
+            resolve(redisResp)
           }
-          resolve(err)
         })
       }
     })
@@ -172,27 +183,19 @@ function getKeysResponse (err, res, keys) {
 
 function getResponse (err, res, req, redisResp) {
   if (err) {
-    if (res) {
-      DeveloperHandler.setErrorResponse(res, err, 404)
-    }
+    DeveloperHandler.setErrorResponse(res, err, 404)
     return {reject: err}
   } else if (redisResp === null) {
-    if (res) {
-      DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. ' +
+    DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. ' +
                                            'Please make sure that you are signed up as an authorized ' +
                                            'ciena developer on www.cienadevelopers.com', USERNAME_DOES_NOT_EXIST)
-    }
     return {reject: 'This username does not exist: ' + req.query.username}
   } else if (req.query.token === '' || req.query.token === redisResp) {
-    if (res) {
-      DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
-    }
+    DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
     return {resolve: req.query.token}
   } else {
-    if (res) {
-      DeveloperHandler.setErrorResponse(res, `The token submitted does
+    DeveloperHandler.setErrorResponse(res, `The token submitted does
        not match the token returned.`, TOKEN_DOES_NOT_EXIST)
-    }
     return {reject: 'The token submitted does not match the token returned.'}
   }
 }

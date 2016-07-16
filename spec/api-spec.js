@@ -2,16 +2,9 @@
 const server = require('../handlers/developers-handler.js')
 const redis = require('redis')
 
-var redisResponse = ''
-
 const res = {
   status: jasmine.createSpy('status'),
-  format: jasmine.createSpy('format'),
-  json: function (redisResp) {
-    if (redisResp !== undefined) {
-      redisResponse = redisResp
-    }
-  }
+  format: jasmine.createSpy('format')
 }
 
 var db = new Map()
@@ -23,25 +16,16 @@ var db = new Map()
  */
 function set (username, token) {
   db.set(username, token)
-  res.json('OK')
 }
 
 /**
  * Mocks the redis get command
  * @param {string} username - The username of a developer
+ * @returns {String} - The token of the developer
  */
 function get (username) {
   const token = db.get(username)
-  if (token !== undefined) {
-    res.json(token)
-  } else {
-    res.json(
-      {
-        error: 'The username provided does not match any username. ' +
-        'Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'
-      }
-    )
-  }
+  return token
 }
 
 function getAll () {
@@ -50,29 +34,46 @@ function getAll () {
 
 /**
  * Mocks the redis del command
- * @param {string} username - The username of the developer
+ * @param {String} username - The username of the developer
+ * @returns {Object} - The username, token pair, where the token is replaced by a custom string
+ * indicating it has been deleted
  */
 function remove (username) {
-  db.delete(username)
-  res.json('OK')
+  const ret = {
+    username,
+    token: 'TokenWasDeleted'
+  }
+  if (db.delete(username)) {
+    return ret
+  }
+  return null
 }
 
 beforeEach(() => {
   spyOn(redis, 'createClient').and.returnValue({
     get: function (username, cb) {
-      get(username)
-      if (redisResponse.error !== undefined) {
-        cb(redisResponse.error)
+      const token = get(username)
+      if (!token) {
+        cb({
+          error: 'The username provided does not match any username. ' +
+          'Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'
+        })
       }
-      cb(null)
+      cb(null, get(username))
     },
     set: function (username, token, cb) {
       set(username, token)
-      cb(null)
+      cb(null, {
+        username,
+        token
+      })
     },
     del: function (username, cb) {
-      remove(username)
-      cb(null)
+      const pair = remove(username)
+      if (!pair) {
+        cb('User Does Not Exist')
+      }
+      cb(null, pair)
     },
     keys: function (key, cb) {
       if (key.toString() === '*') {
@@ -96,17 +97,16 @@ describe('Post Requests', () => {
       }
     }
     server.post(req, res)
-      .then((err) => {
-        if (err) {
-          done.fail(err)
-        } else {
-          expect(res.status).toHaveBeenCalledWith(200)
-          expect(res.format).toHaveBeenCalledWith({
-            json: jasmine.any(Function)
-          })
-          expect(redisResponse).toEqual('OK')
-          done()
-        }
+      .then((result) => {
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.format).toHaveBeenCalledWith({
+          json: jasmine.any(Function)
+        })
+        expect(result).toEqual(req.body.developer)
+        done()
+      })
+      .catch((err) => {
+        done.fail(err)
       })
   })
 })
@@ -123,38 +123,35 @@ describe('Get Requests', () => {
       }
     }
     server.post(reqPost, res)
-      .then((err) => {
-        if (err) {
-          done.fail(err)
-        } else {
-          expect(res.status).toHaveBeenCalledWith(200)
-          server.get(reqGet, res)
-            .then((err) => {
-              if (err) {
-                done.fail(err)
-              } else {
-                expect(res.status).toHaveBeenCalledWith(200)
-                expect(res.format).toHaveBeenCalledWith({
-                  json: jasmine.any(Function)
-                })
-                expect(redisResponse).toEqual('acompletelynewandoriginaltoken')
-                done()
-              }
+      .then((result) => {
+        expect(res.status).toHaveBeenCalledWith(200)
+        server.get(reqGet, res)
+          .then((result) => {
+            expect(res.status).toHaveBeenCalledWith(200)
+            expect(res.format).toHaveBeenCalledWith({
+              json: jasmine.any(Function)
             })
-        }
+            expect(result).toEqual(reqPost.body.developer.token)
+            done()
+          }).catch((rej) => {
+            done.fail(rej)
+          })
       })
   })
 
   it('should indicate that a username does not exist', (done) => {
     const req = {query: {username: 'testrandomperson', token: 'acompletelynewandoriginaltoken'}}
     server.get(req, res)
-      .then((err) => {
-        expect(err).not.toBe(null)
-        expect(res.status).toHaveBeenCalledWith(500)
+      .then((result) => {
+        done.fail(result)
+      })
+      .catch((errResult) => {
+        expect(errResult).not.toBe(null)
+        expect(res.status).toHaveBeenCalledWith(520)
         expect(res.format).toHaveBeenCalledWith({
           json: jasmine.any(Function)
         })
-        expect(redisResponse).toEqual({
+        expect(errResult).toEqual({
           error: 'The username provided does not match any username. ' +
           'Please make sure that you are signed up as an authorized ciena developer on www.cienadevelopers.com'
         })
@@ -173,17 +170,16 @@ describe('Get Requests', () => {
       }
     }
     server.post(reqPost, res)
-      .then((err) => {
-        if (err) {
-          done.fail(err)
-        } else {
-          expect(res.status).toHaveBeenCalledWith(200)
-          server.getValue(key.username)
-            .then((res) => {
-              expect(res.username).toEqual(key.username)
-              done()
-            })
-        }
+      .then((result) => {
+        expect(res.status).toHaveBeenCalledWith(200)
+        server.getValue(key.username)
+          .then((res) => {
+            expect(res.username).toEqual(key.username)
+            done()
+          })
+      })
+      .catch((err) => {
+        done.fail(JSON.stringify(err, null, 2))
       })
   })
 
@@ -213,25 +209,23 @@ describe('Get Requests', () => {
       }
     )
     server.post(reqPost1, res)
-      .then((err) => {
-        if (err) {
-          done.fail(err)
-        } else {
-          expect(res.status).toHaveBeenCalledWith(200)
-          server.post(reqPost2, res)
-            .then((err) => {
-              if (err) {
-                done.fail(err)
-              } else {
-                expect(res.status).toHaveBeenCalledWith(200)
-                server.get({query: {queryAll: 1}})
-                  .then((res) => {
-                    expect(res).toEqual(getAll())
-                    done()
-                  })
-              }
-            })
-        }
+      .then((result) => {
+        expect(res.status).toHaveBeenCalledWith(200)
+        server.post(reqPost2, res)
+          .then((result) => {
+            expect(res.status).toHaveBeenCalledWith(200)
+            server.get({query: {queryAll: 1}})
+              .then((res) => {
+                expect(res).toEqual(getAll())
+                done()
+              })
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
+      })
+      .catch((err) => {
+        done.fail(err)
       })
   })
 })
@@ -253,34 +247,38 @@ describe('Delete Requests', () => {
       }
     }
     server.post(reqPost, res)
-      .then((err) => {
-        if (err) {
-          done.fail(err)
-        } else {
-          expect(res.status).toHaveBeenCalledWith(200)
-          server.delete(reqDelete, res)
-            .then((err) => {
-              if (err) {
-                done.fail(err)
-              } else {
-                expect(res.status).toHaveBeenCalledWith(200)
-                server.get(reqGet, res)
-                  .then((err) => {
-                    expect(err).not.toBe(null)
-                    expect(res.status).toHaveBeenCalledWith(500)
-                    expect(res.format).toHaveBeenCalledWith({
-                      json: jasmine.any(Function)
-                    })
-                    expect(redisResponse).toEqual({
-                      error: 'The username provided does not match any username. ' +
-                      'Please make sure that you are signed up as an authorized ' +
-                      'ciena developer on www.cienadevelopers.com'
-                    })
-                    done()
-                  })
-              }
-            })
-        }
+      .then((result) => {
+        expect(res.status).toHaveBeenCalledWith(200)
+        server.delete(reqDelete, res)
+          .then((result) => {
+            expect(res.status).toHaveBeenCalledWith(200)
+            server.get(reqGet, res)
+              .then((result) => {
+                console.log('1')
+                done.fail(JSON.stringify(result, null, 2))
+              })
+              .catch((errResult) => {
+                expect(errResult).not.toBe(null)
+                expect(res.status).toHaveBeenCalledWith(520)
+                expect(res.format).toHaveBeenCalledWith({
+                  json: jasmine.any(Function)
+                })
+                expect(errResult).toEqual({
+                  error: 'The username provided does not match any username. ' +
+                  'Please make sure that you are signed up as an authorized ' +
+                  'ciena developer on www.cienadevelopers.com'
+                })
+                done()
+              })
+          })
+          .catch((err) => {
+            console.log('2')
+            done.fail(JSON.stringify(err, null, 2))
+          })
+      })
+      .catch((err) => {
+        console.log('3')
+        done.fail(JSON.stringify(err, null, 2))
       })
   })
 })

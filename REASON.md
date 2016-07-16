@@ -16,6 +16,8 @@ and those reasons are reflected in the single query param in the url.
   * This means the username provided does not exist on the backend db. The developer must sign up using their GitHub credentials
 6. reason = 6
   * This means the user tried to access the denied page with a reason parameter.
+7. reason = 7
+  * This means something failed when posting. See handlers/github-api-handlers.js for an example of reason = 7
 6. reason = 0
   * Something has gone wrong on the backend. View `/app/routes/contract.js' for an example of reason = 0
 

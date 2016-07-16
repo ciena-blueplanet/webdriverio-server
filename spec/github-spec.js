@@ -5,12 +5,13 @@ const repoPagesDB = require('./mocks/getPageOfRepos')
 const repoDB1 = require('./mocks/getRepoByID.1')
 const repoDB2 = require('./mocks/getRepoByID.2')
 const githubAPI = require('../handlers/github-api-handler')
+const DeveloperHandler = require('../handlers/developers-handler')
 const GitHubAPI = require('github')
 
 const github = new GitHubAPI()
 
 describe('Github API Testing', function () {
-  let redirectLocation, response
+  let response
   beforeEach(function () {
     spyOn(github.activity, 'getEventsForUserPublic').and.callFake(
       function (obj, cb) {
@@ -28,10 +29,8 @@ describe('Github API Testing', function () {
         }
       }
     )
-    redirectLocation = ''
     response = {
       redirect: function (location) {
-        redirectLocation = location
       }
     }
   })
@@ -106,9 +105,12 @@ describe('Github API Testing', function () {
           }
         )
       })
-      it('should redirect to the denied page', function () {
+      it('should redirect to the denied page', function (done) {
         githubAPI.checkNumberRepos(github, response)
-        expect(redirectLocation).toEqual('/#/auth/denied')
+          .then((location) => {
+            expect(location).toEqual('/#/auth/denied?reason=2')
+            done()
+          })
       })
     })
 
@@ -119,11 +121,16 @@ describe('Github API Testing', function () {
             cb(null, numReposDB2)
           }
         )
+        spyOn(DeveloperHandler, 'post').and.callFake(function (req) {
+          return Promise.resolve()
+        })
       })
 
-      it('should redirect to the contract page', function () {
-        githubAPI.checkNumberRepos(github, response)
-        expect(redirectLocation).toEqual('/#/auth/contract')
+      it('should redirect to the contract page', function (done) {
+        githubAPI.checkNumberRepos(github, response, 'pastorsj').then((location) => {
+          expect(location).toEqual('/#/auth/contract?username=pastorsj')
+          done()
+        })
       })
     })
   })
@@ -137,7 +144,11 @@ describe('Github API Testing', function () {
           })
         }
       )
-      spyOn(githubAPI, 'checkNumberRepos')
+      spyOn(githubAPI, 'checkNumberRepos').and.callFake(
+        function () {
+          return Promise.resolve()
+        }
+      )
       githubAPI.verify(github, response, 'pastorsj', 0).then(() => {
         done()
       })

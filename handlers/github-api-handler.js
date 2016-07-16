@@ -9,6 +9,7 @@ const REPOS_OWNED = 2
 const PAGES_TO_QUERY = 3
 const NOT_ENOUGH_PERSONAL_REPOS = 2
 const NOT_ENOUGH_PUBLIC_REPOS = 3
+const POST_FAILED = 7
 const githubAPI = {
   /**
    * Removes duplicate items (repositories) from an array by creating a set from the array
@@ -99,34 +100,41 @@ const githubAPI = {
    * @param {Object} res - The result object, allowing either the user to be redirected to a denied access
    * @param {String} user - The username of the account being analysed
    * page or a contract/success page
+   * @returns {Promise} - Returns a promise that either resolves to a url or an error
    */
   checkNumberRepos: function (github, res, user) {
-    github.repos.getAll({
-    }, (err, result) => {
-      if (err) {
-        throw err
-      }
-      let total = _.reduce(result, (sum, repo) => {
-        if (!repo.fork) {
-          return ++sum
+    return new Promise((resolve, reject) => {
+      github.repos.getAll({
+      }, (err, result) => {
+        if (err) {
+          reject(err)
         }
-        return sum
-      }, 0)
-      if (total < REPOS_OWNED) {
-        res.redirect('/#/auth/denied?reason=' + NOT_ENOUGH_PERSONAL_REPOS)
-      } else {
-        const req = {
-          body: {
-            developer: {
-              username: user,
-              token: '!'
+        let total = _.reduce(result, (sum, repo) => {
+          if (!repo.fork) {
+            return ++sum
+          }
+          return sum
+        }, 0)
+        if (total < REPOS_OWNED) {
+          resolve('/#/auth/denied?reason=' + NOT_ENOUGH_PERSONAL_REPOS)
+        } else {
+          const req = {
+            body: {
+              developer: {
+                username: user,
+                token: '!'
+              }
             }
           }
+          DeveloperHandler.post(req).then(() => {
+            resolve('/#/auth/contract?username=' + user)
+          }).catch((err) => {
+            if (err) {
+              resolve('/#/auth/denied?reason=' + POST_FAILED)
+            }
+          })
         }
-        DeveloperHandler.post(req).then(() => {
-          res.redirect('/#/auth/contract?username=' + user)
-        })
-      }
+      })
     })
   },
   /**
@@ -153,6 +161,12 @@ const githubAPI = {
         res.redirect('/#/auth/denied?reason=' + NOT_ENOUGH_PUBLIC_REPOS)
       } else {
         githubAPI.checkNumberRepos(github, res, user)
+          .then((output) => {
+            res.redirect(output)
+          })
+          .catch((err) => {
+            console.error(err)
+          })
       }
     })
   }
