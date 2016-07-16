@@ -66,8 +66,6 @@ app.use('/developers', developers)
 //                          The main method
 // ==================================================================
 
-let done = false
-
 app.use(multer({
   dest: path.join(__dirname, '..', 'uploads'),
   rename: function (fieldname, filename) {
@@ -78,7 +76,6 @@ app.use(multer({
   },
   onFileUploadComplete: function (file) {
     debug(file.fieldname + ' uploaded to  ' + file.path)
-    done = true
   }
 }))
 
@@ -98,19 +95,6 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
 app.use('/', express.static(path.join(__dirname, '..', '/dist')))
 
 app.post('/', function (req, res) {
-  if (done) {
-    const filename = req.files.tarball.name
-    const entryPoint = req.body['entry-point'] || 'demo'
-    const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-    processUpload.newFile(filename, entryPoint, testsFolder, res)
-  }
-})
-
-// ==================================================================
-//                   Configuration Settings
-// ==================================================================
-
-app.get('/authconfig', function (req, res) {
   if (!req.headers) {
     res.send('Error: Headers do not exist')
     res.end()
@@ -125,18 +109,27 @@ app.get('/authconfig', function (req, res) {
     }
     if (!username || !token) {
       res.send(`Your config.json file must contain a valid username and token.\n
-       Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
+      Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
       res.end()
     } else {
-      DeveloperHandler.get(request).then((redisResponse) => {
-        res.send(redisResponse)
-        res.end()
+      DeveloperHandler.get(request).then(() => {
+        const filename = req.files.tarball.name
+        const entryPoint = req.body['entry-point'] || 'demo'
+        const testsFolder = req.body['tests-folder'] || 'tests/e2e'
+        processUpload.newFile(filename, entryPoint, testsFolder, res)
       }).catch((err) => {
         res.send(err)
         res.end()
       })
     }
   }
+})
+
+// ==================================================================
+//                   Configuration Settings
+// ==================================================================
+
+app.get('/authconfig', function (req, res) {
 })
 
 app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')))
