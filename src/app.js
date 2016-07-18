@@ -16,6 +16,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const User = require('../models/user')
 const md5 = require('blueimp-md5')
+const session = require('express-session')
 
 const app = express()
 
@@ -51,12 +52,13 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use(require('express-session')({
+app.use(session({
   secret: 'random-secret1025',
   resave: false,
   saveUninitialized: false
 }))
 app.use(passport.initialize())
+
 app.use(passport.session())
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -206,6 +208,11 @@ passport.use(new LocalStrategy((username, password, done) => {
 }))
 
 app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err)
+    }
+  })
   req.logout()
   res.end()
 })
