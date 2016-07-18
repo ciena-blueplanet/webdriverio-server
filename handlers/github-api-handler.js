@@ -34,7 +34,7 @@ const githubAPI = {
         id: repoInformation.repo.id
       }, (err, result) => {
         if (err) {
-          throw err
+          reject(err)
         }
         if (result.owner.login !== user) {
           resolve({
