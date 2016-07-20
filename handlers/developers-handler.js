@@ -4,8 +4,6 @@
  * https://github.com/NodeRedis/node_redis
  */
 const redis = require('redis') // redis connection
-const USERNAME_DOES_NOT_EXIST = 510
-const TOKEN_DOES_NOT_EXIST = 520
 
 var DeveloperHandler = {
   /**
@@ -110,9 +108,11 @@ var DeveloperHandler = {
         })
       } else {
         this.client.get(req.query.username, (err, redisResp) => {
-          let response = {}
-          response = getResponse(err, res, req, redisResp)
-          if (response.resolve) {
+          if (err) {
+            reject(err)
+          }
+          let response = getResponse(err, res, req, redisResp)
+          if (response.resolve || response.resolve === '') {
             resolve(response.resolve)
           } else {
             reject(response.reject)
@@ -188,14 +188,14 @@ function getResponse (err, res, req, redisResp) {
   } else if (redisResp === null) {
     DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. ' +
                                            'Please make sure that you are signed up as an authorized ' +
-                                           'ciena developer on www.cienadevelopers.com', USERNAME_DOES_NOT_EXIST)
+                                           'ciena developer on www.cienadevelopers.com', 500)
     return {reject: 'This username does not exist: ' + req.query.username}
   } else if (req.query.token === '' || req.query.token === redisResp) {
     DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
     return {resolve: req.query.token}
   } else {
     DeveloperHandler.setErrorResponse(res, `The token submitted does
-       not match the token returned.`, TOKEN_DOES_NOT_EXIST)
+       not match the token returned.`, 500)
     return {reject: 'The token submitted does not match the token returned.'}
   }
 }

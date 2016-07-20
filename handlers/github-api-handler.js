@@ -100,9 +100,10 @@ const githubAPI = {
    * @param {Object} res - The result object, allowing either the user to be redirected to a denied access
    * @param {String} user - The username of the account being analysed
    * page or a contract/success page
+   * @param {Object} req - The initial request object contain the encrypted session variable
    * @returns {Promise} - Returns a promise that either resolves to a url or an error
    */
-  checkNumberRepos: function (github, res, user) {
+  checkNumberRepos: function (github, res, user, req) {
     return new Promise((resolve, reject) => {
       github.repos.getAll({
       }, (err, result) => {
@@ -118,19 +119,49 @@ const githubAPI = {
         if (total < REPOS_OWNED) {
           resolve('/#/auth/denied?reason=' + NOT_ENOUGH_PERSONAL_REPOS)
         } else {
-          const req = {
-            body: {
-              developer: {
-                username: user,
-                token: '!'
-              }
+          const reqGet = {
+            query: {
+              username: user,
+              token: ''
             }
           }
-          DeveloperHandler.post(req).then(() => {
-            resolve('/#/auth/contract?username=' + user)
-          }).catch((err) => {
-            if (err) {
-              resolve('/#/auth/denied?reason=' + POST_FAILED)
+          DeveloperHandler.get(reqGet).then((result) => {
+            if (result === '') {
+              resolve('/#/auth/denied?reason=4')
+            } else {
+              resolve('/#/auth/denied?reason=0')
+            }
+          })
+          .catch((err) => {
+            if (err === 'This username does not exist: ' + user) {
+              const reqPost = {
+                body: {
+                  developer: {
+                    username: user,
+                    token: '!'
+                  }
+                }
+              }
+              DeveloperHandler.post(reqPost).then(() => {
+                resolve('/#/auth/contract')
+              })
+              .catch((err) => {
+                if (err) {
+                  req.session.destroy((err) => {
+                    if (err) {
+                      console.error(err)
+                    }
+                  })
+                  resolve('/#/auth/denied?reason=' + POST_FAILED)
+                }
+              })
+            } else {
+              req.session.destroy((err) => {
+                if (err) {
+                  console.error(err)
+                }
+              })
+              resolve('/#/auth/denied?reason=0')
             }
           })
         }
@@ -145,9 +176,10 @@ const githubAPI = {
    * page or a contract/success page
    * @param {String} user - The owner of the account being validated
    * @param {Number} reviewStartTime - The current time minus 6 months, for now
+   * @param {Object} req - The initial request object containing the encrypted session variable
    * @returns {Promise} - The set of promises containing the results of the query for pages of repos
    */
-  verify: function (github, res, user, reviewStartTime) {
+  verify: function (github, res, user, reviewStartTime, req) {
     const pages = PAGES_TO_QUERY
     let eventPSet = []
     for (let i = 0; i < pages; i++) {
@@ -158,9 +190,14 @@ const githubAPI = {
         return sum + n.total
       }, 0)
       if (total < REPOS_CONTRIBUTED_TO) {
+        req.session.destroy((err) => {
+          if (err) {
+            console.error(err)
+          }
+        })
         res.redirect('/#/auth/denied?reason=' + NOT_ENOUGH_PUBLIC_REPOS)
       } else {
-        githubAPI.checkNumberRepos(github, res, user)
+        githubAPI.checkNumberRepos(github, res, user, req)
           .then((output) => {
             res.redirect(output)
           })

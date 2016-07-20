@@ -11,12 +11,11 @@ describeModule(
     unit: true
   },
   function () {
-    let route, sandbox, store
+    let route, sandbox
 
     beforeEach(function () {
       sandbox = sinon.sandbox.create()
       route = this.subject()
-      store = route.get('store')
     })
 
     afterEach(function () {

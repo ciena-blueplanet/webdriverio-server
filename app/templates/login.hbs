@@ -23,8 +23,11 @@
                         </td>
                     </tr>
                 </table>
-                <div class='login-result'>
-                </div>
+                {{#if loginResult}}
+                    <div class='login-result'>
+                        Authentication Failed
+                    </div>
+                {{/if}}
                 <div class='login-button'>
                     <button class='medium frost-button primary' type="submit">Log in</button>
                 </div>

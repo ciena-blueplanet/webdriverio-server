@@ -8,12 +8,23 @@ export default Ember.Route.extend({
       refreshModel: true
     }
   },
+  /**
+   * This function will return whether the reason why
+   * the developer was denied access to the server
+   * @param {Object} params - Contains the reason paramter
+   * @returns {Number} - The reason why a developer why denied access
+   */
   model: function (params) {
     if (params.reason) {
       return params.reason
     }
     return NO_REASON
   },
+  /**
+   * Details on the DOM why the developer was denied
+   * @param {Object} controller - The ember object representing the controller
+   * @param {Number} model - The reason why the developer was denied access to the server
+   */
   setupController: function (controller, model) {
     controller.set('reason', model)
     switch (model) {

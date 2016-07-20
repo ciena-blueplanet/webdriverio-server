@@ -12,11 +12,10 @@ describeModule(
   },
   function () {
     // Replace this with your real tests.
-    let controller, sandbox, store
+    let controller, sandbox
     beforeEach(function () {
       sandbox = sinon.sandbox.create()
       controller = this.subject()
-      store = controller.get('store')
     })
 
     afterEach(function () {
@@ -51,73 +50,59 @@ describeModule(
     })
 
     describe('submitForm()', function () {
-      let returnVal
       let record = {
-        label: 'test',
-        value: 'test-token'
+        username: 'pastorsj',
+        token: 'itsarandomthirtycharactertoken'
       }
 
-      beforeEach(function () {
-        returnVal = {
-          username: record.label
-        }
-        controller.set('info', returnVal)
-      })
-
-      describe('Creation is successful', function () {
+      describe('Successful, no redirect Case', function () {
         beforeEach(function () {
-          sandbox.stub(store, 'createRecord', () => {
-            return Ember.Object.create({
-              username: record.label,
-              save: sandbox.spy(() => {
-                return Ember.RSVP.resolve(returnVal)
-              })
-            })
+          sandbox.stub(Ember.$, 'post', (route, cb) => {
+            cb(record)
           })
           controller.actions.submitForm.call(controller)
-          controller.set('username', record.label)
+        })
+        it('should set the username as the username property', function () {
+          expect(controller.get('username')).to.equal(record.username)
         })
 
-        describe('Resolve Case', function () {
-          it('Makes sure that the token has a length of 30', function () {
-            expect(store.createRecord.lastCall.args[1].token.length).to.equal(30)
-          })
+        it('should set the token as the token property', function () {
+          expect(controller.get('token')).to.equal(record.token)
+        })
 
-          it('Makes sure that the first argument passed into the createRecord is the developer model', function () {
-            expect(store.createRecord.lastCall.args[0]).to.equal('developer')
-          })
-
-          it('should set the username as the username property', function () {
-            expect(controller.get('username')).to.equal(record.label)
-          })
-
-          it('should set the token as the token property', function () {
-            expect(controller.get('token').length).to.equal(30)
-          })
+        it('should make a post call with the correct arguments', function () {
+          expect(Ember.$.post.lastCall.args[0]).to.equal('/auth/contract')
         })
       })
 
-      describe('Reject Case', function () {
+      describe('Redirect Case', function () {
         beforeEach(function () {
-          sandbox.stub(store, 'createRecord', () => {
-            return Ember.Object.create({
-              username: returnVal.username,
-              save: sandbox.spy(() => {
-                return Ember.RSVP.reject('Error')
-              })
-            })
+          sandbox.stub(Ember.$, 'post', (route, cb) => {
+            cb({redirect: '/#/auth/denied?reason=1'})
+          })
+          sandbox.stub(controller, 'transitionToRoute')
+          controller.actions.submitForm.call(controller)
+        })
+        it('should call transitionToRoute with the correct arguments', function () {
+          expect(controller.transitionToRoute.lastCall.args[0]).to.equal('auth.denied')
+          expect(controller.transitionToRoute.lastCall.args[1]).to.eql({queryParams: {reason: '1'}})
+        })
+
+        it('should make a post call with the correct arguments', function () {
+          expect(Ember.$.post.lastCall.args[0]).to.equal('/auth/contract')
+        })
+      })
+
+      describe('Failure Case', function () {
+        beforeEach(function () {
+          sandbox.stub(Ember.$, 'post', (route, cb) => {
+            cb()
           })
           sandbox.stub(Ember.Logger, 'debug')
-          sandbox.stub(window, 'alert')
           controller.actions.submitForm.call(controller)
         })
-
-        it('should call the debug function once when the promise reaches the catch statement', function () {
+        it('should indicate an error occured', function () {
           expect(Ember.Logger.debug.callCount).to.equal(1)
-        })
-
-        it('should call the alert function once when the promise reaches the catch statement', function () {
-          expect(window.alert.callCount).to.equal(1)
         })
       })
     })

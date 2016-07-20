@@ -11,6 +11,8 @@ and those reasons are reflected in the single query param in the url.
 | 5  |This means the username provided does not exist on the backend db. The developer must sign up using their GitHub credentials  |
 | 6  |This means the user tried to access the denied page with a reason parameter.  |
 | 7  |This means something failed when posting. See handlers/github-api-handlers.js for an example of reason = 7  |
+| 8  |The github api failed |
+| 9  |The session expired or the session's username did not exist at the time of the requests  |
 | 0  |Something has gone wrong on the backend. View `/app/routes/contract.js' for an example of reason = 0  |
 
 ## Sample url with the reason attached

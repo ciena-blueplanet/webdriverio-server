@@ -4,8 +4,6 @@ import {
   it
 } from 'ember-mocha'
 
-const jQueryPrototype = Object.getPrototypeOf($('body'))
-
 describeModule(
   'route:login',
   'LoginRoute',
@@ -13,37 +11,37 @@ describeModule(
     unit: true
   },
   function () {
-    let route, sandbox
+    let route, sandbox, params
     beforeEach(function () {
       sandbox = sinon.sandbox.create()
       route = this.subject()
-      sandbox.stub(jQueryPrototype, 'text')
+      params = {
+        failure: 1
+      }
     })
 
     afterEach(function () {
       sandbox.restore()
     })
     describe('model()', function () {
-      let params
-      describe('Failed Authentication', function () {
-        beforeEach(function () {
-          params = {
-            failure: 1
-          }
-          route.model(params)
-        })
-        it('should update the login-result text', function () {
-          expect(jQueryPrototype.text.firstCall.args[0]).to.equal('Authentication Failed')
-        })
+      it('should return the params passed in', function () {
+        expect(route.model(params)).to.eql(params)
       })
-      describe('No Params', function () {
-        beforeEach(function () {
-          params = {}
-          route.model(params)
-        })
-        it('should not update the login-result text', function () {
-          expect(jQueryPrototype.text.callCount).to.equal(0)
-        })
+    })
+    describe('setupController()', function () {
+      let controller
+      beforeEach(function () {
+        controller = Ember.A()
+      })
+
+      it('should set loginResult to true', function () {
+        route.setupController(controller, params)
+        expect(controller.get('loginResult')).to.equal(true)
+      })
+
+      it('should set loginResult to false', function () {
+        route.setupController(controller, {})
+        expect(controller.get('loginResult')).to.equal(false)
       })
     })
   }

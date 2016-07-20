@@ -12,161 +12,53 @@ describeModule(
     needs: ['model:developer']
   },
   function () {
-    let route, sandbox, store
+    let route, sandbox
 
     beforeEach(function () {
       sandbox = sinon.sandbox.create()
+
       route = this.subject()
-      store = route.get('store')
     })
 
     afterEach(function () {
       sandbox.restore()
     })
 
-    describe('model()', function () {
-      let params = {
-        username: 'test-user'
-      }
-      beforeEach(function () {
-        sandbox.stub(Ember.Logger, 'debug')
-      })
-      describe('Resolve Case', function () {
+    describe('beforeModel()', function () {
+      describe('Redirect Case', function () {
         beforeEach(function () {
-          sandbox.stub(store, 'queryRecord', () => {
-            const returnValue = Ember.Object.create(params)
-            return Ember.RSVP.resolve(returnValue)
+          sandbox.stub(Ember.$, 'get', (route, cb) => {
+            cb({redirect: '/#/auth/denied?reason=1'})
           })
-          route.model(params)
+          sandbox.stub(route, 'transitionTo')
+          route.beforeModel()
         })
-        it('Makes sure that the username is the same as the parameters username', function () {
-          expect(store.queryRecord.lastCall.args[1].username).to.equal(params.username)
-        })
-
-        it('Makes sure that the token is the bang character', function () {
-          expect(store.queryRecord.lastCall.args[1].token).to.equal('!')
+        it('should use a jquery request to check whether the session exists', function () {
+          expect(Ember.$.get.lastCall.args[0]).to.equal('/session')
         })
 
-        it('Makes sure that the first argument passed into the queryRecord is the developer model', function () {
-          expect(store.queryRecord.lastCall.args[0]).to.equal('developer')
+        it('should attempt to redirect to auth.denied with query params of {reason: 1}', function () {
+          expect(route.transitionTo.lastCall.args[0]).to.equal('auth.denied')
+          expect(route.transitionTo.lastCall.args[1]).to.eql({queryParams: {reason: '1'}})
         })
       })
 
-      describe('Reject Case', function () {
-        let err
-        describe('Reason 5', function () {
-          beforeEach(function () {
-            err = {
-              errors: [
-                {
-                  status: '510'
-                }
-              ]
-            }
-            sandbox.stub(store, 'queryRecord', () => {
-              const error = Ember.Object.create(err)
-              return Ember.RSVP.reject(error)
-            })
-            sandbox.stub(route, 'transitionTo')
-            route.model(params)
+      describe('No redirection Case', function () {
+        beforeEach(function () {
+          sandbox.stub(Ember.$, 'get', (route, cb) => {
+            cb()
           })
-
-          it('transitionTo should be called once', function () {
-            expect(route.transitionTo.callCount).to.equal(1)
-          })
-
-          it('should transition to the denied route', function () {
-            expect(route.transitionTo.lastCall.args[0]).to.equal('auth.denied')
-          })
-
-          it('should transition to the denied route with reason = 5', function () {
-            expect(route.transitionTo.lastCall.args[1]).to.eql({queryParams: {reason: 5}})
-          })
+          sandbox.stub(route, 'transitionTo')
+          route.beforeModel()
+        })
+        it('should use a jquery request to check whether the session exists', function () {
+          expect(Ember.$.get.lastCall.args[0]).to.equal('/session')
         })
 
-        describe('Reason 4', function () {
-          beforeEach(function () {
-            err = {
-              errors: [
-                {
-                  status: '520'
-                }
-              ]
-            }
-            sandbox.stub(store, 'queryRecord', () => {
-              const error = Ember.Object.create(err)
-              return Ember.RSVP.reject(error)
-            })
-            sandbox.stub(route, 'transitionTo')
-            route.model(params)
-          })
-
-          it('transitionTo should be called once', function () {
-            expect(route.transitionTo.callCount).to.equal(1)
-          })
-
-          it('should transition to the denied route', function () {
-            expect(route.transitionTo.lastCall.args[0]).to.equal('auth.denied')
-          })
-
-          it('should transition to the denied route with reason = 4', function () {
-            expect(route.transitionTo.lastCall.args[1]).to.eql({queryParams: {reason: 4}})
-          })
-        })
-
-        describe('Reason 0', function () {
-          beforeEach(function () {
-            err = {
-              errors: [
-                {
-                  status: '500'
-                }
-              ]
-            }
-            sandbox.stub(store, 'queryRecord', () => {
-              const error = Ember.Object.create(err)
-              return Ember.RSVP.reject(error)
-            })
-            sandbox.stub(route, 'transitionTo')
-            route.model(params)
-          })
-
-          it('transitionTo should be called once', function () {
-            expect(route.transitionTo.callCount).to.equal(1)
-          })
-
-          it('should transition to the denied route', function () {
-            expect(route.transitionTo.lastCall.args[0]).to.equal('auth.denied')
-          })
-
-          it('should transition to the denied route with reason = 0', function () {
-            expect(route.transitionTo.lastCall.args[1]).to.eql({queryParams: {reason: 0}})
-          })
+        it('should not attempt to redirect', function () {
+          expect(route.transitionTo.callCount).to.equal(0)
         })
       })
-    })
-
-    describe('setupController()', function () {
-      let controller, model
-      beforeEach(function () {
-        model = {
-          username: 'test-user'
-        }
-        controller = Ember.Object.create()
-        route.setupController(controller, model)
-      })
-
-      it('should set the model to be the model parameter', function () {
-        expect(controller.get('model')).to.eql(model)
-      })
-
-      it('should set the username to model.username', function () {
-        expect(controller.get('username')).to.eql(model.username)
-      })
-    })
-
-    it('exists', function () {
-      expect(route).to.be.ok
     })
   }
 )

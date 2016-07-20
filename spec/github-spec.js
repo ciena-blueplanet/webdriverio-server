@@ -11,7 +11,7 @@ const GitHubAPI = require('github')
 const github = new GitHubAPI()
 
 describe('Github API Testing', function () {
-  let response
+  let response, req
   beforeEach(function () {
     spyOn(github.activity, 'getEventsForUserPublic').and.callFake(
       function (obj, cb) {
@@ -31,6 +31,11 @@ describe('Github API Testing', function () {
     )
     response = {
       redirect: function (location) {
+      }
+    }
+    req = {
+      session: {
+        destroy: function () {}
       }
     }
   })
@@ -132,7 +137,7 @@ describe('Github API Testing', function () {
         )
       })
       it('should redirect to the denied page', function (done) {
-        githubAPI.checkNumberRepos(github, response)
+        githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
           .then((location) => {
             expect(location).toEqual('/#/auth/denied?reason=2')
             done()
@@ -150,19 +155,69 @@ describe('Github API Testing', function () {
             cb(null, numReposDB2)
           }
         )
-        spyOn(DeveloperHandler, 'post').and.callFake(function (req) {
-          return Promise.resolve()
+      })
+      describe('Redirect to denied access', function () {
+        it('should deny access with reason 4', function (done) {
+          spyOn(DeveloperHandler, 'get').and.callFake(function (request) {
+            return Promise.resolve('')
+          })
+          githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/denied?reason=4')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
+        })
+
+        it('should deny access with reason 0', function (done) {
+          spyOn(DeveloperHandler, 'get').and.callFake(function (request) {
+            return Promise.resolve('some value')
+          })
+          githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/denied?reason=0')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
         })
       })
-
-      it('should redirect to the contract page', function (done) {
-        githubAPI.checkNumberRepos(github, response, 'pastorsj')
-        .then((location) => {
-          expect(location).toEqual('/#/auth/contract?username=pastorsj')
-          done()
+      describe('User does not exist', function () {
+        beforeEach(function () {
+          spyOn(DeveloperHandler, 'get').and.callFake(function (request) {
+            return Promise.reject('This username does not exist: pastorsj')
+          })
         })
-        .catch((err) => {
-          done.fail(err)
+        // TODO: What happened here?
+        it('should redirect to the contract page', function (done) {
+          spyOn(DeveloperHandler, 'post').and.callFake(function (request) {
+            return Promise.resolve()
+          })
+          githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/contract')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
+        })
+
+        it('should not redirect to the contract page', function (done) {
+          spyOn(DeveloperHandler, 'post').and.callFake(function (request) {
+            return Promise.reject('Error')
+          })
+          githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/denied?reason=7')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
         })
       })
     })

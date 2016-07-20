@@ -1,5 +1,5 @@
 import Ember from 'ember'
-import generateToken from '../../utils/generateToken'
+import parseAndRedirect from '../../utils/parseAndRedirect'
 
 export default Ember.Controller.extend({
   checked: false,
@@ -7,29 +7,31 @@ export default Ember.Controller.extend({
   disabled: true,
   token: '',
   actions: {
+    /**
+     * This is executed when the user clicks the checkbox
+     */
     onInputHandler: function () {
       this.set('checked', !this.get('checked'))
       this.set('disabled', !this.get('checked'))
     },
+    /**
+     * This is executed when the user accepts the contract. It will
+     * post to the /auth/contract route, which will generate a token and pass
+     * their username and token back in a json object
+     */
     submitForm: function () {
       this.set('confirmed', true)
-      const username = this.get('username')
-      const token = generateToken(30)
-      this.set('username', username)
-      this.set('token', token)
-      return this.get('store').createRecord('developer', {
-        username,
-        token
-      })
-      .save()
-      .then((res) => {
-        Ember.Logger.debug('For the user with this username: ' +
-                          username + ', their testing token is: ' +
-                          token)
-      })
-      .catch((err) => {
-        window.alert('An error has occured. Please contact the admin and give them this message:\n' + err)
-        Ember.Logger.debug('An error has occured! ' + err)
+      Ember.$.post('/auth/contract', (res) => {
+        if (!res) {
+          Ember.Logger.debug('An error has occured ' + res)
+        } else if (res.username && res.token) {
+          this.set('username', res.username)
+          this.set('token', res.token)
+        } else if (typeof res.redirect === 'string' && res.redirect.startsWith('/#/auth/denied?')) {
+          parseAndRedirect(res.redirect, this)
+        } else {
+          Ember.Logger.debug('An error has occured! ' + res)
+        }
       })
     }
   }
