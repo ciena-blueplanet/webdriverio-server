@@ -213,7 +213,6 @@ app.post('/auth/contract', function (req, res) {
   if (req.session && req.session.user) {
     const token = generateToken(30)
     const username = req.session.user
-    console.log(username)
     let request = {
       query: {
         username,
@@ -307,6 +306,19 @@ app.get('/portal', isAuthenticated, (req, res) => {
 
 app.post('/login', passport.authenticate('local', {successRedirect: '/#/portal', failureRedirect: '/#/login?failure=1'}), (req, res) => {
   res.redirect('/#/portal')
+})
+
+// ==================================================================
+//                        Denied Access Reasons
+// ==================================================================
+
+app.get('/auth/denied', (req, res) => {
+  let fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'reasons.json')))
+  if (!req.query || !req.query.reason) {
+    res.send(fileContents['reason0'])
+  } else {
+    res.send(fileContents['reason' + req.query.reason])
+  }
 })
 
 // ==================================================================

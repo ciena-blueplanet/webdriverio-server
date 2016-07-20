@@ -191,7 +191,6 @@ describe('Github API Testing', function () {
             return Promise.reject('This username does not exist: pastorsj')
           })
         })
-        // TODO: What happened here?
         it('should redirect to the contract page', function (done) {
           spyOn(DeveloperHandler, 'post').and.callFake(function (request) {
             return Promise.resolve()
