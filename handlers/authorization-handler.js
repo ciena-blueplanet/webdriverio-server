@@ -15,8 +15,7 @@ function generateToken (n) {
   }
 }
 
-const baseUrl = 'localhost:3000'
-// const deploymentURL = 'wdio.bp.cyaninc.com'
+const deploymentURL = 'wdio.bp.cyaninc.com'
 const MINIMUM_ACCOUNT_LIFETIME = 6
 
 function destroySession (req) {
@@ -43,7 +42,7 @@ const AuthorizationHandler = {
   get: function (req, res) {
     res.writeHead(303, {
       Location: this.OAuth2.getAuthorizeUrl({
-        'redirect_uri': 'http://' + baseUrl + '/auth/callback',
+        'redirect_uri': 'http://' + deploymentURL + '/auth/callback',
         scope: ''
       })
     })
