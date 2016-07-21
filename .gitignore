@@ -59,4 +59,4 @@ build/Release
 dist
 tmp
 .sass-cache
-workflow-screenshots
+config.json

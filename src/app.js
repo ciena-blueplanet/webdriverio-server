@@ -186,9 +186,9 @@ app.post('/login', passport.authenticate('local', {successRedirect: '/#/portal',
 app.get('/auth/denied', (req, res) => {
   let fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'reasons.json')))
   if (!req.query || !req.query.reason) {
-    res.send(fileContents['reason0'])
+    res.send(fileContents[0])
   } else {
-    res.send(fileContents['reason' + req.query.reason])
+    res.send(fileContents[req.query.reason])
   }
 })
 

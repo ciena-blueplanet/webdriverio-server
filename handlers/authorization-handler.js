@@ -1,6 +1,8 @@
 'use strict'
 const GitHubAPI = require('github')
 const oauth = require('oauth').OAuth2
+const fs = require('fs')
+const path = require('path')
 const OAuth = oauth
 const DeveloperHandler = require('../handlers/developers-handler.js')
 
@@ -15,7 +17,8 @@ function generateToken (n) {
   }
 }
 
-const deploymentURL = 'wdio.bp.cyaninc.com'
+const deploymentURL = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json'))).url
+
 const MINIMUM_ACCOUNT_LIFETIME = 6
 
 function destroySession (req) {

@@ -55,6 +55,16 @@ If the redis-cli returns 'No password set', retry the following steps above. If 
 #### Confirming the front end is running correctly
 Navigate to the server's name in the browser. The website should be displayed. If running on localhost, navigate to localhost:3000
 
+#### Configuring the Deployment URL
+When using requesting an Access token using the GitHub API, it requires the code to pass a redirection URL with the servers name.
+This is ignored on the webdriverio-server repository, but it is required when running the server. In the base directory create a config.json file containing
+
+```
+{
+  "url": "the-url-of-this-server"
+}
+```
+
 ## Sources
 [Git](https://help.ubuntu.com/lts/serverguide/git.html)  
 [X Virtual Frame Buffer](https://www.x.org/archive/X11R7.6/doc/man/man1/Xvfb.1.xhtml)  
