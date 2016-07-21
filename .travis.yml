@@ -6,8 +6,8 @@ branches:
   except:
   - /^v[0-9\.]+/
 before_install:
-- npm install -g coveralls pr-bumper
-- pr-bumper check
+- npm install -g coveralls
+# - pr-bumper check
 install:
 - npm install
 - bower install
