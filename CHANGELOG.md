@@ -1,3 +1,10 @@
+# 2.5.0
+* Added Passport authentication to protect routes and bolster login system
+* Updated contract route to include a `fake` contract and a way to generate a token for a developer
+* Customized denied route to include 5+ reasons why a user was denied access to the server
+* Enabled the ability for authenticated users to submit tar balls with e2e tests to the server using their GitHub username and token
+* Secured the backend from unauthorized people attempting to send malicious tarballs
+
 # 2.4.1
 * Fixed a path in a generate token test
 
