@@ -17,7 +17,12 @@ function generateToken (n) {
   }
 }
 
-const deploymentURL = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json'))).url
+let deploymentURL = ''
+try {
+  deploymentURL = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json'))).url
+} catch (e) {
+  deploymentURL = 'localhost:3000'
+}
 
 const MINIMUM_ACCOUNT_LIFETIME = 6
 
