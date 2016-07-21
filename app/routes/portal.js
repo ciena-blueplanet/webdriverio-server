@@ -2,8 +2,10 @@ import Ember from 'ember'
 
 export default Ember.Route.extend({
   beforeModel: function () {
-    if (!window._isAuthenticated_) {
-      this.transitionTo('login')
-    }
+    Ember.$.get('/portal', (authStatus) => {
+      if (authStatus === 'NotAuthenticated') {
+        this.transitionTo('login')
+      }
+    })
   }
 })

@@ -2,6 +2,8 @@
 
 @import './login-view';
 @import './portal-view';
+@import './contract-view';
+@import './denied-view';
 
 .link-a {
     @extend .frost-link;

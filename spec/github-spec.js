@@ -5,12 +5,13 @@ const repoPagesDB = require('./mocks/getPageOfRepos')
 const repoDB1 = require('./mocks/getRepoByID.1')
 const repoDB2 = require('./mocks/getRepoByID.2')
 const githubAPI = require('../handlers/github-api-handler')
+const DeveloperHandler = require('../handlers/developers-handler')
 const GitHubAPI = require('github')
 
 const github = new GitHubAPI()
 
 describe('Github API Testing', function () {
-  let redirectLocation, response
+  let response, req
   beforeEach(function () {
     spyOn(github.activity, 'getEventsForUserPublic').and.callFake(
       function (obj, cb) {
@@ -18,20 +19,23 @@ describe('Github API Testing', function () {
       }
     )
     spyOn(github.repos, 'getById').and.callFake(
-      function (id, cb) {
-        if (id === repoDB1.id) {
+      function (params, cb) {
+        if (params.id === repoDB1.id) {
           cb(null, repoDB1)
-        } else if (id === repoDB2.id) {
+        } else if (params.id === repoDB2.id) {
           cb(null, repoDB2)
         } else {
           cb('Error, ID does not match', null)
         }
       }
     )
-    redirectLocation = ''
     response = {
       redirect: function (location) {
-        redirectLocation = location
+      }
+    }
+    req = {
+      session: {
+        destroy: function () {}
       }
     }
   })
@@ -41,58 +45,84 @@ describe('Github API Testing', function () {
   })
   describe('getRepoByID()', function () {
     describe('owned by user', function () {
-      it('should return that the repo is owned by the user', function () {
-        githubAPI.getRepoByID(github, repoPagesDB[0], 'pastorsj').then((res) => {
+      it('should return that the repo is owned by the user', function (done) {
+        githubAPI.getRepoByID(github, repoPagesDB[0], 'pastorsj')
+        .then((res) => {
           expect(res.id).toBe(repoDB1.id)
           expect(res.isPublic).toEqual(false)
+          done()
+        })
+        .catch((err) => {
+          done.fail(err)
         })
       })
     })
 
-    it('should return that the repo is not owned by the user', function () {
-      githubAPI.getRepoByID(github, repoPagesDB[2], 'pastorsj').then((res) => {
+    it('should return that the repo is not owned by the user', function (done) {
+      githubAPI.getRepoByID(github, repoPagesDB[2], 'pastorsj')
+      .then((res) => {
         expect(res.id).toBe(repoDB2.id)
         expect(res.isPublic).toEqual(true)
+        done()
+      })
+      .catch((err) => {
+        done.fail(err)
       })
     })
   })
 
   describe('getPageOfRepos()', function () {
-    it('should call getEventsForUserPublic() once', function () {
-      githubAPI.getPageOfRepos(github, 'pastorsj', 0, 0).then((res) => {
-        expect(github.activity.getEventsForUserPublic.callCount).toEqual(1)
+    it('should call getEventsForUserPublic() once', function (done) {
+      githubAPI.getPageOfRepos(github, 'pastorsj', 0, new Date(0))
+      .then((res) => {
+        expect(github.activity.getEventsForUserPublic.calls.count()).toEqual(1)
+        done()
+      })
+      .catch((err) => {
+        done.fail(err)
       })
     })
 
-    it('should call getById() once', function () {
-      githubAPI.getPageOfRepos(github, 'pastorsj', 0, 0).then((res) => {
-        expect(github.activity.getById.callCount).toEqual(1)
+    it('should call getById() once', function (done) {
+      githubAPI.getPageOfRepos(github, 'pastorsj', 0, new Date(0))
+      .then((res) => {
+        expect(github.repos.getById.calls.count()).toEqual(1)
+        done()
+      })
+      .catch((err) => {
+        done.fail(err)
       })
     })
 
-    it('should return 1 repository not owned by the user', function () {
-      githubAPI.getPageOfRepos(github, 'pastorsj', 0, 0).then((res) => {
+    it('should return 1 repository not owned by the user', function (done) {
+      githubAPI.getPageOfRepos(github, 'pastorsj', 0, new Date(0))
+      .then((res) => {
         expect(res.total).toEqual(1)
+        done()
+      })
+      .catch((err) => {
+        done.fail(err)
       })
     })
 
-    it('should get through the Promise.all', function () {
+    it('should get through the Promise.all', function (done) {
       spyOn(githubAPI, 'getRepoByID').and.callFake(
         function () {
-          return Promise.resolve([
+          return Promise.resolve(
             {
               id: repoDB1.id,
               isPublic: true
-            },
-            {
-              id: repoDB2.id,
-              isPublic: false
             }
-          ])
+          )
         }
       )
-      githubAPI.getPageOfRepos(github, 'pastorsj', 0, 0).then((res) => {
+      githubAPI.getPageOfRepos(github, 'pastorsj', 0, new Date(0))
+      .then((res) => {
         expect(res.total).toEqual(1)
+        done()
+      })
+      .catch((err) => {
+        done.fail(err)
       })
     })
   })
@@ -106,9 +136,15 @@ describe('Github API Testing', function () {
           }
         )
       })
-      it('should redirect to the denied page', function () {
-        githubAPI.checkNumberRepos(github, response)
-        expect(redirectLocation).toEqual('/#/auth/denied')
+      it('should redirect to the denied page', function (done) {
+        githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/denied?reason=2')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
       })
     })
 
@@ -120,10 +156,68 @@ describe('Github API Testing', function () {
           }
         )
       })
+      describe('Redirect to denied access', function () {
+        it('should deny access with reason 4', function (done) {
+          spyOn(DeveloperHandler, 'get').and.callFake(function (request) {
+            return Promise.resolve('')
+          })
+          githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/denied?reason=4')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
+        })
 
-      it('should redirect to the contract page', function () {
-        githubAPI.checkNumberRepos(github, response)
-        expect(redirectLocation).toEqual('/#/auth/contract')
+        it('should deny access with reason 0', function (done) {
+          spyOn(DeveloperHandler, 'get').and.callFake(function (request) {
+            return Promise.resolve('some value')
+          })
+          githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/denied?reason=0')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
+        })
+      })
+      describe('User does not exist', function () {
+        beforeEach(function () {
+          spyOn(DeveloperHandler, 'get').and.callFake(function (request) {
+            return Promise.reject('This username does not exist: pastorsj')
+          })
+        })
+        it('should redirect to the contract page', function (done) {
+          spyOn(DeveloperHandler, 'post').and.callFake(function (request) {
+            return Promise.resolve()
+          })
+          githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/contract')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
+        })
+
+        it('should not redirect to the contract page', function (done) {
+          spyOn(DeveloperHandler, 'post').and.callFake(function (request) {
+            return Promise.reject('Error')
+          })
+          githubAPI.checkNumberRepos(github, response, 'pastorsj', req)
+          .then((location) => {
+            expect(location).toEqual('/#/auth/denied?reason=7')
+            done()
+          })
+          .catch((err) => {
+            done.fail(err)
+          })
+        })
       })
     })
   })
@@ -137,9 +231,17 @@ describe('Github API Testing', function () {
           })
         }
       )
-      spyOn(githubAPI, 'checkNumberRepos')
-      githubAPI.verify(github, response, 'pastorsj', 0).then(() => {
+      spyOn(githubAPI, 'checkNumberRepos').and.callFake(
+        function () {
+          return Promise.resolve()
+        }
+      )
+      githubAPI.verify(github, response, 'pastorsj', 0)
+      .then(() => {
         done()
+      })
+      .catch((err) => {
+        done.fail(err)
       })
     })
     it('should call getPageOfRepos three times', function () {
