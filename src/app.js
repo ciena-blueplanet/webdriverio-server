@@ -83,6 +83,12 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
 })
 
 app.post('/', function (req, res) {
+  const ip = req.headers['x-forwarded-for'] ||
+     req.connection.remoteAddress ||
+     req.socket.remoteAddress ||
+     req.connection.socket.remoteAddress
+
+  console.log('IP Address ' + ip)
   if (!req.headers) {
     res.send('Error: Headers do not exist')
     res.end()
