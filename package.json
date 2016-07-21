@@ -17,7 +17,7 @@
     "ember-test": "COVERAGE=true ember test",
     "e2e-test": "wdio-client remote_e2e_test raphael.cyanoptics.com:3000 dist tests/e2e",
     "local-e2e-test": "wdio-client remote_e2e_test localhost:3000 dist tests/e2e",
-    "b2e-test": "ember build --environment=e2e-test && npm run e2e-test",
+    "b2e-test": "ember build --environment=e2e-test && npm run local-e2e-test",
     "update-screenshots": "wdio-client update_screenshots tests/e2e",
     "build": "ember build",
     "lint-sass": "sass-lint *.scss",
@@ -130,7 +130,8 @@
     "request": "^2.72.0",
     "sass-lint": "^1.7.0",
     "smoke-and-mirrors": "0.5.3",
-    "svg4everybody": "2.1.0"
+    "svg4everybody": "2.1.0",
+    "webdriverio-client": "^1.0.3"
   },
   "preferGlobal": true,
   "bin": {
