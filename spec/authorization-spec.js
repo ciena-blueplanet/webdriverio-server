@@ -225,7 +225,8 @@ describe('Authorization Handler', function () {
         AuthorizationHandler.getCallback(req, res)
       })
       it('should get the oauth token with the correct parameters', function () {
-        expect(AuthorizationHandler.OAuth2.getOAuthAccessToken).toHaveBeenCalledWith('123456', {}, jasmine.any(Function))
+        expect(AuthorizationHandler.OAuth2.getOAuthAccessToken)
+          .toHaveBeenCalledWith('123456', {}, jasmine.any(Function))
       })
       it('should call authenticate with the correct parameters', function () {
         expect(AuthorizationHandler.github.authenticate).toHaveBeenCalledWith({

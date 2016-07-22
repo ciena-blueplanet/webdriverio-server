@@ -82,34 +82,61 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
   })
 })
 
+function startTest (req, res) {
+  const filename = req.files.tarball.name
+  const entryPoint = req.body['entry-point'] || 'demo'
+  const testsFolder = req.body['tests-folder'] || 'tests/e2e'
+  processUpload.newFile(filename, entryPoint, testsFolder, res)
+}
+
+function checkIP (req) {
+  const ip = req.headers['x-forwarded-for'].toString()
+  if (!ip) {
+    console.error(`Please set headers for proxy connections using nginx!\n
+    A helpful article on setting this up: https://www.digitalocean.com/community/tutorials/
+    understanding-nginx-http-proxying-load-balancing-buffering-and-caching`)
+  }
+  console.log('IP Address: ' + ip)
+  let fileContents
+  try {
+    fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'info.json'))).ip
+  } catch (e) {
+    return false
+  }
+  if (fileContents.indexOf(ip) !== -1) {
+    return true
+  }
+  return false
+}
+
 app.post('/', function (req, res) {
-  console.log(req.headers['x-forwarded-for'])
   if (!req.headers) {
     res.send('Error: Headers do not exist')
     res.end()
   } else {
-    const username = req.headers.username
-    const token = req.headers.token
-    const request = {
-      query: {
-        username,
-        token
-      }
-    }
-    if (!username || !token) {
-      res.send(`Your config.json file must contain a valid username and token.\n
-      Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
-      res.end()
+    if (checkIP(req)) {
+      startTest(req, res)
     } else {
-      DeveloperHandler.get(request).then(() => {
-        const filename = req.files.tarball.name
-        const entryPoint = req.body['entry-point'] || 'demo'
-        const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-        processUpload.newFile(filename, entryPoint, testsFolder, res)
-      }).catch((err) => {
-        res.send(err)
+      const username = req.headers.username
+      const token = req.headers.token
+      const request = {
+        query: {
+          username,
+          token
+        }
+      }
+      if (!username || !token) {
+        res.send(`Your config.json file must contain a valid username and token.\n
+        Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
         res.end()
-      })
+      } else {
+        DeveloperHandler.get(request).then(() => {
+          startTest(req, res)
+        }).catch((err) => {
+          res.send(err)
+          res.end()
+        })
+      }
     }
   }
 })
@@ -176,7 +203,10 @@ const isAuthenticated = function (req, res, next) {
 app.get('/portal', isAuthenticated, (req, res) => {
 })
 
-app.post('/login', passport.authenticate('local', {successRedirect: '/#/portal', failureRedirect: '/#/login?failure=1'}), (req, res) => {
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/#/portal',
+  failureRedirect: '/#/login?failure=1'
+}), (req, res) => {
   res.redirect('/#/portal')
 })
 
@@ -185,7 +215,13 @@ app.post('/login', passport.authenticate('local', {successRedirect: '/#/portal',
 // ==================================================================
 
 app.get('/auth/denied', (req, res) => {
-  let fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'reasons.json')))
+  let fileContents
+  try {
+    fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'info.json'))).reasons
+  } catch (e) {
+    console.error('info.json was not found')
+    res.send('An error has occured. Please contact the site admin. Please include this number: 404.')
+  }
   if (!req.query || !req.query.reason) {
     res.send(fileContents[0])
   } else {
