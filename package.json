@@ -131,7 +131,7 @@
     "sass-lint": "^1.7.0",
     "smoke-and-mirrors": "0.5.3",
     "svg4everybody": "2.1.0",
-    "webdriverio-client": "1.1.0"
+    "wdio-client": "^1.0.1"
   },
   "preferGlobal": true,
   "bin": {
