@@ -7,14 +7,12 @@ const processUpload = require('../src/process-upload')
 
 const IPHandler = {
   startTest: function (req, res) {
-    console.log('Starting the test')
     const filename = req.files.tarball.name
     const entryPoint = req.body['entry-point'] || 'demo'
     const testsFolder = req.body['tests-folder'] || 'tests/e2e'
     processUpload.newFile(filename, entryPoint, testsFolder, res)
   },
   checkIP: function (req, res) {
-    console.log('Checking IP')
     return new Promise((resolve, reject) => {
       const ip = req.headers['x-forwarded-for'].toString()
       if (!ip) {
@@ -24,7 +22,7 @@ const IPHandler = {
       }
       let fileContents
       try {
-        fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'info.json'))).ip
+        fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src', 'info.json'))).ip
       } catch (e) {
         resolve(false)
       }
@@ -51,47 +49,54 @@ const IPHandler = {
     })
   },
   post: function (req, res) {
-    console.log('Posting')
-    if (!req.headers) {
-      res.send('Error: Headers do not exist')
-      res.end()
-    } else {
-      this.checkIP(req)
-      .then((result) => {
-        if (result === true) {
-          this.startTest(req, res)
-        } else {
-          const username = req.headers.username
-          const token = req.headers.token
-          const request = {
-            query: {
-              username,
-              token
+    return new Promise((resolve, reject) => {
+      if (!req.headers) {
+        res.send('Error: Headers do not exist')
+        res.end()
+        reject()
+      } else {
+        this.checkIP(req)
+        .then((result) => {
+          if (result === true) {
+            this.startTest(req, res)
+            resolve()
+          } else {
+            const username = req.headers.username
+            const token = req.headers.token
+            const request = {
+              query: {
+                username,
+                token
+              }
+            }
+            if (!username || !token) {
+              res.send(`Your config.json file must contain a valid username and token.\n
+              Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
+              res.end()
+              reject()
+            } else {
+              DeveloperHandler.get(request).then(() => {
+                this.startTest(req, res)
+                resolve()
+              }).catch((err) => {
+                if (err) {
+                  res.send(err)
+                  res.end()
+                  reject()
+                }
+              })
             }
           }
-          if (!username || !token) {
-            res.send(`Your config.json file must contain a valid username and token.\n
-            Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
+        })
+        .catch((err) => {
+          if (err) {
+            res.send(err)
             res.end()
-          } else {
-            DeveloperHandler.get(request).then(() => {
-              this.startTest(req, res)
-            }).catch((err) => {
-              console.log('Error 2: ' + err)
-              res.send(err)
-              res.end()
-            })
+            reject()
           }
-        }
-      })
-      .catch((err) => {
-        if (err) {
-          console.log('Error 3: ' + err)
-          res.send(err)
-          res.end()
-        }
-      })
-    }
+        })
+      }
+    })
   }
 }
 
