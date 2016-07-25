@@ -49,7 +49,7 @@ describe('IP Handling Spec', function () {
           })
         })
         it('should resolve to true', function (done) {
-          IPHandler.checkIP(req, res)
+          IPHandler.checkIP(req)
           .then((result) => {
             expect(result).toBeTruthy()
             done()
@@ -59,7 +59,7 @@ describe('IP Handling Spec', function () {
           })
         })
         it('should call DeveloperHandler.get with the correct parameters', function (done) {
-          IPHandler.checkIP(req, res)
+          IPHandler.checkIP(req)
           .then((result) => {
             expect(DeveloperHandler.get).toHaveBeenCalledWith({
               query: {
@@ -81,7 +81,7 @@ describe('IP Handling Spec', function () {
           })
         })
         it('should reject with the correct error message', function (done) {
-          IPHandler.checkIP(req, res)
+          IPHandler.checkIP(req)
           .then((err) => {
             done.fail(err)
           })
@@ -98,7 +98,7 @@ describe('IP Handling Spec', function () {
           })
         })
         it('should reject with the error', function (done) {
-          IPHandler.checkIP(req, res)
+          IPHandler.checkIP(req)
           .then((err) => {
             done.fail(err)
           })
@@ -118,7 +118,7 @@ describe('IP Handling Spec', function () {
         }
       })
       it('should reject with an error message', function (done) {
-        IPHandler.checkIP(req, res)
+        IPHandler.checkIP(req)
         .then((err) => {
           done.fail(err)
         })

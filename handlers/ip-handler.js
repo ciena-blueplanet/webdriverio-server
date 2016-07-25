@@ -6,13 +6,24 @@ const DeveloperHandler = require('../handlers/developers-handler.js')
 const processUpload = require('../src/process-upload')
 
 const IPHandler = {
+  /**
+   * Starts the e2e tests once a developers credentials are verified or travis is running the tests
+   * @param {Object} req - The express formatted object containing the files and the tarball
+   * @param {Object} res - The response object containing any errors produced during the testing process
+   */
   startTest: function (req, res) {
     const filename = req.files.tarball.name
     const entryPoint = req.body['entry-point'] || 'demo'
     const testsFolder = req.body['tests-folder'] || 'tests/e2e'
     processUpload.newFile(filename, entryPoint, testsFolder, res)
   },
-  checkIP: function (req, res) {
+  /**
+   * Checks the IP of the incoming tarball
+   * @param {Object} req - The express formatted object containing the files and credentials
+   * @returns {Promise} A promise that will either resolve if the credentials passed are authentic
+   * or reject if there are errors
+   */
+  checkIP: function (req) {
     return new Promise((resolve, reject) => {
       const ip = req.headers['x-forwarded-for'].toString()
       if (!ip) {
@@ -35,7 +46,7 @@ const IPHandler = {
         }
       }
       if (fileContents.indexOf(ip) !== -1) {
-        DeveloperHandler.get(request).then((res) => {
+        DeveloperHandler.get(request).then(() => {
           reject('Your account is restricted. Your username is ' + username + ' and your token is ' + token)
         })
         .catch((err) => {
@@ -48,6 +59,13 @@ const IPHandler = {
       }
     })
   },
+  /**
+   * This will start e2e tests if the credentials given are correct
+   * @param {Object} req - The express formatted object containing the files and credentials
+   * @param {Object} res - The response object containing any errors produced during the checking process
+   * @returns {Promise} A promise that will either resolve after the tests are finished
+   * or reject if there are errors
+   */
   post: function (req, res) {
     return new Promise((resolve, reject) => {
       if (!req.headers) {
