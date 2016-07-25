@@ -9,8 +9,6 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 
-const DeveloperHandler = require('../handlers/developers-handler.js')
-
 const mongoose = require('mongoose')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
@@ -22,8 +20,7 @@ const app = express()
 
 const developers = require('../routes/developers')
 const auth = require('../routes/auth')
-
-const processUpload = require('./process-upload')
+const ip = require('../routes/ip')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -50,24 +47,12 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/developers', developers)
 app.use('/auth', auth)
-app.use('/', express.static(path.join(__dirname, '..', '/dist')))
+app.use('/', ip)
+app.use(express.static(path.join(__dirname, '..', '/dist')))
 
 // ==================================================================
 //                          The main method
 // ==================================================================
-
-app.use(multer({
-  dest: path.join(__dirname, '..', 'uploads'),
-  rename: function (fieldname, filename) {
-    return filename + '.' + Date.now()
-  },
-  onFileUploadStart: function () {
-    debug('client request is starting ...')
-  },
-  onFileUploadComplete: function (file) {
-    debug(file.fieldname + ' uploaded to  ' + file.path)
-  }
-}))
 
 app.get(/^\/status\/(\d+)$/, function (req, res) {
   const id = req.params[0]
@@ -80,65 +65,6 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
     }
     res.end()
   })
-})
-
-function startTest (req, res) {
-  const filename = req.files.tarball.name
-  const entryPoint = req.body['entry-point'] || 'demo'
-  const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-  processUpload.newFile(filename, entryPoint, testsFolder, res)
-}
-
-function checkIP (req) {
-  const ip = req.headers['x-forwarded-for'].toString()
-  if (!ip) {
-    console.error(`Please set headers for proxy connections using nginx!\n
-    A helpful article on setting this up: https://www.digitalocean.com/community/tutorials/
-    understanding-nginx-http-proxying-load-balancing-buffering-and-caching`)
-  }
-  console.log('IP Address: ' + ip)
-  let fileContents
-  try {
-    fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'info.json'))).ip
-  } catch (e) {
-    return false
-  }
-  if (fileContents.indexOf(ip) !== -1) {
-    return true
-  }
-  return false
-}
-
-app.post('/', function (req, res) {
-  if (!req.headers) {
-    res.send('Error: Headers do not exist')
-    res.end()
-  } else {
-    if (checkIP(req)) {
-      startTest(req, res)
-    } else {
-      const username = req.headers.username
-      const token = req.headers.token
-      const request = {
-        query: {
-          username,
-          token
-        }
-      }
-      if (!username || !token) {
-        res.send(`Your config.json file must contain a valid username and token.\n
-        Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
-        res.end()
-      } else {
-        DeveloperHandler.get(request).then(() => {
-          startTest(req, res)
-        }).catch((err) => {
-          res.send(err)
-          res.end()
-        })
-      }
-    }
-  }
 })
 
 // ==================================================================
@@ -248,3 +174,4 @@ app.use(function (err, req, res) {
 })
 
 module.exports = app
+
