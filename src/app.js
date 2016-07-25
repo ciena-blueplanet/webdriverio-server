@@ -1,13 +1,11 @@
 'use strict'
 
-const debug = require('debug')('server')
 const express = require('express')
 const fs = require('fs')
 const path = require('path')
 const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const multer = require('multer')
 
 const mongoose = require('mongoose')
 const passport = require('passport')
