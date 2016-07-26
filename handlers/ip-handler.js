@@ -56,6 +56,8 @@ const IPHandler = {
             reject(err)
           }
         })
+      } else {
+        resolve(false)
       }
     })
   },
