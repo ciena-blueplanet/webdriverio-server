@@ -1,3 +1,7 @@
+# 2.6.0
+* Added e2e tests
+* Integrated TravisCI by restricting connections with specific IP addresses
+
 # 2.5.0
 * Added Passport authentication to protect routes and bolster login system
 * Updated contract route to include a `fake` contract and a way to generate a token for a developer
