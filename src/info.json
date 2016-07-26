@@ -1,5 +1,5 @@
 {
-  "reasons": [
+  "rejectionReasons": [
     "An error has occured. Please contact the site admin. Please include this number: 0.",
     "Your account has been active for less than six months. Please try again later.",
     "You have less than two repositories linked to your account. Please make sure that you have two personal repositories that you contribute to regularly and then try again.",
@@ -11,7 +11,7 @@
     "The GitHub api has failed. Please try again later or contact the site admin.",
     "The current session has expired. Please attempt to sign up again." 
   ],
-  "ip": [
+  "trustedIpAddresses": [
     "54.172.141.90",
     "54.172.141.32",
     "52.3.133.20",

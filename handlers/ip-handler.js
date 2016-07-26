@@ -33,7 +33,7 @@ const IPHandler = {
       }
       let fileContents
       try {
-        fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src', 'info.json'))).ip
+        fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src', 'info.json'))).trustedIpAddresses
       } catch (e) {
         resolve(false)
       }
@@ -59,6 +59,35 @@ const IPHandler = {
       }
     })
   },
+  checkUsername: function (req, res) {
+    return new Promise((resolve, reject) => {
+      const username = req.headers.username
+      const token = req.headers.token
+      const request = {
+        query: {
+          username,
+          token
+        }
+      }
+      if (!username || !token) {
+        res.send(`Your config.json file must contain a valid username and token.\n
+        Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
+        res.end()
+        reject()
+      } else {
+        DeveloperHandler.get(request).then(() => {
+          this.startTest(req, res)
+          resolve()
+        }).catch((err) => {
+          if (err) {
+            res.send(err)
+            res.end()
+            reject()
+          }
+        })
+      }
+    })
+  },
   /**
    * This will start e2e tests if the credentials given are correct
    * @param {Object} req - The express formatted object containing the files and credentials
@@ -79,31 +108,12 @@ const IPHandler = {
             this.startTest(req, res)
             resolve()
           } else {
-            const username = req.headers.username
-            const token = req.headers.token
-            const request = {
-              query: {
-                username,
-                token
-              }
-            }
-            if (!username || !token) {
-              res.send(`Your config.json file must contain a valid username and token.\n
-              Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
-              res.end()
+            this.checkUsername(req, res).then(() => {
+              resolve()
+            })
+            .catch(() => {
               reject()
-            } else {
-              DeveloperHandler.get(request).then(() => {
-                this.startTest(req, res)
-                resolve()
-              }).catch((err) => {
-                if (err) {
-                  res.send(err)
-                  res.end()
-                  reject()
-                }
-              })
-            }
+            })
           }
         })
         .catch((err) => {

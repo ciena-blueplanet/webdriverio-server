@@ -141,7 +141,7 @@ app.post('/login', passport.authenticate('local', {
 app.get('/auth/denied', (req, res) => {
   let fileContents
   try {
-    fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'info.json'))).reasons
+    fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'info.json'))).rejectionReasons
   } catch (e) {
     console.error('info.json was not found')
     res.send('An error has occured. Please contact the site admin. Please include this number: 404.')
