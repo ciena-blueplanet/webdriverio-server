@@ -23,6 +23,6 @@ export default function (redirectRoute, that) {
   } else if (that.transitionTo) {
     that.transitionTo(redirect, {queryParams})
   } else {
-    console.log('Error in transition')
+    console.error('Error in transition')
   }
 }
