@@ -72,8 +72,8 @@ determine this information. However, the GitHub api limits the number of hits by
 to the API. To set up the TravisCI repository and not have these problems, one must use a Personal Access Token that can be aquired [here](https://help.github.com/articles/creating-an-access-token-for-command-line-use/)
 
 
-In the Travis repository, add this personal access token as the environment variable GITHUB_PAT. This should allow the Travis repository to hit the GitHub api at 60 times an hour 
-without worrying about going over the limit, unless you run more than 60 builds per hour. More information can be found [here](http://www.r-bloggers.com/using-travis-make-sure-you-use-a-github-pat/)
+In the Travis repository, add this personal access token as the environment variable RO_GH_TOKEN. This should allow the Travis repository to hit the GitHub api at 60 times an hour 
+without worrying about going over the limit, unless you run more than 5000 builds per hour.
 
 
 ## Sources

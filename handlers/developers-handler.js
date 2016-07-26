@@ -111,10 +111,13 @@ var DeveloperHandler = {
           if (err) {
             reject(err)
           }
+          console.log('redisresp' + redisResp)
           let response = getResponse(err, res, req, redisResp)
           if (response.resolve || response.resolve === '') {
+            console.log('Found username/password combo')
             resolve(response.resolve)
           } else {
+            console.log('Rejected ' + response.reject)
             reject(response.reject)
           }
         })

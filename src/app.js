@@ -7,12 +7,11 @@ const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 
-const mongoose = require('mongoose')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
-const User = require('../models/user')
 const md5 = require('blueimp-md5')
 const session = require('express-session')
+const DeveloperHandler = require('../handlers/developers-handler')
 
 const app = express()
 
@@ -84,26 +83,26 @@ app.get('/session', function (req, res) {
 //                        Login Authentication
 // ==================================================================
 
-mongoose.connect('mongodb://localhost/authentication')
 passport.serializeUser((user, done) => {
-  done(null, user.id)
+  done(null, user)
 })
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id, (err, user) => {
-    done(err, user)
-  })
+passport.deserializeUser(function (user, done) {
+  done(null, user)
 })
 
 passport.use(new LocalStrategy((username, password, done) => {
-  User.findOne({ username: md5(username) }, (err, user) => {
-    if (err) {
-      return done(err)
+  const req = {
+    query: {
+      username: md5(username),
+      token: md5(password)
     }
-    if (!user || user.password !== md5(password)) {
-      return done(null, false)
-    }
-    return done(null, user)
+  }
+  DeveloperHandler.get(req).then((res) => {
+    return done(null, req.query.username)
+  })
+  .catch(() => {
+    return done(null, false)
   })
 }))
 
