@@ -13,9 +13,7 @@ function generateToken (n) {
   if (isNaN(n) && n <= 0) {
     throw new Error('n must be of type Number and >= 0')
   } else {
-    return Array.apply(null, Array(n)).map(function () {
-      return s.charAt(Math.floor(Math.random() * s.length))
-    }).join('')
+    return Array.apply(null, Array(n)).map(function () { return s.charAt(Math.floor(Math.random() * s.length)) }).join('')
   }
 }
 
@@ -38,8 +36,7 @@ function destroySession (req) {
 
 const AuthorizationHandler = {
   init: function () {
-    this.OAuth2 = new OAuth(process.env.GITHUB_CLIENT_ID, process.env.GITHUB_CLIENT_SECRET,
-    'https://github.com/', 'login/oauth/authorize', 'login/oauth/access_token')
+    this.OAuth2 = new OAuth(process.env.GITHUB_CLIENT_ID, process.env.GITHUB_CLIENT_SECRET, 'https://github.com/', 'login/oauth/authorize', 'login/oauth/access_token')
     this.github = new GitHubAPI({
       debug: false,
       protocol: 'https',
