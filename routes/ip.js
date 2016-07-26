@@ -2,7 +2,10 @@ const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser') // parses info from POST
 const methodOverride = require('method-override') // used to manipulate POST data
-const DeveloperHandler = require('../handlers/developers-handler.js')
+const IPHandler = require('../handlers/ip-handler.js')
+const multer = require('multer')
+const path = require('path')
+const debug = require('debug')('server')
 
 // Parses incoming requests bodies
 router.use(bodyParser.urlencoded({ extended: true }))
@@ -17,13 +20,22 @@ router.use(methodOverride(function (req, res) {
   }
 }))
 
-// This will be accessible from base_url/developers
-DeveloperHandler.init()
-router.route('/')
-    .get(DeveloperHandler.get.bind(DeveloperHandler))
-    .post(DeveloperHandler.post.bind(DeveloperHandler))
+// Handles multipart form requests, specifically for sending files in curl requests
+router.use(multer({
+  dest: path.join(__dirname, '..', 'uploads'),
+  rename: function (fieldname, filename) {
+    return filename + '.' + Date.now()
+  },
+  onFileUploadStart: function () {
+    debug('client request is starting ...')
+  },
+  onFileUploadComplete: function (file) {
+    debug(file.fieldname + ' uploaded to  ' + file.path)
+  }
+}))
 
-router.route('/:username')
-    .delete(DeveloperHandler.delete.bind(DeveloperHandler))
+// This will be accessible from base_url/
+router.route('/')
+    .post(IPHandler.post.bind(IPHandler))
 
 module.exports = router

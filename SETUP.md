@@ -59,11 +59,22 @@ Navigate to the server's name in the browser. The website should be displayed. I
 When using requesting an Access token using the GitHub API, it requires the code to pass a redirection URL with the servers name.
 This is ignored on the webdriverio-server repository, but it is required when running the server. In the base directory create a config.json file containing
 
+
 ```
 {
   "url": "the-url-of-this-server"
 }
 ```
+
+#### Congiuring Travis CI
+When running e2e tests on TravisCI, we using the commit number to determine the username of the person who committed the code. This means we use the GitHub api to 
+determine this information. However, the GitHub api limits the number of hits by a given IP address to 60 per hour. This means that Travis is limited when connecting
+to the API. To set up the TravisCI repository and not have these problems, one must use a Personal Access Token that can be aquired [here](https://help.github.com/articles/creating-an-access-token-for-command-line-use/)
+
+
+In the Travis repository, add this personal access token as the environment variable RO_GH_TOKEN. This should allow the Travis repository to hit the GitHub api at 60 times an hour 
+without worrying about going over the limit, unless you run more than 5000 builds per hour.
+
 
 ## Sources
 [Git](https://help.ubuntu.com/lts/serverguide/git.html)  

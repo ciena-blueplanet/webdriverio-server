@@ -1,29 +1,23 @@
 'use strict'
 
-const debug = require('debug')('server')
 const express = require('express')
 const fs = require('fs')
 const path = require('path')
 const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const multer = require('multer')
 
-const DeveloperHandler = require('../handlers/developers-handler.js')
-
-const mongoose = require('mongoose')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
-const User = require('../models/user')
 const md5 = require('blueimp-md5')
 const session = require('express-session')
+const DeveloperHandler = require('../handlers/developers-handler')
 
 const app = express()
 
 const developers = require('../routes/developers')
 const auth = require('../routes/auth')
-
-const processUpload = require('./process-upload')
+const ip = require('../routes/ip')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -50,24 +44,12 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/developers', developers)
 app.use('/auth', auth)
-app.use('/', express.static(path.join(__dirname, '..', '/dist')))
+app.use('/', ip)
+app.use(express.static(path.join(__dirname, '..', '/dist')))
 
 // ==================================================================
 //                          The main method
 // ==================================================================
-
-app.use(multer({
-  dest: path.join(__dirname, '..', 'uploads'),
-  rename: function (fieldname, filename) {
-    return filename + '.' + Date.now()
-  },
-  onFileUploadStart: function () {
-    debug('client request is starting ...')
-  },
-  onFileUploadComplete: function (file) {
-    debug(file.fieldname + ' uploaded to  ' + file.path)
-  }
-}))
 
 app.get(/^\/status\/(\d+)$/, function (req, res) {
   const id = req.params[0]
@@ -80,37 +62,6 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
     }
     res.end()
   })
-})
-
-app.post('/', function (req, res) {
-  if (!req.headers) {
-    res.send('Error: Headers do not exist')
-    res.end()
-  } else {
-    const username = req.headers.username
-    const token = req.headers.token
-    const request = {
-      query: {
-        username,
-        token
-      }
-    }
-    if (!username || !token) {
-      res.send(`Your config.json file must contain a valid username and token.\n
-      Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
-      res.end()
-    } else {
-      DeveloperHandler.get(request).then(() => {
-        const filename = req.files.tarball.name
-        const entryPoint = req.body['entry-point'] || 'demo'
-        const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-        processUpload.newFile(filename, entryPoint, testsFolder, res)
-      }).catch((err) => {
-        res.send(err)
-        res.end()
-      })
-    }
-  }
 })
 
 // ==================================================================
@@ -132,26 +83,26 @@ app.get('/session', function (req, res) {
 //                        Login Authentication
 // ==================================================================
 
-mongoose.connect('mongodb://localhost/authentication')
 passport.serializeUser((user, done) => {
-  done(null, user.id)
+  done(null, user)
 })
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id, (err, user) => {
-    done(err, user)
-  })
+passport.deserializeUser(function (user, done) {
+  done(null, user)
 })
 
 passport.use(new LocalStrategy((username, password, done) => {
-  User.findOne({ username: md5(username) }, (err, user) => {
-    if (err) {
-      return done(err)
+  const req = {
+    query: {
+      username: md5(username),
+      token: md5(password)
     }
-    if (!user || user.password !== md5(password)) {
-      return done(null, false)
-    }
-    return done(null, user)
+  }
+  DeveloperHandler.get(req).then((res) => {
+    return done(null, req.query.username)
+  })
+  .catch(() => {
+    return done(null, false)
   })
 }))
 
@@ -175,7 +126,10 @@ const isAuthenticated = function (req, res, next) {
 app.get('/portal', isAuthenticated, (req, res) => {
 })
 
-app.post('/login', passport.authenticate('local', {successRedirect: '/#/portal', failureRedirect: '/#/login?failure=1'}), (req, res) => {
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/#/portal',
+  failureRedirect: '/#/login?failure=1'
+}), (req, res) => {
   res.redirect('/#/portal')
 })
 
@@ -184,7 +138,13 @@ app.post('/login', passport.authenticate('local', {successRedirect: '/#/portal',
 // ==================================================================
 
 app.get('/auth/denied', (req, res) => {
-  let fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'reasons.json')))
+  let fileContents
+  try {
+    fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'info.json'))).rejectionReasons
+  } catch (e) {
+    console.error('info.json was not found')
+    res.send('An error has occured. Please contact the site admin. Please include this number: 404.')
+  }
   if (!req.query || !req.query.reason) {
     res.send(fileContents[0])
   } else {
@@ -211,3 +171,4 @@ app.use(function (err, req, res) {
 })
 
 module.exports = app
+
