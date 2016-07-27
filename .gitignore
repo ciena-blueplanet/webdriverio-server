@@ -5,6 +5,7 @@ vendor/
 screenshots/
 uploads/
 coverage/
+coverage-backend/
 dist/
 .DS_Store
 dump.rdb
