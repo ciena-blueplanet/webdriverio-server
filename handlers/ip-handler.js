@@ -25,7 +25,7 @@ const IPHandler = {
    */
   checkIP: function (req) {
     return new Promise((resolve, reject) => {
-      const ip = req.headers['x-forwarded-for'].toString()
+      const ip = req.headers['x-forwarded-for']
       if (!ip) {
         reject(`Please set headers for proxy connections using nginx!\n
         A helpful article on setting this up: https://www.digitalocean.com/community/tutorials/
@@ -45,7 +45,7 @@ const IPHandler = {
           token
         }
       }
-      if (fileContents.indexOf(ip) !== -1) {
+      if (fileContents.indexOf(ip.toString()) !== -1) {
         DeveloperHandler.get(request).then(() => {
           reject('Your account is restricted. Your username is ' + username + ' and your token is ' + token)
         })

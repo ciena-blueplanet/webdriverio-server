@@ -11,3 +11,4 @@ dist/
 dump.rdb
 config.json
 npm-debug.log
+typings/
