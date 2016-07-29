@@ -4,7 +4,7 @@ const childProcess = require('child_process')
 const debug = require('debug')('server')
 const path = require('path')
 const fs = require('fs')
-const http = require('http')
+const webdriverioTester = require('webdriverioTester')
 
 const ns = {
   scriptPath: path.join(__dirname, './exec.sh')
@@ -74,33 +74,8 @@ const watchChild = function (child, seconds) {
   })
 }
 
-function checkServer (serversAvailible, server) {
-  return new Promise((resolve, reject) => {
-    let splitServer = server.split(':')
-    http.get({
-      host: splitServer[0],
-      port: splitServer[1] || '3000'
-    }, (res) => {
-      resolve(-1)
-    }).on('error', (e) => {
-      resolve(serversAvailible.indexOf(server))
-    })
-  })
-}
-
-function checkServerAvailibility () {
-  let servers = []
-  try {
-    servers = JSON.parse(fs.readFileSync(path.join(__dirname, 'servers.json'))).potentialServers
-  } catch (e) {
-    throw new Error(e)
-  }
-  let serversAvailible = servers
-  let pset = []
-  servers.forEach((server) => {
-    pset.push(checkServer(serversAvailible, server))
-  })
-  return serversAvailible
+function serverIsMaster () {
+  return true
 }
 
 /**
@@ -117,13 +92,16 @@ ns.newFile = function (filename, entryPoint, testsFolder, res) {
   const seconds = Math.floor(new Date().getTime() / 1000)
   debug('START: ------------ ' + seconds)
 
-  console.log('Checking avail')
-  let servers = checkServerAvailibility()
-  console.log('Servers availible', servers)
-  const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
-  watchChild(child, seconds)
-  res.send(seconds.toString())
-  res.end()
+  if (serverIsMaster()) {
+    // TODO: Convert e2e directories to tarballs
+    // execute this shell script (tardir.sh)
+    webdriverioTester.execute()
+  } else {
+    const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
+    watchChild(child, seconds)
+    res.send(seconds.toString())
+    res.end()
+  }
 }
 
 module.exports = ns

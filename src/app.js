@@ -54,6 +54,8 @@ app.use(express.static(path.join(__dirname, '..', '/dist')))
 app.get(/^\/status\/(\d+)$/, function (req, res) {
   const id = req.params[0]
   const filename = path.join(__dirname, '..', 'screenshots/output-' + id + '.json')
+  // Poll slave servers
+  // Use waitForResults, Check for results, processResults
   fs.exists(filename, function (exists) {
     if (exists) {
       res.status(200).send('finished')
