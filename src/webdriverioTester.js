@@ -16,7 +16,7 @@
 const _ = require('lodash')
 const Q = require('q')
 const path = require('path')
-const exec = require('child_process').exec
+const childProcess = require('child_process')
 const sleep = require('sleep')
 const http = require('http')
 const fs = require('fs')
@@ -38,36 +38,80 @@ const ns = {
    */
   init () {
     // this is on the object for eaiser mocking
-    this.exec = Q.denodeify(exec)
+    this.exec = Q.denodeify(childProcess.exec)
+    // This will keep track of the slave servers that are running the e2e tests
+    this.runningProcesses = new Map()
     return this
   },
 
   /**
-   * obvious
-   * @param {String} filename - the filename to remove
-   * @returns {Promise} resolved with result of exec
+   * This polls each slave server and checks to see whether the tests are finished.
+   * @param {Number} id - The unique id identifying a set of tests
+   * @returns {Boolean} Whether all of the tests are ready
    */
-  remove (filename) {
-    return this.exec('rm -rf ' + filename)
+  getExisting (id) {
+    /**
+     * testsRunning => [
+     *  {
+     *    server: "localhost:4000",
+     *    test: "homepage-e2e",
+     *    testComplete: false
+     *  }
+     * ]
+     */
+    let testsRunning = this.runningProcesses.get(id)
+    let pset = []
+    testsRunning.forEach((currentTest) => {
+      const server = currentTest.server
+      const test = currentTest.test
+      const cmd = 'curl -s ' + server + '/status/?id=' + id + '&test=' + test
+      pset.push(this.exec(cmd).then((res) => {
+        const stdout = res[0]
+        if (stdout.toString().toLowerCase() === 'not found') {
+          console.log('For test = ' + test + ' on the server ' + server + ', test was not found')
+          currentTest.testComplete = false
+        } else {
+          currentTest.testComplete = true
+        }
+      }))
+    })
+    return Promise.all(pset).then(() => {
+      return testsRunning.reduce((current, element) => current && element.testComplete)
+    })
+  },
+
+  combineResults (id) {
+    let testsRunning = this.runningProcesses.get(id)
+    let pset = []
+    testsRunning.forEach((currentTest) => {
+      const server = currentTest.server
+      const test = currentTest.test
+      pset.push(this.processResults(id, server, test))
+    })
+    Promise.all(pset).then((res) => {
+      return
+    })
   },
 
   /**
    * Submit the tarball for test
+   * @param {String} tarball - The path to the tarball
    * @param {String} server - the protocol/host/port of the server
+   * @param {String} test - the test folder
    * @returns {Promise} resolved when done
    */
-  submitTarball (server) {
+  submitTarball (tarball, server, test, entryPoint) {
     console.log('Submitting bundle to ' + server + ' for test...')
 
     const cmd = [
       'curl',
       '-s',
       '-F',
-      '"tarball=@test.tar.gz"',
+      '"tarball=' + tarball + '"',
       '-F',
-      '"entry-point=' + process.env['BUILD_OUTPUT_DIR'] + '/"',
+      '"entry-point=' + entryPoint + '/"',
       '-F',
-      '"tests-folder=' + process.env['E2E_TESTS_DIR'] + '"',
+      '"tests-folder=' + process.env['E2E_TESTS_DIR'] + '/' + test + '"',
       server + '/'
     ]
 
@@ -76,45 +120,14 @@ const ns = {
     return this.exec(cmd.join(' ')).then((res) => {
       const stdout = res[0]
       const timestamp = stdout.toString()
+      this.runningProcesses.get(timestamp).push({
+        server,
+        test,
+        testComplete: false
+      })
       console.log('TIMESTAMP: ' + timestamp)
       return timestamp
     })
-  },
-
-  /**
-   * Wait till the server is done with our tests
-   * @param {String} cmd - the command to execute to check for results
-   * @param {Number} pollInterval - the poll interval in seconds
-   * @returns {Promise} resolved when done
-   */
-  checkForResults (cmd, pollInterval) {
-    console.log('Checking for results...')
-    return this.exec(cmd).then((res) => {
-      const stdout = res[0]
-      if (stdout.toString().toLowerCase() === 'not found') {
-        sleep.sleep(pollInterval)
-        return this.checkForResults(cmd, pollInterval)
-      } else {
-        return makePromise()
-      }
-    })
-  },
-
-  /**
-   * Wait till the server is done with our tests
-   * @param {Object} params - object for named parameters
-   * @param {String} params.timestamp - the timestamp of the results we're waiting for
-   * @param {String} params.server - the protocol/host/port of the server
-   * @param {Number} params.initialSleep - the initial sleep time in seconds
-   * @param {Number} params.pollInterval - the poll interval in seconds
-   * @returns {Promise} resolved when done
-   */
-  waitForResults (params) {
-    console.log('Waiting ' + params.initialSleep + 's before checking')
-    sleep.sleep(params.initialSleep)
-
-    const cmd = 'curl -s ' + params.server + '/status/' + params.timestamp
-    // return this.checkForResults(cmd, params.pollInterval)
   },
 
   /**
@@ -141,21 +154,6 @@ const ns = {
   },
 
   /**
-   * Obvious
-   * @param {WebdriverioServerTestResults} results - details of the test results
-   * @returns {Promise} resolved when done
-   */
-  extractTarball (results) {
-    const filename = path.basename(results.output)
-    return this.exec('tar -xf ' + filename).then(() => {
-      return {
-        filename: filename,
-        results: results
-      }
-    })
-  },
-
-  /**
    * Parse and output the results
    * @param {String} timestamp - the timestamp of the results we're processing
    * @param {String} server - the protocol/host/port of the server
@@ -163,7 +161,7 @@ const ns = {
    * @returns {Promise} resolved when done
    */
   processResults (timestamp, server, testsDir) {
-    const url = server + '/screenshots/output-' + timestamp + '.json'
+    const url = server + '/screenshots/output-' + timestamp + '-' + testsDir + '.json'
 
     return this.getResults(url)
       .then((results) => {
@@ -172,100 +170,101 @@ const ns = {
           return results
         })
       })
-      .then((results) => {
-        return this.extractTarball(results)
-      })
-      .then((params) => {
-        return this.remove(params.filename).then(() => {
-          return params.results
-        })
-      })
-      .then((results) => {
-        console.log(results.info)
-
-        console.log('----------------------------------------------------------------------')
-        console.log('Screenshots directory updated with results from server.')
-
-        // combineResults()
-
-        if (results.exitCode === 0) {
-          console.log('Tests Pass.')
-        } else {
-          console.log('Tests FAILED')
-          process.exit(1)
-        }
-      })
   },
 
-  checkServer (serversAvailible, server) {
+  checkServer (server) {
     return new Promise((resolve, reject) => {
       let splitServer = server.split(':')
       http.get({
         host: splitServer[0],
         port: splitServer[1] || '3000'
-      }, (res) => {
-        resolve(-1)
+      }, () => {
+        resolve(server)
       }).on('error', (e) => {
-        resolve(serversAvailible.indexOf(server))
+        resolve()
       })
     })
   },
 
   checkServerAvailibility () {
-    let servers = []
+    let servers
     try {
       servers = JSON.parse(fs.readFileSync(path.join(__dirname, 'servers.json'))).potentialServers
     } catch (e) {
+      console.log(e)
       throw new Error(e)
     }
-    let serversAvailible = servers
     let pset = []
-    servers.forEach((server) => {
-      pset.push(this.checkServer(serversAvailible, server))
+    servers.map((server) => {
+      pset.push(this.checkServer(server))
     })
-    return serversAvailible
+    return Promise.all(pset).then((res) => {
+      return res
+    })
   },
 
-  submitAndWait (argv) {
-    return this.submitTarball(argv.server)
+  getRandomServer (servers) {
+    return servers[Math.floor((Math.random() * servers.length))]
+  },
 
-      return this.waitForResults(params).then(() => {
-        return timestamp
+  submitTarballs (filename, entryPoint, timestamp, testsFolder, servers) {
+    // Go through the testsFolder directory and find all the tar files._
+    // Submit each tarball and wait for the results.
+    let pset = []
+    let buildPath = path.join(__dirname, '..', 'build-' + timestamp, testsFolder)
+    console.log('Build Path: ' + buildPath)
+    fs.readdir(buildPath, (err, files) => {
+      if (err) {
+        console.log(err)
+        process.exit(1)
+      }
+      files.forEach((element) => {
+        fs.stat(path.join(buildPath, element), (err, file) => {
+          if (err) {
+            process.exit(1)
+          }
+          if (file.isFile() && element.endsWith('.tar')) {
+            let fname = path.join(buildPath, element).slice(0, -4)
+            fname = fname + '-' + timestamp + '.tar'
+            fs.rename(path.join(buildPath, element), fname, (err) => {
+              if (err) {
+                console.log(err)
+                process.exit(1)
+              }
+            })
+            const server = this.getRandomServer(servers)
+            pset.push(this.submitTarball(path.basename(fname), server, element, entryPoint))
+          }
+        })
       })
     })
-    .then((timestamp) => {
-      return this.processResults(timestamp, argv.server)
+    return Promise.all(pset).then(() => {
+      return timestamp
     })
   },
 
-  /**
-   * Actual functionality of the 'webdriverio-test' command
-   * @param {MinimistArgv} argv - the minimist arguments object
-   * @throws CliError
-   */
-  execute (argv) {
-    _.defaults(argv, {
-      initialSleep: 10,
-      pollInterval: 3
-    })
-
+  execute (filename, entryPoint, seconds, testsFolder) {
     // Get List of Availible servers here
-    console.log('Checking availibility')
-    let servers = this.checkServerAvailibility()
-    console.log('Servers availible', servers)
-
-    // Execute tardir.sh
-    // This creates a set of tarballs from the tmp directory
-    this.exec('./tardir.sh')
-    .then(() => {
-      // Send a set of tarballs to a set of servers
-      // No need to create the tarballs, just submit each tarball to a different server
-      // For each tarball, run submitAndWait()
-      const tarball = argv
-      this.submitAndWait(tarball).done()
-    })
-    .catch((err) => {
-      console.log(err)
+    return this.checkServerAvailibility().then((servers) => {
+      // Execute tardir.sh
+      // This creates a set of tarballs from the tmp directory
+      console.log('Servers availible: ' + servers)
+      console.log('Executing tar script')
+      const cmd = [path.join(__dirname, './tardir.sh'), filename, entryPoint, seconds, testsFolder + '/tmp']
+      console.log('Command ' + cmd.join(' '))
+      childProcess.exec(cmd.join(' '), (err, stdout, stderr) => {
+        if (err) {
+          console.log('Error: ' + err)
+        }
+        console.log('Printing!!!')
+        console.log(filename)
+        console.log(entryPoint)
+        console.log(seconds)
+        console.log(testsFolder)
+        return this.submitTarballs(filename, entryPoint, seconds, testsFolder + '/tmp', servers).then((timestamp) => {
+          return timestamp
+        })
+      })
     })
   }
 }

@@ -4,7 +4,7 @@ const childProcess = require('child_process')
 const debug = require('debug')('server')
 const path = require('path')
 const fs = require('fs')
-const webdriverioTester = require('webdriverioTester')
+const webdriverioTester = require('./webdriverioTester')
 
 const ns = {
   scriptPath: path.join(__dirname, './exec.sh')
@@ -18,8 +18,9 @@ var strip = function (data) {
  * Collect information from the child process
  * @param {Child} child - child process
  * @param {Number} seconds - timestamp when process started
+ * @param {String} test - the current test being run
  */
-const watchChild = function (child, seconds) {
+const watchChild = function (child, seconds, test) {
   const info = []
 
   child.stdout.on('data', function (data) {
@@ -43,7 +44,7 @@ const watchChild = function (child, seconds) {
     var output = {
       exitCode: code,
       info: info.join(''),
-      output: 'screenshots/' + seconds + '.tar'
+      output: 'screenshots/' + seconds + '-' + test + '.tar'
     }
 
     try {
@@ -53,7 +54,7 @@ const watchChild = function (child, seconds) {
       output = {
         exitCode: code,
         info: e.toString(),
-        output: 'screenshots/' + seconds + '.tar'
+        output: 'screenshots/' + seconds + '-' + test + '.tar'
       }
 
       try {
@@ -63,7 +64,7 @@ const watchChild = function (child, seconds) {
       }
     }
 
-    var filename = path.join(__dirname, '../screenshots/output-' + seconds + '.json')
+    var filename = path.join(__dirname, '../screenshots/output-' + seconds + '-' + test + '.json')
     fs.writeFile(filename, output, function (err) {
       if (err) {
         debug(seconds + ' : UNABLE TO WRITE FILE ' + filename + ' -- ' + err.toString())
@@ -93,12 +94,16 @@ ns.newFile = function (filename, entryPoint, testsFolder, res) {
   debug('START: ------------ ' + seconds)
 
   if (serverIsMaster()) {
-    // TODO: Convert e2e directories to tarballs
-    // execute this shell script (tardir.sh)
-    webdriverioTester.execute()
+    console.log('Master')
+    webdriverioTester.init()
+    webdriverioTester.execute(filename, entryPoint, seconds, testsFolder).then((timestamp) => {
+      res.send(timestamp.toString())
+      res.end()
+    })
   } else {
+    console.log('Tests Folder: ' + testsFolder)
     const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
-    watchChild(child, seconds)
+    watchChild(child, seconds, testsFolder)
     res.send(seconds.toString())
     res.end()
   }

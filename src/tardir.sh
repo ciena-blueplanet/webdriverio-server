@@ -46,3 +46,5 @@ cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 cd $TESTS_FOLDER
 find . -type d -maxdepth 1 -mindepth 1 -exec tar cf {}.tar {}  \;
+
+exit 0

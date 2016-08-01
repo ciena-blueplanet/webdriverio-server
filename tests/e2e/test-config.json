@@ -6,9 +6,9 @@
     },
     "http": {
         "host": "localhost",
-        "port": "1529",
+        "port": "1329",
         "entryPoint": "/"
     },
     "seleniumServer": "localhost",
-    "url": "http://localhost:1529/"
+    "url": "http://localhost:1329/"
 }

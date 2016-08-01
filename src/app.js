@@ -19,6 +19,8 @@ const developers = require('../routes/developers')
 const auth = require('../routes/auth')
 const ip = require('../routes/ip')
 
+const webdriverioTester = require('./webdriverioTester')
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
@@ -54,8 +56,10 @@ app.use(express.static(path.join(__dirname, '..', '/dist')))
 app.get(/^\/status\/(\d+)$/, function (req, res) {
   const id = req.params[0]
   const filename = path.join(__dirname, '..', 'screenshots/output-' + id + '.json')
-  // Poll slave servers
-  // Use waitForResults, Check for results, processResults
+  // Poll slave servers using the id (timestamp)
+  if (webdriverioTester.getExisting(id)) {
+    webdriverioTester.combineResults(id)
+  }
   fs.exists(filename, function (exists) {
     if (exists) {
       res.status(200).send('finished')

@@ -12,3 +12,5 @@ dump.rdb
 config.json
 npm-debug.log
 typings/
+build-*/
+test.tar.gz
