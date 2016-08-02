@@ -21,31 +21,14 @@ set -x
 set -e
 set -u
 
-TARBALL=$1
-ENTRY_POINT=$2
-TIMESTAMP=$3
-TESTS_FOLDER=$4
+TIMESTAMP=$1
+TESTS_FOLDER=$2
+TARBALL=$3
+TEST=$4
+ENTRY_POINT=$5
+SERVER=$6
 
-TEST_CONFIG="$TESTS_FOLDER/test-config.json"
-NODE_SPECS=$TESTS_FOLDER
-
-
-echo '-INPUT VARIABLES---------------'
-echo tarball: $TARBALL
-echo entry-point: $ENTRY_POINT
-echo timestamp: $TIMESTAMP
-echo '-------------------------------'
-
-cd $DIR/..
-echo Processing ${TARBALL}...
-mkdir build-${TIMESTAMP}
-ln -s ../build/node_modules build-${TIMESTAMP}/node_modules
-ln -s ../testUtils build-${TIMESTAMP}/testUtils
-
-cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
-tar -xzf ../uploads/$TARBALL
-cd $TESTS_FOLDER
-find . -type d -maxdepth 1 -mindepth 1 -exec cp -r ../../../dist {} \;
-find . -type d -maxdepth 1 -mindepth 1 -exec tar -Pcf {}.tar {} \;
+cd $DIR/../build-${TIMESTAMP}/$TESTS_FOLDER
+curl -s -F "tarball=@${TARBALL}" -F "entry-point=${ENTRY_POINT}" -F "tests-folder=${TEST}" ${SERVER}
 
 exit 0

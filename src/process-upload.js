@@ -94,14 +94,13 @@ ns.newFile = function (filename, entryPoint, testsFolder, res) {
   debug('START: ------------ ' + seconds)
 
   if (serverIsMaster()) {
-    console.log('Master')
     webdriverioTester.init()
     webdriverioTester.execute(filename, entryPoint, seconds, testsFolder).then((timestamp) => {
+      console.log('Timestamp returned: ' + timestamp.toString())
       res.send(timestamp.toString())
       res.end()
     })
   } else {
-    console.log('Tests Folder: ' + testsFolder)
     const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
     watchChild(child, seconds, testsFolder)
     res.send(seconds.toString())

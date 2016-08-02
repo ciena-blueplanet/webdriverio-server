@@ -39,8 +39,8 @@ const ns = {
   init () {
     // this is on the object for eaiser mocking
     this.exec = Q.denodeify(childProcess.exec)
-    // This will keep track of the slave servers that are running the e2e tests
     this.runningProcesses = new Map()
+    // This will keep track of the slave servers that are running the e2e tests
     return this
   },
 
@@ -68,7 +68,6 @@ const ns = {
       pset.push(this.exec(cmd).then((res) => {
         const stdout = res[0]
         if (stdout.toString().toLowerCase() === 'not found') {
-          console.log('For test = ' + test + ' on the server ' + server + ', test was not found')
           currentTest.testComplete = false
         } else {
           currentTest.testComplete = true
@@ -100,36 +99,71 @@ const ns = {
    * @param {String} test - the test folder
    * @returns {Promise} resolved when done
    */
-  submitTarball (tarball, server, test, entryPoint) {
-    console.log('Submitting bundle to ' + server + ' for test...')
-
-    const cmd = [
-      'curl',
-      '-s',
-      '-F',
-      '"tarball=' + tarball + '"',
-      '-F',
-      '"entry-point=' + entryPoint + '/"',
-      '-F',
-      '"tests-folder=' + process.env['E2E_TESTS_DIR'] + '/' + test + '"',
-      server + '/'
-    ]
-
-    console.log('Running command: ' + cmd.join(' '))
-
-    return this.exec(cmd.join(' ')).then((res) => {
-      const stdout = res[0]
-      const timestamp = stdout.toString()
-      this.runningProcesses.get(timestamp).push({
-        server,
-        test,
-        testComplete: false
-      })
-      console.log('TIMESTAMP: ' + timestamp)
-      return timestamp
+  submitTarball (tarball, server, test, entryPoint, timestamp1) {
+    const tarpath = path.join(__dirname, './submitCurl.sh')
+    return new Promise((resolve, reject) => {
+      childProcess.exec(
+        `bash ${tarpath} ${timestamp1} tests/e2e/tmp ${tarball} ${test} ${entryPoint} ${server}/`,
+        (err, stdout, stderr) => {
+          if (err) {
+            reject(err)
+          }
+          const timestamp2 = stdout.toString()
+          this.runningProcesses.get(timestamp1.toString()).push({
+            server,
+            test,
+            timestamp: timestamp2,
+            testComplete: false
+          })
+          resolve(timestamp1)
+        })
     })
   },
 
+  submitTarballs (filename, entryPoint, timestamp, testsFolder, servers) {
+    // Go through the testsFolder directory and find all the tar files._
+    // Submit each tarball and wait for the results.
+    let pset = []
+    let buildPath = path.join(__dirname, '..', 'build-' + timestamp, testsFolder)
+    this.runningProcesses.set(timestamp.toString(), [])
+    let files
+    try {
+      files = fs.readdirSync(buildPath)
+    } catch (e) {
+      console.log(e)
+      process.exit(1)
+    }
+    files.forEach((element) => {
+      let file
+      try {
+        file = fs.statSync(path.join(buildPath, element))
+      } catch (e) {
+        process.exit(1)
+      }
+      if (file.isFile() && element.endsWith('.tar')) {
+        let fname = path.join(buildPath, element).slice(0, -4)
+        fname = fname + '-' + timestamp + '.tar'
+        fs.rename(path.join(buildPath, element), fname, (err) => {
+          if (err) {
+            console.log(err)
+            process.exit(1)
+          }
+        })
+        const server = this.getRandomServer(servers)
+        pset.push(this.submitTarball(path.basename(fname), server, element.slice(0, -4), entryPoint, timestamp)
+        .then((timestamp) => {
+        })
+        .catch((err) => {
+          console.log(err)
+          process.exit(1)
+        }))
+      }
+    })
+    return Promise.all(pset).then((timestampMaybe) => {
+      console.log('Timestamp being returned: ' + timestamp)
+      return timestamp
+    })
+  },
   /**
    * Fetch the results from the server
    * @param {String} url - the url to fetch results from
@@ -207,62 +241,17 @@ const ns = {
     return servers[Math.floor((Math.random() * servers.length))]
   },
 
-  submitTarballs (filename, entryPoint, timestamp, testsFolder, servers) {
-    // Go through the testsFolder directory and find all the tar files._
-    // Submit each tarball and wait for the results.
-    let pset = []
-    let buildPath = path.join(__dirname, '..', 'build-' + timestamp, testsFolder)
-    console.log('Build Path: ' + buildPath)
-    fs.readdir(buildPath, (err, files) => {
-      if (err) {
-        console.log(err)
-        process.exit(1)
-      }
-      files.forEach((element) => {
-        fs.stat(path.join(buildPath, element), (err, file) => {
-          if (err) {
-            process.exit(1)
-          }
-          if (file.isFile() && element.endsWith('.tar')) {
-            let fname = path.join(buildPath, element).slice(0, -4)
-            fname = fname + '-' + timestamp + '.tar'
-            fs.rename(path.join(buildPath, element), fname, (err) => {
-              if (err) {
-                console.log(err)
-                process.exit(1)
-              }
-            })
-            const server = this.getRandomServer(servers)
-            pset.push(this.submitTarball(path.basename(fname), server, element, entryPoint))
-          }
-        })
-      })
-    })
-    return Promise.all(pset).then(() => {
-      return timestamp
-    })
-  },
-
   execute (filename, entryPoint, seconds, testsFolder) {
-    // Get List of Availible servers here
-    return this.checkServerAvailibility().then((servers) => {
-      // Execute tardir.sh
-      // This creates a set of tarballs from the tmp directory
-      console.log('Servers availible: ' + servers)
-      console.log('Executing tar script')
-      const cmd = [path.join(__dirname, './tardir.sh'), filename, entryPoint, seconds, testsFolder + '/tmp']
-      console.log('Command ' + cmd.join(' '))
-      childProcess.exec(cmd.join(' '), (err, stdout, stderr) => {
-        if (err) {
-          console.log('Error: ' + err)
-        }
-        console.log('Printing!!!')
-        console.log(filename)
-        console.log(entryPoint)
-        console.log(seconds)
-        console.log(testsFolder)
-        return this.submitTarballs(filename, entryPoint, seconds, testsFolder + '/tmp', servers).then((timestamp) => {
-          return timestamp
+    return new Promise((resolve, reject) => {
+      this.checkServerAvailibility().then((servers) => {
+        const cmd = ['bash', path.join(__dirname, './tardir.sh'), filename, entryPoint, seconds, testsFolder + '/tmp']
+        childProcess.exec(cmd.join(' '), (err, stdout, stderr) => {
+          if (err) {
+            reject(err)
+          }
+          return this.submitTarballs(filename, entryPoint, seconds, testsFolder + '/tmp', servers).then((timestamp) => {
+            resolve(timestamp)
+          })
         })
       })
     })
