@@ -29,6 +29,6 @@ ENTRY_POINT=$5
 SERVER=$6
 
 cd $DIR/../build-${TIMESTAMP}/$TESTS_FOLDER
-curl -s -F "tarball=@${TARBALL}" -F "entry-point=${ENTRY_POINT}" -F "tests-folder=${TEST}" ${SERVER}
+curl -s -F "tarball=@${TARBALL}" -F "entry-point=${TEST}/${ENTRY_POINT}" -F "tests-folder=${TEST}" ${SERVER}
 
 exit 0

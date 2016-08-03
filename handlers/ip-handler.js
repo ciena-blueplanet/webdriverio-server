@@ -1,4 +1,5 @@
 'use strict'
+const MASTER = true
 const fs = require('fs')
 const path = require('path')
 
@@ -98,6 +99,9 @@ const IPHandler = {
    * or reject if there are errors
    */
   post: function (req, res) {
+    if (!MASTER) {
+      this.startTest(req, res)
+    }
     return new Promise((resolve, reject) => {
       if (!req.headers) {
         res.send('Error: Headers do not exist')

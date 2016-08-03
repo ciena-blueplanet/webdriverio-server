@@ -1,5 +1,6 @@
 'use strict'
 
+const MASTER = true
 const express = require('express')
 const fs = require('fs')
 const path = require('path')
@@ -57,7 +58,7 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
   const id = req.params[0]
   const filename = path.join(__dirname, '..', 'screenshots/output-' + id + '.json')
   // Poll slave servers using the id (timestamp)
-  if (webdriverioTester.getExisting(id)) {
+  if (MASTER && webdriverioTester.getExisting(id)) {
     webdriverioTester.combineResults(id)
   }
   fs.exists(filename, function (exists) {

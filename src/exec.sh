@@ -105,7 +105,9 @@ ln -s ../testUtils build-${TIMESTAMP}/testUtils
 cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 testIt
-tar -cf ../screenshots/${TIMESTAMP}.tar "$TESTS_FOLDER/screenshots"
+mv tests/e2e/screenshots $TESTS_FOLDER/screenshots
+rm -rf tests/e2e
+tar -cf ../screenshots/${TIMESTAMP}-${TESTS_FOLDER}.tar "$TESTS_FOLDER/screenshots"
 
 # CD TO ROOT DIRECTORY ==================================
 cd $DIR/..

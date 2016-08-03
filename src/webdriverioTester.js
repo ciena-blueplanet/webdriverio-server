@@ -55,6 +55,7 @@ const ns = {
      *  {
      *    server: "localhost:4000",
      *    test: "homepage-e2e",
+     *    timestamp: "03498520938",
      *    testComplete: false
      *  }
      * ]
@@ -64,7 +65,11 @@ const ns = {
     testsRunning.forEach((currentTest) => {
       const server = currentTest.server
       const test = currentTest.test
-      const cmd = 'curl -s ' + server + '/status/?id=' + id + '&test=' + test
+      console.log('Curl server: ', server)
+      console.log('Curl test: ', test)
+      console.log('Curl timestamp: ', currentTest.timestamp)
+      const cmd = 'curl -s ' + server + '/status/' + currentTest.timestamp + '-' + test
+      console.log(cmd)
       pset.push(this.exec(cmd).then((res) => {
         const stdout = res[0]
         if (stdout.toString().toLowerCase() === 'not found') {
@@ -75,7 +80,9 @@ const ns = {
       }))
     })
     return Promise.all(pset).then(() => {
-      return testsRunning.reduce((current, element) => current && element.testComplete)
+      return testsRunning.reduce((current, element) => {
+        return current && element.testComplete
+      })
     })
   },
 
@@ -88,7 +95,8 @@ const ns = {
       pset.push(this.processResults(id, server, test))
     })
     Promise.all(pset).then((res) => {
-      return
+      console.log('Final result!: ', res)
+      console.log('This is the place where we need to complete the testing')
     })
   },
 
@@ -200,8 +208,12 @@ const ns = {
     return this.getResults(url)
       .then((results) => {
         const url = server + '/' + results.output
-        return this.getTarball(url).then(() => {
+        return this.getTarball(url)
+        .then(() => {
           return results
+        })
+        .catch((err) => {
+          console.log(err)
         })
       })
   },
