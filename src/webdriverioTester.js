@@ -13,22 +13,11 @@
  * @property {String} stdout - the standard output from command
  */
 
-const _ = require('lodash')
 const Q = require('q')
 const path = require('path')
 const childProcess = require('child_process')
-const sleep = require('sleep')
 const http = require('http')
-const fs = require('fs')
-
-/**
- * Helper for creating a promise (so I don't need to disable new-cap everywhere)
- * @param {*} resolution - what to resolve the promise with
- * @returns {Promise} the promise
- */
-function makePromise (resolution) {
-  return Q(resolution) // eslint-disable-line new-cap
-}
+const fs = require('fs-extra')
 
 /** @alias tester */
 const ns = {
@@ -65,11 +54,7 @@ const ns = {
     testsRunning.forEach((currentTest) => {
       const server = currentTest.server
       const test = currentTest.test
-      console.log('Curl server: ', server)
-      console.log('Curl test: ', test)
-      console.log('Curl timestamp: ', currentTest.timestamp)
       const cmd = 'curl -s ' + server + '/status/' + currentTest.timestamp + '-' + test
-      console.log(cmd)
       pset.push(this.exec(cmd).then((res) => {
         const stdout = res[0]
         if (stdout.toString().toLowerCase() === 'not found') {
@@ -86,6 +71,30 @@ const ns = {
     })
   },
 
+  combineScreenshots (tarFiles, timestamp) {
+    return new Promise((resolve, reject) => {
+      try {
+        let pset = []
+        fs.ensureDirSync(path.join(__dirname, '..', 'build-' + timestamp, 'screenshots'))
+        tarFiles.forEach((file) => {
+          file = file.substring(file.indexOf('/') + 1)
+          pset.push(this.exec('bash ' + path.join(__dirname, 'tarScreenshots.sh') + ' ' + file + ' ' + timestamp))
+        })
+        return Promise.all(pset).then(() => {
+          this.exec('tar -cf ' + timestamp + '.tar build-' + timestamp + '/screenshots/*').then(() => {
+            resolve()
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+          reject(err)
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    })
+  },
+
   combineResults (id) {
     let testsRunning = this.runningProcesses.get(id)
     let pset = []
@@ -97,6 +106,30 @@ const ns = {
     Promise.all(pset).then((res) => {
       console.log('Final result!: ', res)
       console.log('This is the place where we need to complete the testing')
+      let exitCode = 0
+      let notZeroCodes = []
+      let output = ''
+      let tarFiles = []
+      res.forEach((test) => {
+        if (test.exitCode !== 0) {
+          exitCode = 1
+          notZeroCodes.push({
+            test: test.output.slice(test.output.indexOf('-'), -4),
+            info: test.info
+          })
+        }
+        tarFiles.push(test.output)
+      })
+      output = tarFiles[0]
+      let timestamp = output.slice(0, output.indexOf('-'))
+      output = timestamp + '.tar'
+      timestamp = timestamp.substring(timestamp.indexOf('/') + 1)
+      let result = {
+        info: exitCode === 1 ? notZeroCodes : 'All Tests Passed',
+        output
+      }
+      this.combineScreenshots(tarFiles, timestamp)
+      fs.writeFileSync(path.join(__dirname, '..', 'screenshots', 'output-' + id + '.json'), JSON.stringify(result, null, 2))
     })
   },
 
@@ -178,6 +211,7 @@ const ns = {
    * @returns {Promise} resolved when done
    */
   getResults (url) {
+    console.log('curl -s ' + url)
     return this.exec('curl -s ' + url).then((res) => {
       const stdout = res[0]
       console.log('Parsing results...')
