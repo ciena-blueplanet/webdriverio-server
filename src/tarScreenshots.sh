@@ -23,10 +23,16 @@ set -u
 
 TARBALL=$1
 TIMESTAMP=$2
+DIRNAME=$3
 
 cd $DIR/..
 mv ${TARBALL} build-${TIMESTAMP}/screenshots
 cd build-${TIMESTAMP}/screenshots
 tar -xvf ${TARBALL}
+rm ${TARBALL}
+cd ${DIRNAME}
+rsync -a screenshots/* ../
+cd ..
+rm -rf ${DIRNAME}
 
 exit 0

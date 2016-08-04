@@ -98,11 +98,11 @@ function testIt {
 # start at the root of the project
 cd $DIR/..
 echo Processing ${TARBALL}...
-mkdir build-${TIMESTAMP}
-ln -s ../build/node_modules build-${TIMESTAMP}/node_modules
-ln -s ../testUtils build-${TIMESTAMP}/testUtils
+mkdir build-${TIMESTAMP}-${TESTS_FOLDER}
+ln -s ../build/node_modules build-${TIMESTAMP}-${TESTS_FOLDER}/node_modules
+ln -s ../testUtils build-${TIMESTAMP}-${TESTS_FOLDER}/testUtils
 
-cd build-${TIMESTAMP} # IN BUILD DIRECTORY =============================
+cd build-${TIMESTAMP}-${TESTS_FOLDER} # IN BUILD DIRECTORY =============================
 tar -xzf ../uploads/$TARBALL
 testIt
 mv tests/e2e/screenshots $TESTS_FOLDER/screenshots
@@ -112,6 +112,6 @@ tar -cf ../screenshots/${TIMESTAMP}-${TESTS_FOLDER}.tar "$TESTS_FOLDER/screensho
 # CD TO ROOT DIRECTORY ==================================
 cd $DIR/..
 
-rm -rf build-${TIMESTAMP}
+rm -rf build-${TIMESTAMP}-${TESTS_FOLDER}
 
 exit $TEST_STATUS

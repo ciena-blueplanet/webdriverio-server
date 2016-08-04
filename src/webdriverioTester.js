@@ -78,11 +78,14 @@ const ns = {
         fs.ensureDirSync(path.join(__dirname, '..', 'build-' + timestamp, 'screenshots'))
         tarFiles.forEach((file) => {
           file = file.substring(file.indexOf('/') + 1)
-          pset.push(this.exec('bash ' + path.join(__dirname, 'tarScreenshots.sh') + ' ' + file + ' ' + timestamp))
+          let dirname = file.slice(file.indexOf('-') + 1, -4)
+          pset.push(this.exec(`bash ${path.join(__dirname, 'tarScreenshots.sh')} ${file} ${timestamp} ${dirname}`))
         })
         return Promise.all(pset).then(() => {
-          this.exec('tar -cf ' + timestamp + '.tar build-' + timestamp + '/screenshots/*').then(() => {
-            resolve()
+          this.exec(`tar -cf ${timestamp}.tar build-${timestamp}/screenshots/*`).then(() => {
+            this.exec(`mv ${timestamp}.tar screenshots/`).then(() => {
+              resolve()
+            })
           })
         })
         .catch((err) => {
@@ -101,11 +104,10 @@ const ns = {
     testsRunning.forEach((currentTest) => {
       const server = currentTest.server
       const test = currentTest.test
-      pset.push(this.processResults(id, server, test))
+      const timestamp = currentTest.timestamp
+      pset.push(this.processResults(timestamp, server, test))
     })
     Promise.all(pset).then((res) => {
-      console.log('Final result!: ', res)
-      console.log('This is the place where we need to complete the testing')
       let exitCode = 0
       let notZeroCodes = []
       let output = ''
@@ -125,11 +127,13 @@ const ns = {
       output = timestamp + '.tar'
       timestamp = timestamp.substring(timestamp.indexOf('/') + 1)
       let result = {
+        exitCode,
         info: exitCode === 1 ? notZeroCodes : 'All Tests Passed',
         output
       }
       this.combineScreenshots(tarFiles, timestamp)
-      fs.writeFileSync(path.join(__dirname, '..', 'screenshots', 'output-' + id + '.json'), JSON.stringify(result, null, 2))
+      let jsonFile = path.join(__dirname, '..', 'screenshots', 'output-' + id + '.json')
+      fs.writeFileSync(jsonFile, JSON.stringify(result, null, 2))
     })
   },
 
@@ -191,6 +195,7 @@ const ns = {
           }
         })
         const server = this.getRandomServer(servers)
+        console.log('Server: ', server)
         pset.push(this.submitTarball(path.basename(fname), server, element.slice(0, -4), entryPoint, timestamp)
         .then((timestamp) => {
         })
@@ -279,7 +284,9 @@ const ns = {
       pset.push(this.checkServer(server))
     })
     return Promise.all(pset).then((res) => {
-      return res
+      return res.filter((s) => {
+        return s !== undefined
+      })
     })
   },
 
@@ -290,6 +297,7 @@ const ns = {
   execute (filename, entryPoint, seconds, testsFolder) {
     return new Promise((resolve, reject) => {
       this.checkServerAvailibility().then((servers) => {
+        console.log('Servers availible: ' + servers)
         const cmd = ['bash', path.join(__dirname, './tardir.sh'), filename, entryPoint, seconds, testsFolder + '/tmp']
         childProcess.exec(cmd.join(' '), (err, stdout, stderr) => {
           if (err) {
