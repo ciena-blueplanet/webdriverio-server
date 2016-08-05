@@ -103,7 +103,7 @@ ln -s ../build/node_modules build-${TIMESTAMP}-${TESTS_FOLDER}/node_modules
 ln -s ../testUtils build-${TIMESTAMP}-${TESTS_FOLDER}/testUtils
 
 cd build-${TIMESTAMP}-${TESTS_FOLDER} # IN BUILD DIRECTORY =============================
-tar -xzf ../uploads/$TARBALL
+tar -xf ../uploads/$TARBALL
 testIt
 mv tests/e2e/screenshots $TESTS_FOLDER/screenshots
 rm -rf tests/e2e

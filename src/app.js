@@ -57,7 +57,7 @@ app.use(express.static(path.join(__dirname, '..', '/dist')))
 app.get(/^\/status\/(\d+)$/, function (req, res) {
   const id = req.params[0]
   const filename = path.join(__dirname, '..', 'screenshots/output-' + id + '.json')
-  // Poll slave servers using the id (timestamp)
+  // Poll slave servers using the id (timestamp) if the server is the master server
   if (MASTER && webdriverioTester.getExisting(id)) {
     webdriverioTester.combineResults(id)
   }
