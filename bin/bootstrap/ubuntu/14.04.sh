@@ -2,6 +2,7 @@
 set -ex
 
 MASTER=$1
+
 { # this ensures the entire script is downloaded
 
 # Install the base dependencies
@@ -166,7 +167,7 @@ npm install -g webdriverio-server && webdriverio-server-init
 echo "source ~/.bashrc" >> ~/.bash_profile
 echo 'export NVM_DIR="$HOME/.nvm' >> ~/.bashrc
 echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh' >> ~/.bashrc
-echo 'MASTER=$MASTER' >> ~/.bashrc
+echo 'export MASTER='${MASTER} >> ~/.bashrc
 echo "Please source ~/.bashrc to complete setup"
 echo "After the initial run, to run it again, you should only need:"
 echo "\$ source ~/.bashrc && DISPLAY=:0 DEBUG=server webdriverio-server"

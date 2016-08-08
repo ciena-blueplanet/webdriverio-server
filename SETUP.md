@@ -66,6 +66,19 @@ This is ignored on the webdriverio-server repository, but it is required when ru
 }
 ```
 
+#### Configuring the set of slave servers
+When using the multi server solution, where a master server sends tests to slave servers, a json file is required.
+
+```
+{
+  "potentialServers": [
+    "localhost:3000",
+    "localhost:4000"
+  ]
+}
+```
+This file needs to be called servers.json and must be stored in the base directory.
+
 #### Congiuring Travis CI
 When running e2e tests on TravisCI, we using the commit number to determine the username of the person who committed the code. This means we use the GitHub api to 
 determine this information. However, the GitHub api limits the number of hits by a given IP address to 60 per hour. This means that Travis is limited when connecting
