@@ -1,11 +1,5 @@
 {
   "potentialServers": [
-    "wdio.bp.cyaninc.com",
-    "localhost:4000",
-    "localhost:4500",
-    "localhost:5000",
-    "localhost:5500",
-    "localhost:6000",
-    "localhost:6500"
+    "wdio.bp.cyaninc.com"
   ]
 }

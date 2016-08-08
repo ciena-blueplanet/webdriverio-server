@@ -15,3 +15,4 @@ typings/
 build-*/
 test.tar.gz
 *.tar
+servers.json

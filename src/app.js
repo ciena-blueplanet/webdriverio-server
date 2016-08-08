@@ -21,6 +21,7 @@ const auth = require('../routes/auth')
 const ip = require('../routes/ip')
 
 const webdriverioTester = require('./webdriverioTester')
+webdriverioTester.init()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))

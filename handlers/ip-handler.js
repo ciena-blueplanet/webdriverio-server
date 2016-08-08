@@ -99,26 +99,25 @@ const IPHandler = {
    * or reject if there are errors
    */
   post: function (req, res) {
+    console.log('Getting request')
     if (!MASTER) {
+      console.log('This is a slave server, starting tests...')
       this.startTest(req, res)
-    }
-    return new Promise((resolve, reject) => {
+    } else {
+      console.log('This is a master server. Checking the IP of the incoming request...')
       if (!req.headers) {
         res.send('Error: Headers do not exist')
         res.end()
-        reject()
       } else {
         this.checkIP(req)
         .then((result) => {
           if (result === true) {
             this.startTest(req, res)
-            resolve()
           } else {
             this.checkUsername(req, res).then(() => {
-              resolve()
             })
-            .catch(() => {
-              reject()
+            .catch((err) => {
+              throw new Error(err)
             })
           }
         })
@@ -126,11 +125,11 @@ const IPHandler = {
           if (err) {
             res.send(err)
             res.end()
-            reject()
+            console.log(err)
           }
         })
       }
-    })
+    }
   }
 }
 

@@ -91,10 +91,9 @@ ns.newFile = function (filename, entryPoint, testsFolder, res) {
   debug('START: ------------ ' + seconds)
 
   if (MASTER) {
-    webdriverioTester.init()
     webdriverioTester.execute(filename, entryPoint, seconds, testsFolder)
     .then((timestamp) => {
-      console.log('Timestamp: ', timestamp.toString())
+      console.log('Timestamp: ', timestamp)
       res.send(timestamp.toString())
       res.end()
     })

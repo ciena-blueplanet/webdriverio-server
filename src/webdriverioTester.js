@@ -128,6 +128,7 @@ const ns = {
     let testsRunning = this.runningProcesses.get(id)
     let pset = []
     testsRunning.forEach((currentTest) => {
+      console.log('Timestamp: ', currentTest.timestamp)
       pset.push(this.processResults(currentTest.timestamp, currentTest.server, currentTest.test))
     })
     return Promise.all(pset)
@@ -182,7 +183,7 @@ const ns = {
     return new Promise((resolve, reject) => {
       console.log(
         `curl -s -F "tarball=@${tarball}" -F "entry-point=${test}/${entryPoint}" -F "tests-folder=${test}" ${server}`)
-      childProcess.exec(
+      return childProcess.exec(
         `bash ${tarpath} ${timestamp1} tests/e2e/tmp ${tarball} ${test} ${entryPoint} ${server}/`,
         (err, stdout, stderr) => {
           if (err) {
@@ -209,6 +210,7 @@ const ns = {
    * @returns {Promise} Resolves with a timestamp or an error
    */
   submitTarballs (entryPoint, timestamp, testsFolder, servers) {
+    console.log('Timestamp tarballs: ', timestamp)
     let pset = []
     let buildPath = path.join(__dirname, '..', 'build-' + timestamp, testsFolder)
     this.runningProcesses.set(timestamp.toString(), [])
@@ -234,22 +236,24 @@ const ns = {
           }
         })
         const server = this.getRandomServer(servers)
-        setTimeout(() => {
-          console.log('Submitting Tarball to ', server)
-          pset.push(this.submitTarball(path.basename(fname), server, element.slice(0, -4), entryPoint, timestamp)
-          .then((timestamp) => {
-          })
-          .catch((err) => {
-            throw new Error(err)
-          }))
-        }, 3000)
+        console.log('Submitting Tarball to ', server)
+        pset.push(this.submitTarball(path.basename(fname), server, element.slice(0, -4), entryPoint, timestamp).then((timestamp2) => {
+          console.log('Timestamp returned: ', timestamp2)
+        })
+        .catch((err) => {
+          console.log('submitTarball fails: ', err)
+          throw new Error(err)
+        }))
       }
     })
     return Promise.all(pset)
     .then((timestampMaybe) => {
+      console.log('Timestamp: ', timestamp)
+      console.log('Timestamp array: ', timestampMaybe)
       return timestamp
     })
     .catch((err) => {
+      console.log('Submit Tarballs fails here: ', err)
       throw new Error(err)
     })
   },
@@ -375,6 +379,7 @@ const ns = {
           }
           return this.submitTarballs(entryPoint, seconds, testsFolder + '/tmp', servers)
           .then((timestamp) => {
+            console.log('Timestamp execute: ', timestamp)
             resolve(timestamp)
           })
           .catch((err) => {
