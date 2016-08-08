@@ -24,7 +24,7 @@ router.use(methodOverride(function (req, res) {
 router.use(multer({
   dest: path.join(__dirname, '..', 'uploads'),
   rename: function (fieldname, filename) {
-    return filename + '.' + Date.now()
+    return filename + process.env['MASTER'] ? '.' + Date.now() : ''
   },
   onFileUploadStart: function () {
     debug('client request is starting ...')

@@ -1,5 +1,5 @@
 'use strict'
-const MASTER = true
+const MASTER = process.env['MASTER']
 
 const childProcess = require('child_process')
 const debug = require('debug')('server')
