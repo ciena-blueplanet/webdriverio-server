@@ -1,7 +1,7 @@
 /* eslint-disable max-nested-callbacks */
 
 'use strict'
-
+process.env['MASTER'] = false
 const childProcess = require('child_process')
 const fs = require('fs')
 const path = require('path')

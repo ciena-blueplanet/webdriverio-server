@@ -1,5 +1,4 @@
 'use strict'
-const MASTER = process.env['MASTER']
 
 const childProcess = require('child_process')
 const debug = require('debug')('server')
@@ -85,12 +84,13 @@ const watchChild = function (child, seconds, test) {
  * @param {String} entryPoint - the URL to start testing
  * @param {String} testsFolder - the path to the tests folder (tests/e2e)
  * @param {Response} res - the express response object
+ * @param {String} master - Whether the server is a master server or not
  */
-ns.newFile = function (filename, entryPoint, testsFolder, res) {
+ns.newFile = function (filename, entryPoint, testsFolder, res, master) {
   const seconds = Math.floor(new Date().getTime() / 1000)
   debug('START: ------------ ' + seconds)
 
-  if (MASTER) {
+  if (master) {
     webdriverioTester.execute(filename, entryPoint, seconds, testsFolder)
     .then((timestamp) => {
       console.log('Timestamp: ', timestamp)

@@ -24,7 +24,7 @@ router.use(methodOverride(function (req, res) {
 router.use(multer({
   dest: path.join(__dirname, '..', 'uploads'),
   rename: function (fieldname, filename) {
-    return filename + process.env['MASTER'] ? '.' + Date.now() : ''
+    return filename + process.env['MASTER'] === 'true' ? '.' + Date.now() : ''
   },
   onFileUploadStart: function () {
     debug('client request is starting ...')
@@ -35,6 +35,7 @@ router.use(multer({
 }))
 
 // This will be accessible from base_url/
+IPHandler.init()
 router.route('/')
     .post(IPHandler.post.bind(IPHandler))
 

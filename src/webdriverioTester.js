@@ -63,7 +63,7 @@ const ns = {
         }
       })
       .catch((err) => {
-        throw new Error(err)
+        throw err
       }))
     })
     return Promise.all(pset)
@@ -73,7 +73,7 @@ const ns = {
       })
     })
     .catch((err) => {
-      throw new Error(err)
+      throw err
     })
   },
 

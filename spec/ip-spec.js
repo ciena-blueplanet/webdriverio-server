@@ -1,4 +1,5 @@
 'use strict'
+process.env['MASTER'] = true
 
 const DeveloperHandler = require('../handlers/developers-handler.js')
 const IPHandler = require('../handlers/ip-handler.js')
@@ -130,7 +131,7 @@ describe('IP Handling Spec', function () {
     })
   })
 
-  describe('post()', function () {
+  describe('post() and checkUsername()', function () {
     let req, res
     beforeEach(function () {
       res = jasmine.createSpyObj('res', ['send', 'end'])
@@ -153,30 +154,17 @@ describe('IP Handling Spec', function () {
           spyOn(DeveloperHandler, 'get').and.callFake(function () {
             return Promise.resolve()
           })
-        })
-        it('should start the tests', function (done) {
           IPHandler.post(req, res)
-          .then(() => {
-            expect(IPHandler.startTest).toHaveBeenCalledWith(req, res)
-            done()
-          })
-          .catch((err) => {
-            done.fail(err)
-          })
         })
-        it('should call DeveloperHandler.get with the correct parameters', function (done) {
-          IPHandler.post(req, res)
-          .then(() => {
-            expect(DeveloperHandler.get).toHaveBeenCalledWith({
-              query: {
-                username: req.headers.username,
-                token: req.headers.token
-              }
-            })
-            done()
-          })
-          .catch((err) => {
-            done.fail(err)
+        it('should start the tests', function () {
+          expect(IPHandler.startTest).toHaveBeenCalledWith(req, res)
+        })
+        it('should call DeveloperHandler.get with the correct parameters', function () {
+          expect(DeveloperHandler.get).toHaveBeenCalledWith({
+            query: {
+              username: req.headers.username,
+              token: req.headers.token
+            }
           })
         })
       })
@@ -185,17 +173,11 @@ describe('IP Handling Spec', function () {
           spyOn(DeveloperHandler, 'get').and.callFake(function () {
             return Promise.reject('Error')
           })
-        })
-        it('should send the error back in the res object', function (done) {
           IPHandler.post(req, res)
-          .then((err) => {
-            done.fail(err)
-          })
-          .catch(() => {
-            expect(res.send).toHaveBeenCalledWith('Error')
-            expect(res.end).toHaveBeenCalled()
-            done()
-          })
+        })
+        it('should send the error back in the res object', function () {
+          expect(res.send).toHaveBeenCalledWith('Error')
+          expect(res.end).toHaveBeenCalled()
         })
       })
       describe('username or token does not exist', function () {
@@ -206,17 +188,11 @@ describe('IP Handling Spec', function () {
               token: '~'
             }
           }
-        })
-        it('should send an error in the res object', function (done) {
           IPHandler.post(req, res)
-          .then((err) => {
-            done.fail(err)
-          })
-          .catch(() => {
-            expect(res.send).toHaveBeenCalled()
-            expect(res.end).toHaveBeenCalled()
-            done()
-          })
+        })
+        it('should send an error in the res object', function () {
+          expect(res.send).toHaveBeenCalled()
+          expect(res.end).toHaveBeenCalled()
         })
       })
     })
@@ -232,16 +208,10 @@ describe('IP Handling Spec', function () {
         spyOn(IPHandler, 'checkIP').and.callFake(function () {
           return Promise.resolve(true)
         })
-      })
-      it('should start the tests', function (done) {
         IPHandler.post(req, res)
-        .then(() => {
-          expect(IPHandler.startTest).toHaveBeenCalledWith(req, res)
-          done()
-        })
-        .catch((err) => {
-          done.fail(err)
-        })
+      })
+      it('should start the tests', function () {
+        expect(IPHandler.startTest).toHaveBeenCalledWith(req, res)
       })
     })
     describe('checkIP rejects', function () {
@@ -252,37 +222,24 @@ describe('IP Handling Spec', function () {
             token: '123456'
           }
         }
-        spyOn(IPHandler, 'startTest')
         spyOn(IPHandler, 'checkIP').and.callFake(function () {
           return Promise.reject('Error')
         })
-      })
-      it('should send an error message in the res object', function (done) {
         IPHandler.post(req, res)
-        .then((err) => {
-          done.fail(err)
-        })
-        .catch((result) => {
-          expect(res.send).toHaveBeenCalledWith('Error')
-          expect(res.end).toHaveBeenCalled()
-          done()
-        })
+      })
+      it('should send an error message in the res object', function () {
+        expect(res.send).toHaveBeenCalledWith('Error')
+        expect(res.end).toHaveBeenCalled()
       })
     })
     describe('No headers exist', function () {
       beforeEach(function () {
         req = {}
-      })
-      it('should send an error message in the res object', function (done) {
         IPHandler.post(req, res)
-        .then((err) => {
-          done.fail(err)
-        })
-        .catch(() => {
-          expect(res.send).toHaveBeenCalled()
-          expect(res.end).toHaveBeenCalled()
-          done()
-        })
+      })
+      it('should send an error message in the res object', function () {
+        expect(res.send).toHaveBeenCalled()
+        expect(res.end).toHaveBeenCalled()
       })
     })
   })

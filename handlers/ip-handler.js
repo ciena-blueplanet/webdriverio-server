@@ -1,5 +1,5 @@
 'use strict'
-const MASTER = process.env['MASTER']
+
 const fs = require('fs')
 const path = require('path')
 
@@ -7,6 +7,9 @@ const DeveloperHandler = require('../handlers/developers-handler.js')
 const processUpload = require('../src/process-upload')
 
 const IPHandler = {
+  init: function () {
+    this.MASTER = process.env['MASTER'] === 'true'
+  },
   /**
    * Starts the e2e tests once a developers credentials are verified or travis is running the tests
    * @param {Object} req - The express formatted object containing the files and the tarball
@@ -16,7 +19,7 @@ const IPHandler = {
     const filename = req.files.tarball.name
     const entryPoint = req.body['entry-point'] || 'demo'
     const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-    processUpload.newFile(filename, entryPoint, testsFolder, res)
+    processUpload.newFile(filename, entryPoint, testsFolder, res, this.MASTER)
   },
   /**
    * Checks the IP of the incoming tarball
@@ -82,10 +85,11 @@ const IPHandler = {
           this.startTest(req, res)
           resolve()
         }).catch((err) => {
+          console.log('Dev Handler: ', err)
           if (err) {
             res.send(err)
             res.end()
-            reject()
+            reject(err)
           }
         })
       }
@@ -95,16 +99,17 @@ const IPHandler = {
    * This will start e2e tests if the credentials given are correct
    * @param {Object} req - The express formatted object containing the files and credentials
    * @param {Object} res - The response object containing any errors produced during the checking process
-   * @returns {Promise} A promise that will either resolve after the tests are finished
-   * or reject if there are errors
    */
   post: function (req, res) {
-    console.log('Getting request')
-    if (!MASTER) {
-      console.log('This is a slave server, starting tests...')
+    console.log('process.env', this.MASTER)
+    console.log('process.env', process.env['MASTER'])
+    let check = process.env['MASTER'] === 'true'
+    console.log('check eql', check)
+    if (!this.MASTER) {
+      console.log('Here')
       this.startTest(req, res)
     } else {
-      console.log('This is a master server. Checking the IP of the incoming request...')
+      console.log('Over here')
       if (!req.headers) {
         res.send('Error: Headers do not exist')
         res.end()
@@ -117,7 +122,7 @@ const IPHandler = {
             this.checkUsername(req, res).then(() => {
             })
             .catch((err) => {
-              throw new Error(err)
+              throw err
             })
           }
         })

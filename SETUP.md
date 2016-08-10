@@ -28,6 +28,14 @@ This script should configure everything, including Node, Redis, xvfb, and Java
 
 If there is any need to enter the tmux session again, run the command ```tmux attach-session```
 
+##### Configuring the webdriverio-server to use forever js
+Forever.js is another solution which is very easy to setup and might become the default way to run a program in the background. However, it is not as 
+easy to find the output logs, since the output is not directory to the console.
+1. Run the command ```npm install -g forever```
+2. Run the command ```forever start webdriverio-server```
+
+This should run webdriverio-server as a service forever. If you want to stop the service, run `forever stop webdriverio-server`. More details on forever can be found [here](https://github.com/foreverjs/forever/blob/master/README.md)
+
 #### Configuring the RedisDB to use a password
 In Ubuntu, the redis.conf file, or the redis configuration file is stored at this location ```/etc/redis```  
 

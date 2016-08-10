@@ -1,6 +1,6 @@
 'use strict'
 
-const MASTER = process.env['MASTER']
+const MASTER = process.env['MASTER'] === 'true'
 const express = require('express')
 const fs = require('fs')
 const path = require('path')
