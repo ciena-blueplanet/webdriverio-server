@@ -65,6 +65,12 @@ const IPHandler = {
       }
     })
   },
+  /**
+   * Checks the username of the developer sending the requests to the master server
+   * @param {Object} req - The express formatted object containing the files and credentials
+   * @param {Object} res - The response object containing any errors produced during the checking process
+   * @returns {Promise} - Either resolves indicating no error or rejects with an error
+   */
   checkUsername: function (req, res) {
     return new Promise((resolve, reject) => {
       const username = req.headers.username
@@ -85,7 +91,6 @@ const IPHandler = {
           this.startTest(req, res)
           resolve()
         }).catch((err) => {
-          console.log('Dev Handler: ', err)
           if (err) {
             res.send(err)
             res.end()
@@ -99,42 +104,43 @@ const IPHandler = {
    * This will start e2e tests if the credentials given are correct
    * @param {Object} req - The express formatted object containing the files and credentials
    * @param {Object} res - The response object containing any errors produced during the checking process
+   * @returns {Promise} - Either resolves indicating no error or rejects with an error
    */
   post: function (req, res) {
-    console.log('process.env', this.MASTER)
-    console.log('process.env', process.env['MASTER'])
-    let check = process.env['MASTER'] === 'true'
-    console.log('check eql', check)
-    if (!this.MASTER) {
-      console.log('Here')
-      this.startTest(req, res)
-    } else {
-      console.log('Over here')
-      if (!req.headers) {
-        res.send('Error: Headers do not exist')
-        res.end()
+    return new Promise((resolve, reject) => {
+      if (!this.MASTER) {
+        this.startTest(req, res)
+        resolve()
       } else {
-        this.checkIP(req)
-        .then((result) => {
-          if (result === true) {
-            this.startTest(req, res)
-          } else {
-            this.checkUsername(req, res).then(() => {
-            })
-            .catch((err) => {
-              throw err
-            })
-          }
-        })
-        .catch((err) => {
-          if (err) {
-            res.send(err)
-            res.end()
-            console.log(err)
-          }
-        })
+        if (!req.headers) {
+          res.send('Error: Headers do not exist')
+          res.end()
+          reject('Error: Headers do not exist')
+        } else {
+          return this.checkIP(req)
+          .then((result) => {
+            if (result === true) {
+              this.startTest(req, res)
+              resolve()
+            } else {
+              this.checkUsername(req, res).then(() => {
+                resolve()
+              })
+              .catch((err) => {
+                throw err
+              })
+            }
+          })
+          .catch((err) => {
+            if (err) {
+              res.send(err)
+              res.end()
+              reject(err)
+            }
+          })
+        }
       }
-    }
+    })
   }
 }
 

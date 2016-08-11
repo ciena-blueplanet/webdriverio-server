@@ -1,7 +1,6 @@
 /* eslint-disable max-nested-callbacks */
 
 'use strict'
-process.env['MASTER'] = false
 const childProcess = require('child_process')
 const fs = require('fs')
 const path = require('path')
@@ -69,11 +68,11 @@ describe('process-upload', function () {
 
       it('writes a file', function () {
         expect(fs.writeFile).toHaveBeenCalledWith(
-          path.join(__dirname, '../screenshots/output-' + seconds + '.json'),
+          path.join(__dirname, '../screenshots/output-' + seconds + '-..json'),
           JSON.stringify({
             exitCode: 13,
             info: 'some-stdout-datasome-stderr-data',
-            output: 'screenshots/' + seconds + '.tar'
+            output: 'screenshots/' + seconds + '-..tar'
           }),
           jasmine.any(Function)
         )
