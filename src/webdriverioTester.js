@@ -161,11 +161,11 @@ const ns = {
         fs.writeFileSync(jsonFile, JSON.stringify(result, null, 2))
       })
       .catch((err) => {
-        throw new Error(err)
+        throw err
       })
     })
     .catch((err) => {
-      throw new Error(err)
+      throw err
     })
   },
 
@@ -218,21 +218,21 @@ const ns = {
     try {
       files = fs.readdirSync(buildPath)
     } catch (err) {
-      throw new Error(err)
+      throw err
     }
     files.forEach((element) => {
       let file
       try {
         file = fs.statSync(path.join(buildPath, element))
       } catch (err) {
-        throw new Error(err)
+        throw err
       }
       if (file.isFile() && element.endsWith('.tar')) {
         let fname = path.join(buildPath, element).slice(0, -4)
         fname = fname + '-' + timestamp + '.tar'
         fs.rename(path.join(buildPath, element), fname, (err) => {
           if (err) {
-            throw new Error(err)
+            throw err
           }
         })
         const server = this.getRandomServer(servers)
@@ -241,15 +241,12 @@ const ns = {
           console.log('Timestamp returned: ', timestamp2)
         })
         .catch((err) => {
-          console.log('submitTarball fails: ', err)
-          throw new Error(err)
+          throw err
         }))
       }
     })
     return Promise.all(pset)
-    .then((timestampMaybe) => {
-      console.log('Timestamp: ', timestamp)
-      console.log('Timestamp array: ', timestampMaybe)
+    .then(() => {
       return timestamp
     })
     .catch((err) => {
@@ -290,7 +287,6 @@ const ns = {
    */
   processResults (timestamp, server, testsDir) {
     const url = server + '/screenshots/output-' + timestamp + '-' + testsDir + '.json'
-
     return this.getResults(url)
       .then((results) => {
         const url = server + '/' + results.output
