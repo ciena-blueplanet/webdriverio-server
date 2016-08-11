@@ -410,7 +410,7 @@ describe('WebDriverIO Testing Spec', function () {
     let serverArray = ['localhost:3000', 'localhost:3500', 'localhost:4000']
     it('should return one of the servers from the given server array parameter', function () {
       let res = wdioTester.getRandomServer(serverArray)
-      expect(serverArray.includes(res)).toBeTruthy()
+      expect(serverArray.indexOf(res)).not.toEqual(-1)
     })
   })
   describe('execute()', function () {
