@@ -237,7 +237,8 @@ const ns = {
         })
         const server = this.getRandomServer(servers)
         console.log('Submitting Tarball to ', server)
-        pset.push(this.submitTarball(path.basename(fname), server, element.slice(0, -4), entryPoint, timestamp).then((timestamp2) => {
+        pset.push(this.submitTarball(path.basename(fname), server, element.slice(0, -4), entryPoint, timestamp)
+        .then((timestamp2) => {
           console.log('Timestamp returned: ', timestamp2)
         })
         .catch((err) => {

@@ -76,8 +76,8 @@ describe('WebDriverIO Testing Spec', function () {
       it('should call the exec command with the correct curl commands', function (done) {
         wdioTester.combineScreenshots(tarFiles, '23098409').then(() => {
           expect(wdioTester.exec.calls.allArgs()).toEqual([
-            [`bash ${path.join(__dirname, '../src', 'tarScreenshots.sh')} 23098409-tests2-e2e.tar ${timestamp} tests2-e2e`],
-            [`bash ${path.join(__dirname, '../src', 'tarScreenshots.sh')} 23098409-tests-e2e.tar ${timestamp} tests-e2e`],
+            [`bash ${path.join(__dirname, '../src', 'tarScreenshots.sh')} 23098409-tests2-e2e.tar ${timestamp} tests2-e2e`], // eslint-disable-line max-len
+            [`bash ${path.join(__dirname, '../src', 'tarScreenshots.sh')} 23098409-tests-e2e.tar ${timestamp} tests-e2e`], // eslint-disable-line max-len
             [`tar -cf ${timestamp}.tar build-${timestamp}/screenshots/*`],
             [`mv ${timestamp}.tar screenshots/`]
           ])
@@ -469,7 +469,8 @@ describe('WebDriverIO Testing Spec', function () {
       })
       it('should be called with the correct arguments', function (done) {
         wdioTester.execute(filename, entryPoint, seconds, testsFolder).then(() => {
-          expect(wdioTester.submitTarballs).toHaveBeenCalledWith(entryPoint, seconds, testsFolder + '/tmp', serversArray)
+          expect(wdioTester.submitTarballs)
+            .toHaveBeenCalledWith(entryPoint, seconds, testsFolder + '/tmp', serversArray)
           done()
         })
       })
