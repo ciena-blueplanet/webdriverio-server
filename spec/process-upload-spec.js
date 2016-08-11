@@ -1,7 +1,6 @@
 /* eslint-disable max-nested-callbacks */
 
 'use strict'
-
 const childProcess = require('child_process')
 const fs = require('fs')
 const path = require('path')
@@ -26,9 +25,7 @@ describe('process-upload', function () {
     beforeEach(function () {
       res = jasmine.createSpyObj('res', ['send', 'end'])
       seconds = Math.floor(new Date().getTime() / 1000)
-      console.log('attempting newFile call...')
       processUpload.newFile('filename', 'entry-point', '.', res)
-      console.log('done----------------------')
     })
 
     it('spawns a new process', function () {
@@ -71,11 +68,11 @@ describe('process-upload', function () {
 
       it('writes a file', function () {
         expect(fs.writeFile).toHaveBeenCalledWith(
-          path.join(__dirname, '../screenshots/output-' + seconds + '.json'),
+          path.join(__dirname, '../screenshots/output-' + seconds + '-..json'),
           JSON.stringify({
             exitCode: 13,
             info: 'some-stdout-datasome-stderr-data',
-            output: 'screenshots/' + seconds + '.tar'
+            output: 'screenshots/' + seconds + '-..tar'
           }),
           jasmine.any(Function)
         )

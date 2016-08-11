@@ -1,4 +1,5 @@
 'use strict'
+
 const fs = require('fs')
 const path = require('path')
 
@@ -6,6 +7,9 @@ const DeveloperHandler = require('../handlers/developers-handler.js')
 const processUpload = require('../src/process-upload')
 
 const IPHandler = {
+  init: function () {
+    this.MASTER = process.env['MASTER'] === 'true'
+  },
   /**
    * Starts the e2e tests once a developers credentials are verified or travis is running the tests
    * @param {Object} req - The express formatted object containing the files and the tarball
@@ -15,7 +19,7 @@ const IPHandler = {
     const filename = req.files.tarball.name
     const entryPoint = req.body['entry-point'] || 'demo'
     const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-    processUpload.newFile(filename, entryPoint, testsFolder, res)
+    processUpload.newFile(filename, entryPoint, testsFolder, res, this.MASTER)
   },
   /**
    * Checks the IP of the incoming tarball
@@ -25,7 +29,7 @@ const IPHandler = {
    */
   checkIP: function (req) {
     return new Promise((resolve, reject) => {
-      const ip = req.headers['x-forwarded-for'].toString()
+      const ip = req.headers['x-forwarded-for']
       if (!ip) {
         reject(`Please set headers for proxy connections using nginx!\n
         A helpful article on setting this up: https://www.digitalocean.com/community/tutorials/
@@ -45,7 +49,7 @@ const IPHandler = {
           token
         }
       }
-      if (fileContents.indexOf(ip) !== -1) {
+      if (fileContents.indexOf(ip.toString()) !== -1) {
         DeveloperHandler.get(request).then(() => {
           reject('Your account is restricted. Your username is ' + username + ' and your token is ' + token)
         })
@@ -61,6 +65,12 @@ const IPHandler = {
       }
     })
   },
+  /**
+   * Checks the username of the developer sending the requests to the master server
+   * @param {Object} req - The express formatted object containing the files and credentials
+   * @param {Object} res - The response object containing any errors produced during the checking process
+   * @returns {Promise} - Either resolves indicating no error or rejects with an error
+   */
   checkUsername: function (req, res) {
     return new Promise((resolve, reject) => {
       const username = req.headers.username
@@ -84,7 +94,7 @@ const IPHandler = {
           if (err) {
             res.send(err)
             res.end()
-            reject()
+            reject(err)
           }
         })
       }
@@ -94,37 +104,41 @@ const IPHandler = {
    * This will start e2e tests if the credentials given are correct
    * @param {Object} req - The express formatted object containing the files and credentials
    * @param {Object} res - The response object containing any errors produced during the checking process
-   * @returns {Promise} A promise that will either resolve after the tests are finished
-   * or reject if there are errors
+   * @returns {Promise} - Either resolves indicating no error or rejects with an error
    */
   post: function (req, res) {
     return new Promise((resolve, reject) => {
-      if (!req.headers) {
-        res.send('Error: Headers do not exist')
-        res.end()
-        reject()
+      if (!this.MASTER) {
+        this.startTest(req, res)
+        resolve()
       } else {
-        this.checkIP(req)
-        .then((result) => {
-          if (result === true) {
-            this.startTest(req, res)
-            resolve()
-          } else {
-            this.checkUsername(req, res).then(() => {
+        if (!req.headers) {
+          res.send('Error: Headers do not exist')
+          res.end()
+          reject('Error: Headers do not exist')
+        } else {
+          return this.checkIP(req)
+          .then((result) => {
+            if (result === true) {
+              this.startTest(req, res)
               resolve()
-            })
-            .catch(() => {
-              reject()
-            })
-          }
-        })
-        .catch((err) => {
-          if (err) {
-            res.send(err)
-            res.end()
-            reject()
-          }
-        })
+            } else {
+              this.checkUsername(req, res).then(() => {
+                resolve()
+              })
+              .catch((err) => {
+                throw err
+              })
+            }
+          })
+          .catch((err) => {
+            if (err) {
+              res.send(err)
+              res.end()
+              reject(err)
+            }
+          })
+        }
       }
     })
   }

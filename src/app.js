@@ -1,5 +1,6 @@
 'use strict'
 
+const MASTER = process.env['MASTER'] === 'true'
 const express = require('express')
 const fs = require('fs')
 const path = require('path')
@@ -18,6 +19,9 @@ const app = express()
 const developers = require('../routes/developers')
 const auth = require('../routes/auth')
 const ip = require('../routes/ip')
+
+const webdriverioTester = require('./webdriverioTester')
+webdriverioTester.init()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -54,6 +58,10 @@ app.use(express.static(path.join(__dirname, '..', '/dist')))
 app.get(/^\/status\/(\d+)$/, function (req, res) {
   const id = req.params[0]
   const filename = path.join(__dirname, '..', 'screenshots/output-' + id + '.json')
+  // Poll slave servers using the id (timestamp) if the server is the master server
+  if (MASTER && webdriverioTester.getExisting(id)) {
+    webdriverioTester.combineResults(id)
+  }
   fs.exists(filename, function (exists) {
     if (exists) {
       res.status(200).send('finished')

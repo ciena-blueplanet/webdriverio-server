@@ -28,6 +28,14 @@ This script should configure everything, including Node, Redis, xvfb, and Java
 
 If there is any need to enter the tmux session again, run the command ```tmux attach-session```
 
+##### Configuring the webdriverio-server to use forever js
+Forever.js is another solution which is very easy to setup and might become the default way to run a program in the background. However, it is not as 
+easy to find the output logs, since the output is not directory to the console.
+1. Run the command ```npm install -g forever```
+2. Run the command ```forever start webdriverio-server```
+
+This should run webdriverio-server as a service forever. If you want to stop the service, run `forever stop webdriverio-server`. More details on forever can be found [here](https://github.com/foreverjs/forever/blob/master/README.md)
+
 #### Configuring the RedisDB to use a password
 In Ubuntu, the redis.conf file, or the redis configuration file is stored at this location ```/etc/redis```  
 
@@ -65,6 +73,19 @@ This is ignored on the webdriverio-server repository, but it is required when ru
   "url": "the-url-of-this-server"
 }
 ```
+
+#### Configuring the set of slave servers
+When using the multi server solution, where a master server sends tests to slave servers, a json file is required.
+
+```
+{
+  "potentialServers": [
+    "localhost:3000",
+    "localhost:4000"
+  ]
+}
+```
+This file needs to be called servers.json and must be stored in the base directory.
 
 #### Congiuring Travis CI
 When running e2e tests on TravisCI, we using the commit number to determine the username of the person who committed the code. This means we use the GitHub api to 

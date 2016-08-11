@@ -190,6 +190,9 @@ function getResponse (err, res, req, redisResp) {
                                            'Please make sure that you are signed up as an authorized ' +
                                            'ciena developer on www.cienadevelopers.com', 500)
     return {reject: 'This username does not exist: ' + req.query.username}
+  } else if (redisResp === '~' || req.query.token === '~') {
+    DeveloperHandler.setErrorResponse(res, 'This account has been restricted', 500)
+    return {reject: 'This account has been restricted'}
   } else if (req.query.token === '' || req.query.token === redisResp) {
     DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
     return {resolve: req.query.token}

@@ -4,6 +4,7 @@ const childProcess = require('child_process')
 const debug = require('debug')('server')
 const path = require('path')
 const fs = require('fs')
+const webdriverioTester = require('./webdriverioTester')
 
 const ns = {
   scriptPath: path.join(__dirname, './exec.sh')
@@ -17,8 +18,9 @@ var strip = function (data) {
  * Collect information from the child process
  * @param {Child} child - child process
  * @param {Number} seconds - timestamp when process started
+ * @param {String} test - the current test being run
  */
-const watchChild = function (child, seconds) {
+const watchChild = function (child, seconds, test) {
   const info = []
 
   child.stdout.on('data', function (data) {
@@ -42,7 +44,7 @@ const watchChild = function (child, seconds) {
     var output = {
       exitCode: code,
       info: info.join(''),
-      output: 'screenshots/' + seconds + '.tar'
+      output: 'screenshots/' + seconds + '-' + test + '.tar'
     }
 
     try {
@@ -52,7 +54,7 @@ const watchChild = function (child, seconds) {
       output = {
         exitCode: code,
         info: e.toString(),
-        output: 'screenshots/' + seconds + '.tar'
+        output: 'screenshots/' + seconds + '-' + test + '.tar'
       }
 
       try {
@@ -62,7 +64,7 @@ const watchChild = function (child, seconds) {
       }
     }
 
-    var filename = path.join(__dirname, '../screenshots/output-' + seconds + '.json')
+    var filename = path.join(__dirname, '../screenshots/output-' + seconds + '-' + test + '.json')
     fs.writeFile(filename, output, function (err) {
       if (err) {
         debug(seconds + ' : UNABLE TO WRITE FILE ' + filename + ' -- ' + err.toString())
@@ -75,22 +77,36 @@ const watchChild = function (child, seconds) {
 
 /**
  * We have received a request to process a new file
- * spawn a shell process to do all the operations and
- * watch the output of that process. Then bundle up a json
- * response for the requester.
+ * If the server is the master server, we need to tar all of the files and send them to slave servers
+ * and then wait for there return
+ * If the server is a slave server, we spawn a child process to process the files and run the e2e test
  * @param {String} filename - the name of the tar file that was uploaded
  * @param {String} entryPoint - the URL to start testing
  * @param {String} testsFolder - the path to the tests folder (tests/e2e)
  * @param {Response} res - the express response object
+ * @param {String} master - Whether the server is a master server or not
  */
-ns.newFile = function (filename, entryPoint, testsFolder, res) {
+ns.newFile = function (filename, entryPoint, testsFolder, res, master) {
   const seconds = Math.floor(new Date().getTime() / 1000)
   debug('START: ------------ ' + seconds)
 
-  const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
-  watchChild(child, seconds)
-  res.send(seconds.toString())
-  res.end()
+  if (master) {
+    webdriverioTester.execute(filename, entryPoint, seconds, testsFolder)
+    .then((timestamp) => {
+      console.log('Timestamp: ', timestamp)
+      res.send(timestamp.toString())
+      res.end()
+    })
+    .catch((err) => {
+      console.log(err)
+      process.exit(1)
+    })
+  } else {
+    const child = childProcess.spawn('bash', [this.scriptPath, filename, entryPoint, seconds, testsFolder])
+    watchChild(child, seconds, testsFolder)
+    res.send(seconds.toString())
+    res.end()
+  }
 }
 
 module.exports = ns

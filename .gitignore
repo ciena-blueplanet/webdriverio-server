@@ -5,8 +5,14 @@ vendor/
 screenshots/
 uploads/
 coverage/
+coverage-backend/
 dist/
 .DS_Store
 dump.rdb
 config.json
 npm-debug.log
+typings/
+build-*/
+test.tar.gz
+*.tar
+servers.json
