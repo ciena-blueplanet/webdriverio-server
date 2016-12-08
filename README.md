@@ -26,7 +26,7 @@ These instructions assume that you have set up a server (either Mac or Ubuntu) w
 ### Installation
 
     npm install -g webdriverio-server
-    webdriverio-server-init
+    ./node_modules/.bin/webdriverio-server-init
 
 The first line will install both the `webdriverio-server` and `webdriver-manager` alongside it. The second line will
 initialize the build environment for the `webriverio-server`.
