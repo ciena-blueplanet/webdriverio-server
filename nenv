@@ -1,0 +1,9 @@
+#!/bin/bash
+
+. /opt/node-envs/${NODE_VERSION}/bin/activate
+echo "DISPLAY = [$DISPLAY]"
+echo "node [$(node -v)]"
+echo "npm [$(npm -v)]"
+echo "npm registry [$(npm config get registry)]"
+echo "$@"
+$@

@@ -1,23 +1,23 @@
 'use strict'
 
+const debug = require('debug')('server')
 const express = require('express')
 const fs = require('fs')
 const path = require('path')
 const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
+const multer = require('multer')
 
 const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy
-const md5 = require('blueimp-md5')
 const session = require('express-session')
-const DeveloperHandler = require('../handlers/developers-handler')
 
 const app = express()
 
 const developers = require('../routes/developers')
 const auth = require('../routes/auth')
-const ip = require('../routes/ip')
+
+const processUpload = require('./process-upload')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -44,12 +44,24 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/developers', developers)
 app.use('/auth', auth)
-app.use('/', ip)
-app.use(express.static(path.join(__dirname, '..', '/dist')))
+app.use('/', express.static(path.join(__dirname, '..', '/dist')))
 
 // ==================================================================
 //                          The main method
 // ==================================================================
+
+app.use(multer({
+  dest: path.join(__dirname, '..', 'uploads'),
+  rename: function (fieldname, filename) {
+    return filename + '.' + Date.now()
+  },
+  onFileUploadStart: function () {
+    debug('client request is starting ...')
+  },
+  onFileUploadComplete: function (file) {
+    debug(file.fieldname + ' uploaded to  ' + file.path)
+  }
+}))
 
 app.get(/^\/status\/(\d+)$/, function (req, res) {
   const id = req.params[0]
@@ -62,6 +74,18 @@ app.get(/^\/status\/(\d+)$/, function (req, res) {
     }
     res.end()
   })
+})
+
+app.post('/', function (req, res) {
+  if (!req.headers) {
+    res.send('Error: Headers do not exist')
+    res.end()
+  } else {
+    const filename = req.files.tarball.name
+    const entryPoint = req.body['entry-point'] || 'demo'
+    const testsFolder = req.body['tests-folder'] || 'tests/e2e'
+    processUpload.newFile(filename, entryPoint, testsFolder, res)
+  }
 })
 
 // ==================================================================
@@ -83,29 +107,6 @@ app.get('/session', function (req, res) {
 //                        Login Authentication
 // ==================================================================
 
-passport.serializeUser((user, done) => {
-  done(null, user)
-})
-
-passport.deserializeUser(function (user, done) {
-  done(null, user)
-})
-
-passport.use(new LocalStrategy((username, password, done) => {
-  const req = {
-    query: {
-      username: md5(username),
-      token: md5(password)
-    }
-  }
-  DeveloperHandler.get(req).then((res) => {
-    return done(null, req.query.username)
-  })
-  .catch(() => {
-    return done(null, false)
-  })
-}))
-
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -126,10 +127,7 @@ const isAuthenticated = function (req, res, next) {
 app.get('/portal', isAuthenticated, (req, res) => {
 })
 
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/#/portal',
-  failureRedirect: '/#/login?failure=1'
-}), (req, res) => {
+app.post('/login', passport.authenticate('local', {successRedirect: '/#/portal', failureRedirect: '/#/login?failure=1'}), (req, res) => {
   res.redirect('/#/portal')
 })
 
@@ -138,13 +136,7 @@ app.post('/login', passport.authenticate('local', {
 // ==================================================================
 
 app.get('/auth/denied', (req, res) => {
-  let fileContents
-  try {
-    fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'info.json'))).rejectionReasons
-  } catch (e) {
-    console.error('info.json was not found')
-    res.send('An error has occured. Please contact the site admin. Please include this number: 404.')
-  }
+  let fileContents = JSON.parse(fs.readFileSync(path.join(__dirname, 'reasons.json')))
   if (!req.query || !req.query.reason) {
     res.send(fileContents[0])
   } else {
@@ -171,4 +163,3 @@ app.use(function (err, req, res) {
 })
 
 module.exports = app
-
