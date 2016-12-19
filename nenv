@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /opt/node-envs/${NODENV_VERSION}/bin/activate
+. /opt/node-envs/${NODE_VERSION}/bin/activate
 echo "DISPLAY = [$DISPLAY]"
 echo "node [$(node -v)]"
 echo "npm [$(npm -v)]"
