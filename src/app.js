@@ -9,13 +9,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 
-const DeveloperHandler = require('../handlers/developers-handler.js')
-
-const mongoose = require('mongoose')
 const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy
-const User = require('../models/user')
-const md5 = require('blueimp-md5')
 const session = require('express-session')
 
 const app = express()
@@ -87,23 +81,10 @@ app.post('/', function (req, res) {
     res.send('Error: Headers do not exist')
     res.end()
   } else {
-    const username = req.headers.username
-    const token = req.headers.token
-    const request = {
-      query: {
-        username,
-        token
-      }
-    }
-    DeveloperHandler.get(request).then(() => {
-      const filename = req.files.tarball.name
-      const entryPoint = req.body['entry-point'] || 'demo'
-      const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-      processUpload.newFile(filename, entryPoint, testsFolder, res)
-    }).catch((err) => {
-      res.send(err)
-      res.end()
-    })
+    const filename = req.files.tarball.name
+    const entryPoint = req.body['entry-point'] || 'demo'
+    const testsFolder = req.body['tests-folder'] || 'tests/e2e'
+    processUpload.newFile(filename, entryPoint, testsFolder, res)
   }
 })
 
@@ -125,29 +106,6 @@ app.get('/session', function (req, res) {
 // ==================================================================
 //                        Login Authentication
 // ==================================================================
-
-mongoose.connect('mongodb://localhost/authentication')
-passport.serializeUser((user, done) => {
-  done(null, user.id)
-})
-
-passport.deserializeUser(function (id, done) {
-  User.findById(id, (err, user) => {
-    done(err, user)
-  })
-})
-
-passport.use(new LocalStrategy((username, password, done) => {
-  User.findOne({ username: md5(username) }, (err, user) => {
-    if (err) {
-      return done(err)
-    }
-    if (!user || user.password !== md5(password)) {
-      return done(null, false)
-    }
-    return done(null, user)
-  })
-}))
 
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
