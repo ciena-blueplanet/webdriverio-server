@@ -21,7 +21,7 @@
     "jasmine": "^2.4.1",
     "protractor": "^2.1.0",
     "webdriver": "0.0.1",
-    "webdriver-manager": "7.0.1",
+    "webdriver-manager": "^10.0.0",
     "webdrivercss": "ciena-blueplanet/webdrivercss#v1.1.4.fork",
     "webdriverio": "^2.4.5"
   },

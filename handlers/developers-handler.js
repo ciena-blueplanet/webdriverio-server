@@ -1,4 +1,5 @@
 'use strict'
+// FIXME: This module should be removed
 /**
  * A Redis client for node.js
  * https://github.com/NodeRedis/node_redis
@@ -100,26 +101,7 @@ var DeveloperHandler = {
    * @returns {Promise} err - This function will always resolve with the err Object, since we are required to either resolve or reject the promise.
    */
   get: function (req, res) {
-    return new Promise((resolve, reject) => {
-      if (req.query.queryAll) {
-        this.client.keys('*', (err, keys) => {
-          getKeysResponse(err, res, keys)
-          resolve(keys)
-        })
-      } else {
-        this.client.get(req.query.username, (err, redisResp) => {
-          if (err) {
-            reject(err)
-          }
-          let response = getResponse(err, res, req, redisResp)
-          if (response.resolve || response.resolve === '') {
-            resolve(response.resolve)
-          } else {
-            reject(response.reject)
-          }
-        })
-      }
-    })
+    return true
   },
   /**
    * @param {Object} req - The request Object, containing the username and the token in the body
@@ -165,38 +147,6 @@ var DeveloperHandler = {
         })
       }
     })
-  }
-}
-
-function getKeysResponse (err, res, keys) {
-  if (err) {
-    DeveloperHandler.setErrorResponse(res, err, 404)
-  } else {
-    const pset = keys.map((item) => DeveloperHandler.getValue(item))
-    Promise.all(pset).then((value) => {
-      DeveloperHandler.setStandardKeysResponse(res, value)
-    }).catch((reason) => {
-      DeveloperHandler.setErrorResponse(res, reason, 404)
-    })
-  }
-}
-
-function getResponse (err, res, req, redisResp) {
-  if (err) {
-    DeveloperHandler.setErrorResponse(res, err, 404)
-    return {reject: err}
-  } else if (redisResp === null) {
-    DeveloperHandler.setErrorResponse(res, 'The username provided does not match any username. ' +
-                                           'Please make sure that you are signed up as an authorized ' +
-                                           'ciena developer on www.cienadevelopers.com', 500)
-    return {reject: 'This username does not exist: ' + req.query.username}
-  } else if (req.query.token === '' || req.query.token === redisResp) {
-    DeveloperHandler.setStandardResponse(res, req.query.username, redisResp)
-    return {resolve: req.query.token}
-  } else {
-    DeveloperHandler.setErrorResponse(res, `The token submitted does
-       not match the token returned.`, 500)
-    return {reject: 'The token submitted does not match the token returned.'}
   }
 }
 

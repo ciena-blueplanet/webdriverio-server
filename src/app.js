@@ -95,21 +95,15 @@ app.post('/', function (req, res) {
         token
       }
     }
-    if (!username || !token) {
-      res.send(`Your config.json file must contain a valid username and token.\n
-      Please visit wdio.bp.cyaninc.com to sign up to become an authorized third party developer for Ciena.`)
+    DeveloperHandler.get(request).then(() => {
+      const filename = req.files.tarball.name
+      const entryPoint = req.body['entry-point'] || 'demo'
+      const testsFolder = req.body['tests-folder'] || 'tests/e2e'
+      processUpload.newFile(filename, entryPoint, testsFolder, res)
+    }).catch((err) => {
+      res.send(err)
       res.end()
-    } else {
-      DeveloperHandler.get(request).then(() => {
-        const filename = req.files.tarball.name
-        const entryPoint = req.body['entry-point'] || 'demo'
-        const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-        processUpload.newFile(filename, entryPoint, testsFolder, res)
-      }).catch((err) => {
-        res.send(err)
-        res.end()
-      })
-    }
+    })
   }
 })
 

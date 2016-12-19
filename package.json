@@ -63,7 +63,6 @@
     "multer": "^0.1.8",
     "oauth": "^0.9.14",
     "q": "^1.4.1",
-    "redis": "^2.6.1",
     "passport": "^0.2.1",
     "passport-local": "^1.0.0",
     "serve-favicon": "~2.2.0"
