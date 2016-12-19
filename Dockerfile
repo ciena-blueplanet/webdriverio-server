@@ -42,7 +42,7 @@ RUN service xvfb start
 #  Java  #
 ##########
 
-ENV JAVA_URL http://download.oracle.com/otn-pub/java/jdk/8u65-b17/jdk-8u65-linux-x64.tar.gz
+ENV JAVA_URL=http://download.oracle.com/otn-pub/java/jdk/8u65-b17/jdk-8u65-linux-x64.tar.gz
 RUN mkdir -p /usr/lib/jvm
 RUN wget --no-check-certificate --quiet --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" $JAVA_URL
 RUN tar -zxf jdk-8u65-linux-x64.tar.gz -C /usr/lib/jvm
@@ -65,9 +65,9 @@ RUN service nginx reload
 #                            Install Node                             #
 #######################################################################
 
-ENV NODE_VERSION 6.9.2
-ENV ENV_DIR /.ci-env
-ENV DISPLAY :0
+ENV NODE_VERSION=6.9.2 \
+ ENV_DIR=/.ci-env \
+ DISPLAY=:0
 
 RUN mkdir /opt/node-envs
 RUN pip install nodeenv
@@ -81,6 +81,7 @@ RUN nenv npm install bower -g
 RUN nenv npm install -g webdriverio-server
 RUN nenv webdriverio-server-init
 
-ENV PORT 3001
-ENV DEBUG server
+ENV PORT=3001 \
+ DEBUG=server
+
 CMD nenv webdriverio-server
