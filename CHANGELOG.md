@@ -1,3 +1,6 @@
+# 3.0.1
+When running webdriverio-server in a docker container, we need to have NENV environment variable set.
+
 # 3.0.0
 A lot of the client-side functionality we didn't end up using and we were wasting resources trying to maintain it. Therefore, let's pull it out and focus on the core use-case of webdriverio-server
 
