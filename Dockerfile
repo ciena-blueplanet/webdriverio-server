@@ -17,6 +17,7 @@ RUN apt-get install -y \
     nginx \
     python-pip \
     unzip \
+    lsof \
     wget \
     tmux
 
@@ -66,22 +67,34 @@ RUN service nginx reload
 #######################################################################
 
 ENV NODE_VERSION=6.9.2 \
- ENV_DIR=/.ci-env \
+ NENV=nenv \
  DISPLAY=:0
 
 RUN mkdir /opt/node-envs
 RUN pip install nodeenv
 RUN nodeenv -n $NODE_VERSION /opt/node-envs/$NODE_VERSION
 
-COPY nenv /usr/local/bin/nenv
-RUN chmod +x /usr/local/bin/nenv
+COPY $NENV /usr/local/bin/$NENV
+RUN chmod +x /usr/local/bin/$NENV
 # COPY npmrc ~/.npmrc
 
-RUN nenv npm install bower -g
-RUN nenv npm install -g webdriverio-server
-RUN nenv webdriverio-server-init
+RUN $NENV npm install bower -g
+
+########################################
+#  install or copy webdriverio-server  #
+########################################
+
+RUN $NENV npm install -g webdriverio-server
+# RUN mkdir /opt/node-envs/$NODE_VERSION/lib/node_modules/npm/node_modules/webdriverio-server
+# COPY . /opt/node-envs/$NODE_VERSION/lib/node_modules/npm/node_modules/webdriverio-server
+# RUN ln -s /opt/node-envs/$NODE_VERSION/lib/node_modules/npm/node_modules/webdriverio-server/scripts/init.sh /opt/node-envs/$NODE_VERSION/bin/webdriverio-server-init
+# RUN chmod a+x /opt/node-envs/$NODE_VERSION/bin/webdriverio-server-init
+
+RUN $NENV webdriverio-server-init
 
 ENV PORT=3001 \
  DEBUG=server
 
-CMD nenv webdriverio-server
+EXPOSE 3001
+CMD $NENV webdriverio-server
+#CMD bash

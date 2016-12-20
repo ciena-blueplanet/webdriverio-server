@@ -35,6 +35,7 @@ echo '-INPUT VARIABLES---------------'
 echo tarball: $TARBALL
 echo entry-point: $ENTRY_POINT
 echo timestamp: $TIMESTAMP
+echo nenv: $NENV
 echo '-------------------------------'
 
 
@@ -66,16 +67,16 @@ function testIt {
   kill $(lsof -t -i:$HTTP_PORT) 2>/dev/null || echo ''
   CURRENT_DIR=`pwd`
   cd $ENTRY_POINT
-  $CURRENT_DIR/node_modules/.bin/http-server -s -c-1 -p $HTTP_PORT &
+  $NENV $CURRENT_DIR/node_modules/.bin/http-server -s -c-1 -p $HTTP_PORT &
   waitForPort $HTTP_PORT
   cd $CURRENT_DIR
 
   SELENIUM_PORT=$(getOpenPort)
   kill $(lsof -t -i:$SELENIUM_PORT) 2>/dev/null || echo ''
-  ./node_modules/.bin/webdriver-manager start --seleniumPort $SELENIUM_PORT > /dev/null 2>&1 &
+  $NENV ./node_modules/.bin/webdriver-manager start --seleniumPort $SELENIUM_PORT > /dev/null 2>&1 &
   waitForPort $SELENIUM_PORT
 
-  ../bin/replace.js $TEST_CONFIG \
+  $NENV ../bin/replace.js $TEST_CONFIG \
       selenium.host:localhost \
       selenium.port:$SELENIUM_PORT \
       http.host:localhost \
@@ -85,7 +86,7 @@ function testIt {
   echo "Running jasmine tests with http port $HTTP_PORT and selenium port $SELENIUM_PORT"
   echo
   TEST_STATUS=0
-  ./node_modules/.bin/jasmine JASMINE_CONFIG_PATH=${NODE_SPECS}/jasmine.json || TEST_STATUS=1
+  $NENV ./node_modules/.bin/jasmine JASMINE_CONFIG_PATH=${NODE_SPECS}/jasmine.json || TEST_STATUS=1
 
   kill $(lsof -t -i:$HTTP_PORT) || echo 'ERROR killing http-server'
   kill $(lsof -t -i:$SELENIUM_PORT) || echo 'ERROR killing selenium server'
