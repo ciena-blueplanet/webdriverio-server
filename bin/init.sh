@@ -1,7 +1,8 @@
 #!/bin/bash
 
 if [ "$1" = "docker" ]; then
-  docker build -t webdriverio-server .
+  DIRECTORY=$(dirname $(dirname $0)/$(readlink $0))/../
+  docker build -t webdriverio-server $DIRECTORY
 else
   # =================================================================================================================
   # Begin snippet taken from http://stackoverflow.com/a/246128 to figure out where the script lives
