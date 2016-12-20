@@ -32,12 +32,16 @@ RUN apt-get install -y \
 RUN sh -c 'curl -sL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
 RUN sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
 RUN apt-get update
-RUN apt-get install -y xvfb firefox google-chrome-stable
+RUN apt-get install -y xvfb google-chrome-stable
 RUN apt-get clean
+# Version 35 is all that works with Selenium!
+# See https://github.com/SeleniumHQ/selenium/issues/1915
+RUN wget sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_35.0.1-0ubuntu1_amd64.deb
+RUN dpkg -i firefox-mozilla-build_35.0.1-0ubuntu1_amd64.deb
 
 COPY xvfb.service /etc/init.d/xvfb
 RUN chmod +x /etc/init.d/xvfb
-RUN service xvfb start
+RUN /etc/init.d/xvfb start
 
 ##########
 #  Java  #
@@ -57,9 +61,9 @@ RUN chmod a+x /usr/bin/java /usr/bin/javac /usr/bin/javaws
 #  Nginx  #
 ###########
 
-RUN cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.default
-COPY nginx.conf /etc/nginx/nginx.conf
-RUN service nginx reload
+# RUN cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.default
+# COPY nginx.conf /etc/nginx/nginx.conf
+# RUN service nginx reload
 
 
 #######################################################################
@@ -76,7 +80,6 @@ RUN nodeenv -n $NODE_VERSION /opt/node-envs/$NODE_VERSION
 
 COPY $NENV /usr/local/bin/$NENV
 RUN chmod +x /usr/local/bin/$NENV
-# COPY npmrc ~/.npmrc
 
 RUN $NENV npm install bower -g
 
@@ -95,6 +98,12 @@ RUN $NENV webdriverio-server-init
 ENV PORT=3001 \
  DEBUG=server
 
+RUN apt-get install -y vim
+
 EXPOSE 3001
+# EXPOSE 4444
+# EXPOSE 8080
+# EXPOSE 80
+
 CMD $NENV webdriverio-server
 #CMD bash
