@@ -23,4 +23,4 @@ mkdir -p screenshots
 
 cd build
 npm install
-./node_modules/.bin/webdriver-manager update --standalone
+$NENV ./node_modules/.bin/webdriver-manager update --standalone
