@@ -41,7 +41,6 @@ RUN dpkg -i firefox-mozilla-build_35.0.1-0ubuntu1_amd64.deb
 
 COPY xvfb.service /etc/init.d/xvfb
 RUN chmod +x /etc/init.d/xvfb
-RUN /etc/init.d/xvfb start
 
 ##########
 #  Java  #
@@ -98,12 +97,10 @@ RUN $NENV webdriverio-server-init
 ENV PORT=3001 \
  DEBUG=server
 
-RUN apt-get install -y vim
-
 EXPOSE 3001
 # EXPOSE 4444
 # EXPOSE 8080
 # EXPOSE 80
 
-CMD $NENV webdriverio-server
+CMD ["sh", "-c", "service xvfb start; $NENV webdriverio-server"]
 #CMD bash
