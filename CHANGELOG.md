@@ -1,3 +1,6 @@
+# 3.0.3
+now `webdriverio-server-init docker` should work when webdriverio-server is installed globally.
+
 # 3.0.2
 - Finished the process of removing the UI
 - Added better documentation for how to set up the docker system
