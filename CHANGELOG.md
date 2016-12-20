@@ -1,3 +1,7 @@
+# 3.0.2
+- Finished the process of removing the UI
+- Added better documentation for how to set up the docker system
+
 # 3.0.1
 When running webdriverio-server in a docker container, we need to have NENV environment variable set.
 
