@@ -5,79 +5,86 @@
 
 If you want a remote server to do selenium testing, this is a better way
 
+## Terminology
+
+**Canonical screen-shot:** Producing screen-shots that can be compared between different
+computers can be quite difficult. Often subtle differences in systems, such as what fonts are 
+installed can result in widely varying screen-shots. Therefore the *right thing to do* when using 
+`webdrivercss` is to have a **known-good** system to produce all screen-shots. One approach to this 
+is to set up `webdriverio-server` on a dedicated server somewhere and have `webdriverio-client` send 
+all requests for selenium tests to that machine. Another approach is to use a system that can 
+consistently produce the same machine each time (e.g. using Docker). This way developers can each 
+have their own independent systems for running tests which are identical to each other and to the 
+CI system.
+
+**Test server:** There will be a dedicated server process that can either run locally or on another machine 
+for the purposes of getting testing requests, processing them, and sending back results.
+
 ## Setup
 
-Setting up a new server for selenium testing requires
+There are two use-cases for implementing webdriverio-server:
 
-1. Prerequisites
-1. Installation
-1. Starting the webdriverio-server node process
+1. Running tests on a laptop (Mac OS/X) in order to watch the progress and to visually inspect how a test is executing. Note that this will *not* produce canonical screenshots that can be used across a team.
 
-### Prerequisites
+1. Running tests for the purpose of creating canonical screen-shots that can be checked in as part of a pull-request.
 
-These instructions assume that you have set up a server (either Mac or Ubuntu) with the following:
+### Installing on OS/X
+
+Install the following dependencies:
 
 - [NodeJS >= 5.3 (including NPM)](https://github.com/creationix/nvm)
 - [Dependencies](https://github.com/webdriverio/webdrivercss) of webdrivercss
-- Java runtime environment (ubuntu: `sudo apt-get install -y openjdk-7-jre`)
+- Java
 - Chrome web browser installed
 
-### Installation
+Next install webdriverio-server and run the init script:
 
-    npm install -g webdriverio-server
-    webdriverio-server-init
-
-The first line will install both the `webdriverio-server` and `webdriver-manager` alongside it. The second line will
-initialize the build environment for the `webriverio-server`.
-
-### Setting up the server
-
-To setup the server, refer to SETUP.md.
-
-This will configure a new system capable of running `webdriverio-server` using `xvfb` to allow headless execution of
-the Chrome browser to capture screenshots.
-
-### Starting the webdriver-io server node process
+```bash
+npm install -g webdriverio-server
+webdriverio-server-init local
+```
 
 Now you're ready to run the web service which will respond to test-upload requests:
 
-    webdriverio-server
+```bash
+DEBUG=server PORT=3000 webdriverio-server
+```
 
-If you'd like to override the port being listened to, or perhaps get some verbose debugging output, you can turn
-those on using environment variables
+In this case, you'll be sending test requests to localhost on port 3000.
 
-    PORT=3001 DEBUG=server webdriverio-server
+### Installing on Docker
 
-### Running the webdriverio-server on your localhost
+If you want to share screenshots between developers, you'll need to set up a testing system that 
+produces 100% consistent images. This can be done by doing the above steps on a dedicated server 
+or by setting up a Docker system on developer systems and the CI system. The canonical setup requires 
+that you have Docker installed with appropriate permissions for running user.
 
-1. First install [Graphics Magick](http://www.graphicsmagick.org/README.html). It is a critical dependency for screenshot processing.
-2. Next, fork and clone the webdriverio-server code from the ciena-blueplanet repository and make any changes.
-3. If you are not already in the top level of the webdriverio-server directory, go there (cd webdriverio-server)
-4. Once you have made satisfactory changes or you just want to run the server on your localhost, download a project that utilizes e2e tests (see below for examples on using the server)
-5. Run ```npm start``` on the webdriverio-server code
-6. If you are running a project that is already configured to run e2e tests, you can run those now. If not, configure your project 
-using the (webdriverio-client)[https://github.com/ciena-blueplanet/webdriverio-client] package. Instructions on configuring your project to run e2e tests can 
-be found in the README.md in the webdriverio-client repo on GitHub
+```bash
+npm install -g webdriverio-server
+webdriverio-server-init docker
+```
 
+To start the testing server, use the run command:
+
+```bash
+$ docker run -Pd webdriverio-server
+34a841cb50a0555e40060367c862d50f823c0edcd0a2fe6537b5666f7588e73d
+```
+
+To stop the test container, run `docker stop` with the image id that docker provided, e.g.
+
+```bash
+$ docker stop 34a841cb50a0555e40060367c862d50f823c0edcd0a2fe6537b5666f7588e73d
+34a841cb50a0555e40060367c862d50f823c0edcd0a2fe6537b5666f7588e73d
+```
+
+In this case, you'll be sending test requests to the docker server. Note that docker maps ports on the container 
+to random ports on the host machine. To find out what ports 
 
 ## Using the server
 
-The best way to use the server is to utilize the [webdriverio-client](https://github.com/ciena-blueplanet/webdriverio-client) to make test requests.
+Now that you have a running webdriverio-server, you need to be able to submit tests to it. This is not a trivial 
+procedure. You will need to set up your testing directory properly and to submit a tarball to the server with your 
+entire site in it, packaged up properly with the existing screenshots, if applicable.
 
-For an example usage of the client, take a look at [ember-frost-checkbox](https://github.com/ciena-frost/ember-frost-checkbox.git)
-
-# Running the Front End Application
-
-    cd webdriverio-app
-    npm install
-    npm start
-
-Navigate to localhost:4200 to view the current version of the website
-
-# Frequently Asked Questions
-
-#### Communication Diagrams
-![Use Case 1](https://github.com/pastorsj/webdriverio-server/blob/webdriverio-app/resources/UseCase1.png)
-
-![Use Case 2](https://github.com/pastorsj/webdriverio-server/blob/webdriverio-app/resources/UseCase2.png)
-
+To make this easier, utilize the [webdriverio-client](https://github.com/ciena-blueplanet/webdriverio-client) to make test requests.
