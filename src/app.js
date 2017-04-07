@@ -84,7 +84,9 @@ app.post('/', function (req, res) {
     const filename = req.files.tarball.name
     const entryPoint = req.body['entry-point'] || 'demo'
     const testsFolder = req.body['tests-folder'] || 'tests/e2e'
-    processUpload.newFile(filename, entryPoint, testsFolder, res)
+    const serverCommandInput = req.body['custom-server-command'] || ''
+    const customServerCommand = decodeURIComponent(serverCommandInput)
+    processUpload.newFile(filename, entryPoint, testsFolder, customServerCommand, res)
   }
 })
 

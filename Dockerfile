@@ -56,14 +56,6 @@ RUN update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk1.8.
 RUN update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1.8.0_65/bin/javaws" 1
 RUN chmod a+x /usr/bin/java /usr/bin/javac /usr/bin/javaws
 
-###########
-#  Nginx  #
-###########
-
-# RUN cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.default
-# COPY nginx.conf /etc/nginx/nginx.conf
-# RUN service nginx reload
-
 
 #######################################################################
 #                            Install Node                             #
@@ -80,27 +72,19 @@ RUN nodeenv -n $NODE_VERSION /opt/node-envs/$NODE_VERSION
 COPY $NENV /usr/local/bin/$NENV
 RUN chmod +x /usr/local/bin/$NENV
 
-RUN $NENV npm install bower -g
+RUN $NENV npm install webdriver-manager -g
 
 ########################################
 #  install or copy webdriverio-server  #
 ########################################
 
-RUN $NENV npm install -g webdriverio-server
-# RUN mkdir /opt/node-envs/$NODE_VERSION/lib/node_modules/npm/node_modules/webdriverio-server
-# COPY . /opt/node-envs/$NODE_VERSION/lib/node_modules/npm/node_modules/webdriverio-server
-# RUN ln -s /opt/node-envs/$NODE_VERSION/lib/node_modules/npm/node_modules/webdriverio-server/scripts/init.sh /opt/node-envs/$NODE_VERSION/bin/webdriverio-server-init
-# RUN chmod a+x /opt/node-envs/$NODE_VERSION/bin/webdriverio-server-init
+# This installs selenium
 
-RUN $NENV webdriverio-server-init
+RUN $NENV webdriver-manager update
 
-ENV PORT=3001 \
- DEBUG=server
+RUN apt-get install -y fonts-roboto
 
-EXPOSE 3001
-# EXPOSE 4444
-# EXPOSE 8080
-# EXPOSE 80
+EXPOSE 4444
 
-CMD ["sh", "-c", "service xvfb start; $NENV webdriverio-server"]
+CMD ["sh", "-c", "service xvfb start; $NENV webdriver-manager start"]
 #CMD bash
